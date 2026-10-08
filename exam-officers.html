@@ -1,0 +1,3988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Exam Officers | ALMAFAAZ ACADEMY</title>
+
+  <meta
+    name="description"
+    content="Exam Officer Management — ALMAFAAZ ACADEMY"
+  />
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --blue-950: #071426;
+      --blue-900: #0b1d35;
+      --blue-850: #102945;
+      --blue-800: #12345a;
+      --blue-700: #174b7e;
+      --blue-600: #1d629e;
+
+      --orange: #ff7a00;
+      --orange-dark: #d95f00;
+      --orange-soft: #fff1e4;
+
+      --white: #ffffff;
+      --surface: #f5f7fa;
+      --surface-2: #eef2f6;
+      --border: #dfe5ec;
+      --text: #132238;
+      --muted: #68778b;
+
+      --green: #138a55;
+      --green-soft: #e7f7ef;
+
+      --red: #c73535;
+      --red-soft: #fdecec;
+
+      --yellow: #a66a00;
+      --yellow-soft: #fff5d9;
+
+      --shadow-sm: 0 5px 18px rgba(10, 32, 58, 0.07);
+      --shadow-md: 0 15px 40px rgba(10, 32, 58, 0.12);
+      --shadow-lg: 0 25px 70px rgba(4, 19, 38, 0.20);
+
+      --radius-sm: 9px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(
+          circle at 8% 0%,
+          rgba(255, 122, 0, 0.08),
+          transparent 27%
+        ),
+        radial-gradient(
+          circle at 90% 12%,
+          rgba(29, 98, 158, 0.08),
+          transparent 28%
+        ),
+        var(--surface);
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* =========================================================
+       BOOT
+    ========================================================= */
+
+    #bootScreen {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(
+          circle at 50% 20%,
+          rgba(255, 122, 0, 0.12),
+          transparent 32%
+        ),
+        var(--blue-950);
+      color: white;
+    }
+
+    .boot-box {
+      width: min(420px, calc(100% - 32px));
+      padding: 34px;
+      text-align: center;
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 22px;
+      background: rgba(255,255,255,.05);
+      backdrop-filter: blur(18px);
+    }
+
+    .boot-logo {
+      width: 82px;
+      height: 82px;
+      object-fit: contain;
+      margin-bottom: 20px;
+      border-radius: 18px;
+    }
+
+    .loader {
+      width: 38px;
+      height: 38px;
+      margin: 20px auto 0;
+      border: 3px solid rgba(255,255,255,.16);
+      border-top-color: var(--orange);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* =========================================================
+       APP
+    ========================================================= */
+
+    #app {
+      min-height: 100vh;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      min-height: 76px;
+      background: rgba(7, 20, 38, .96);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      box-shadow: 0 8px 25px rgba(0,0,0,.15);
+      backdrop-filter: blur(18px);
+    }
+
+    .topbar-inner {
+      width: min(1500px, calc(100% - 32px));
+      min-height: 76px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand-area {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      min-width: 0;
+    }
+
+    .back-button {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      color: white;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 11px;
+      transition: .2s ease;
+    }
+
+    .back-button:hover {
+      background: rgba(255,122,0,.18);
+      border-color: rgba(255,122,0,.35);
+      transform: translateX(-2px);
+    }
+
+    .brand-logo {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+      border-radius: 10px;
+      background: white;
+      padding: 4px;
+    }
+
+    .brand-text {
+      min-width: 0;
+    }
+
+    .brand-title {
+      color: white;
+      font-weight: 800;
+      font-size: 15px;
+      letter-spacing: .2px;
+      white-space: nowrap;
+    }
+
+    .brand-subtitle {
+      margin-top: 2px;
+      color: rgba(255,255,255,.57);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .top-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 11px;
+      color: white;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 12px;
+    }
+
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      background: var(--orange);
+      color: white;
+      border-radius: 9px;
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    .user-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .user-name {
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .user-role {
+      font-size: 10px;
+      color: rgba(255,255,255,.55);
+    }
+
+    .logout-button {
+      height: 42px;
+      padding: 0 15px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: white;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 11px;
+      transition: .2s ease;
+    }
+
+    .logout-button:hover {
+      background: rgba(199,53,53,.2);
+      border-color: rgba(255,100,100,.3);
+    }
+
+    /* =========================================================
+       MAIN
+    ========================================================= */
+
+    .main {
+      width: min(1500px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 34px 0 60px;
+    }
+
+    .page-heading {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 25px;
+      margin-bottom: 28px;
+    }
+
+    .heading-copy {
+      max-width: 780px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--orange-dark);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.3px;
+      margin-bottom: 8px;
+    }
+
+    .eyebrow-line {
+      width: 26px;
+      height: 2px;
+      background: var(--orange);
+      border-radius: 2px;
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--blue-950);
+      font-size: clamp(28px, 4vw, 42px);
+      line-height: 1.05;
+      letter-spacing: -1.2px;
+    }
+
+    .heading-description {
+      margin: 10px 0 0;
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 14px;
+    }
+
+    .add-button {
+      height: 48px;
+      padding: 0 19px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      color: white;
+      background: linear-gradient(135deg, var(--orange), #ff8d24);
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(255,122,0,.22);
+      font-weight: 800;
+      transition: .2s ease;
+      white-space: nowrap;
+    }
+
+    .add-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 32px rgba(255,122,0,.28);
+    }
+
+    /* =========================================================
+       STATS
+    ========================================================= */
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 15px;
+      margin-bottom: 22px;
+    }
+
+    .stat-card {
+      position: relative;
+      overflow: hidden;
+      padding: 20px;
+      min-height: 120px;
+      background: rgba(255,255,255,.76);
+      border: 1px solid rgba(220,227,235,.9);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      backdrop-filter: blur(12px);
+    }
+
+    .stat-card::after {
+      content: "";
+      position: absolute;
+      width: 90px;
+      height: 90px;
+      right: -30px;
+      bottom: -45px;
+      border-radius: 50%;
+      background: rgba(255,122,0,.08);
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+    }
+
+    .stat-value {
+      margin-top: 10px;
+      color: var(--blue-950);
+      font-size: 29px;
+      font-weight: 850;
+      letter-spacing: -.8px;
+    }
+
+    .stat-note {
+      margin-top: 3px;
+      color: #8190a2;
+      font-size: 11px;
+    }
+
+    /* =========================================================
+       WORKSPACE
+    ========================================================= */
+
+    .workspace {
+      background: rgba(255,255,255,.78);
+      border: 1px solid rgba(220,227,235,.95);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+      backdrop-filter: blur(18px);
+    }
+
+    .toolbar {
+      padding: 17px;
+      border-bottom: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: minmax(220px, 1fr) 170px 170px 170px auto;
+      gap: 10px;
+      background: rgba(249,251,253,.84);
+    }
+
+    .field {
+      position: relative;
+    }
+
+    .field-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #8491a2;
+      pointer-events: none;
+    }
+
+    .input,
+    .select,
+    .textarea {
+      width: 100%;
+      color: var(--text);
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      outline: none;
+      transition: .18s ease;
+    }
+
+    .input,
+    .select {
+      height: 43px;
+      padding: 0 12px;
+    }
+
+    .input.with-icon {
+      padding-left: 38px;
+    }
+
+    .textarea {
+      min-height: 105px;
+      resize: vertical;
+      padding: 12px;
+    }
+
+    .input:focus,
+    .select:focus,
+    .textarea:focus {
+      border-color: rgba(255,122,0,.75);
+      box-shadow: 0 0 0 3px rgba(255,122,0,.10);
+    }
+
+    .refresh-button {
+      width: 43px;
+      height: 43px;
+      display: grid;
+      place-items: center;
+      color: var(--blue-800);
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      transition: .18s ease;
+    }
+
+    .refresh-button:hover {
+      border-color: var(--orange);
+      color: var(--orange-dark);
+      transform: rotate(12deg);
+    }
+
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      min-width: 1050px;
+      border-collapse: collapse;
+    }
+
+    th {
+      padding: 14px 17px;
+      text-align: left;
+      color: #718096;
+      background: #f9fafc;
+      border-bottom: 1px solid var(--border);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .75px;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 15px 17px;
+      border-bottom: 1px solid #edf0f4;
+      vertical-align: middle;
+      font-size: 13px;
+    }
+
+    tbody tr {
+      transition: .15s ease;
+    }
+
+    tbody tr:hover {
+      background: rgba(255,122,0,.025);
+    }
+
+    .officer-cell {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      min-width: 230px;
+    }
+
+    .officer-avatar {
+      width: 40px;
+      height: 40px;
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      color: white;
+      background: linear-gradient(145deg, var(--blue-800), var(--blue-600));
+      border-radius: 11px;
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    .officer-name {
+      color: var(--blue-950);
+      font-weight: 800;
+    }
+
+    .officer-code {
+      margin-top: 3px;
+      color: #8794a5;
+      font-size: 10px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 25px;
+      padding: 0 9px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .badge-active {
+      color: var(--green);
+      background: var(--green-soft);
+    }
+
+    .badge-leave {
+      color: var(--yellow);
+      background: var(--yellow-soft);
+    }
+
+    .badge-suspended {
+      color: var(--red);
+      background: var(--red-soft);
+    }
+
+    .badge-inactive {
+      color: #68778b;
+      background: #edf1f5;
+    }
+
+    .badge-archived {
+      color: #6d5d75;
+      background: #f1eaf3;
+    }
+
+    .action-group {
+      display: flex;
+      justify-content: flex-end;
+      gap: 6px;
+    }
+
+    .action-button {
+      height: 33px;
+      padding: 0 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--blue-800);
+      font-size: 11px;
+      font-weight: 750;
+      transition: .15s ease;
+      white-space: nowrap;
+    }
+
+    .action-button:hover {
+      border-color: #bfc9d5;
+      background: #f7f9fb;
+    }
+
+    .action-button.primary:hover {
+      color: var(--orange-dark);
+      border-color: rgba(255,122,0,.4);
+      background: var(--orange-soft);
+    }
+
+    .action-button.danger:hover {
+      color: var(--red);
+      border-color: #f1bcbc;
+      background: var(--red-soft);
+    }
+
+    .action-button.success:hover {
+      color: var(--green);
+      border-color: #a9dfc5;
+      background: var(--green-soft);
+    }
+
+    /* =========================================================
+       MOBILE CARDS
+    ========================================================= */
+
+    .mobile-list {
+      display: none;
+      padding: 14px;
+      gap: 12px;
+    }
+
+    .mobile-card {
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      background: white;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .mobile-card-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .mobile-officer {
+      display: flex;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .mobile-meta {
+      margin-top: 13px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .meta-item small {
+      display: block;
+      margin-bottom: 3px;
+      color: #8b98a8;
+      font-size: 9px;
+      text-transform: uppercase;
+      font-weight: 800;
+      letter-spacing: .5px;
+    }
+
+    .meta-item span {
+      display: block;
+      color: var(--text);
+      font-size: 12px;
+      word-break: break-word;
+    }
+
+    .mobile-actions {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 7px;
+      margin-top: 14px;
+    }
+
+    .mobile-actions .action-button {
+      justify-content: center;
+    }
+
+    /* =========================================================
+       EMPTY / LOADING
+    ========================================================= */
+
+    .state {
+      padding: 60px 25px;
+      text-align: center;
+    }
+
+    .state-title {
+      color: var(--blue-950);
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .state-text {
+      max-width: 500px;
+      margin: 8px auto 0;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 13px;
+    }
+
+    .state-loader {
+      width: 30px;
+      height: 30px;
+      margin: 0 auto 15px;
+      border: 3px solid #e7ebf0;
+      border-top-color: var(--orange);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+
+    /* =========================================================
+       MODAL
+    ========================================================= */
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(4, 15, 29, .68);
+      backdrop-filter: blur(7px);
+    }
+
+    .modal {
+      width: min(760px, 100%);
+      max-height: min(900px, calc(100vh - 40px));
+      overflow: auto;
+      background: white;
+      border: 1px solid rgba(255,255,255,.5);
+      border-radius: 20px;
+      box-shadow: var(--shadow-lg);
+      animation: modalIn .18s ease-out;
+    }
+
+    .modal.small {
+      width: min(520px, 100%);
+    }
+
+    @keyframes modalIn {
+      from {
+        opacity: 0;
+        transform: translateY(12px) scale(.985);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .modal-header {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      padding: 19px 21px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      background: rgba(255,255,255,.96);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(10px);
+    }
+
+    .modal-title {
+      margin: 0;
+      color: var(--blue-950);
+      font-size: 20px;
+      font-weight: 850;
+    }
+
+    .modal-description {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .close-button {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      color: #68778b;
+      background: #f3f5f7;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      flex: 0 0 auto;
+    }
+
+    .close-button:hover {
+      color: var(--red);
+      background: var(--red-soft);
+    }
+
+    .modal-body {
+      padding: 22px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .form-group {
+      min-width: 0;
+    }
+
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 7px;
+      color: #3c4b5f;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .required {
+      color: var(--orange-dark);
+    }
+
+    .modal-footer {
+      padding: 15px 21px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 9px;
+      border-top: 1px solid var(--border);
+      background: #fafbfc;
+    }
+
+    .secondary-button,
+    .primary-button,
+    .danger-button {
+      min-height: 42px;
+      padding: 0 16px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .secondary-button {
+      color: var(--blue-800);
+      background: white;
+      border: 1px solid var(--border);
+    }
+
+    .primary-button {
+      color: white;
+      background: var(--orange);
+      border: 1px solid var(--orange);
+    }
+
+    .danger-button {
+      color: white;
+      background: var(--red);
+      border: 1px solid var(--red);
+    }
+
+    .detail-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding-bottom: 20px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .detail-avatar {
+      width: 62px;
+      height: 62px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      color: white;
+      background: linear-gradient(145deg, var(--blue-800), var(--blue-600));
+      border-radius: 16px;
+      font-size: 20px;
+      font-weight: 850;
+    }
+
+    .detail-name {
+      color: var(--blue-950);
+      font-size: 20px;
+      font-weight: 850;
+    }
+
+    .detail-code {
+      margin-top: 4px;
+      color: #8390a1;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 11px;
+    }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 13px;
+    }
+
+    .detail-item {
+      padding: 13px;
+      background: #f7f9fb;
+      border: 1px solid #e9edf1;
+      border-radius: 11px;
+    }
+
+    .detail-item.full {
+      grid-column: 1 / -1;
+    }
+
+    .detail-item-label {
+      margin-bottom: 5px;
+      color: #8491a2;
+      font-size: 9px;
+      text-transform: uppercase;
+      font-weight: 800;
+      letter-spacing: .7px;
+    }
+
+    .detail-item-value {
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 650;
+      word-break: break-word;
+      line-height: 1.5;
+    }
+
+    /* =========================================================
+       TOAST
+    ========================================================= */
+
+    #toastContainer {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 1000;
+      width: min(390px, calc(100% - 40px));
+      display: grid;
+      gap: 9px;
+    }
+
+    .toast {
+      padding: 13px 15px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      color: white;
+      background: rgba(8,25,45,.96);
+      border: 1px solid rgba(255,255,255,.1);
+      border-left: 4px solid var(--orange);
+      border-radius: 11px;
+      box-shadow: var(--shadow-lg);
+      animation: toastIn .2s ease-out;
+    }
+
+    .toast.success {
+      border-left-color: var(--green);
+    }
+
+    .toast.error {
+      border-left-color: var(--red);
+    }
+
+    .toast-title {
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .toast-message {
+      margin-top: 2px;
+      color: rgba(255,255,255,.7);
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
+    @keyframes toastIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* =========================================================
+       FOOTER
+    ========================================================= */
+
+    footer {
+      padding: 30px 0 35px;
+      background: var(--blue-950);
+      border-top: 1px solid rgba(255,255,255,.06);
+      color: white;
+    }
+
+    .footer-inner {
+      width: min(1500px, calc(100% - 32px));
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .footer-title {
+      font-weight: 850;
+      font-size: 13px;
+      letter-spacing: .4px;
+    }
+
+    .footer-copy {
+      margin-top: 4px;
+      color: rgba(255,255,255,.48);
+      font-size: 10px;
+    }
+
+    .footer-powered {
+      color: rgba(255,255,255,.62);
+      font-size: 11px;
+      text-align: right;
+    }
+
+    .footer-powered strong {
+      color: var(--orange);
+    }
+
+    /* =========================================================
+       RESPONSIVE
+    ========================================================= */
+
+    @media (max-width: 1100px) {
+      .toolbar {
+        grid-template-columns: 1fr 1fr 1fr auto;
+      }
+
+      .toolbar .search-field {
+        grid-column: 1 / -1;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 800px) {
+      .top-user {
+        display: none;
+      }
+
+      .page-heading {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .add-button {
+        width: 100%;
+      }
+
+      .toolbar {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .toolbar .search-field {
+        grid-column: 1 / -1;
+      }
+
+      .refresh-button {
+        width: 100%;
+      }
+
+      .table-wrap {
+        display: none;
+      }
+
+      .mobile-list {
+        display: grid;
+      }
+
+      .form-grid,
+      .details-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-group.full,
+      .detail-item.full {
+        grid-column: auto;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .main,
+      .topbar-inner,
+      .footer-inner {
+        width: min(100% - 22px, 1500px);
+      }
+
+      .main {
+        padding-top: 23px;
+      }
+
+      .brand-subtitle {
+        display: none;
+      }
+
+      .brand-title {
+        font-size: 13px;
+      }
+
+      .brand-logo {
+        width: 38px;
+        height: 38px;
+      }
+
+      .back-button {
+        width: 38px;
+        height: 38px;
+      }
+
+      .logout-button span {
+        display: none;
+      }
+
+      .stats-grid {
+        gap: 9px;
+      }
+
+      .stat-card {
+        min-height: 105px;
+        padding: 15px;
+      }
+
+      .stat-value {
+        font-size: 24px;
+      }
+
+      .toolbar {
+        grid-template-columns: 1fr;
+      }
+
+      .toolbar .search-field {
+        grid-column: auto;
+      }
+
+      .modal-backdrop {
+        padding: 10px;
+      }
+
+      .modal-body {
+        padding: 17px;
+      }
+
+      .modal-footer {
+        flex-direction: column-reverse;
+      }
+
+      .modal-footer button {
+        width: 100%;
+      }
+
+      .footer-inner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .footer-powered {
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- =========================================================
+       BOOT SCREEN
+  ========================================================= -->
+
+  <section id="bootScreen">
+    <div class="boot-box">
+      <img
+        class="boot-logo"
+        src="assets/images/Almafaaz-logo.png"
+        alt="ALMAFAAZ ACADEMY"
+      />
+      <div style="font-size:18px;font-weight:800;">
+        Exam Officer Management
+      </div>
+      <div style="margin-top:6px;color:rgba(255,255,255,.55);font-size:12px;">
+        Verifying Super Admin access...
+      </div>
+      <div class="loader"></div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       APPLICATION
+  ========================================================= -->
+
+  <div id="app" class="hidden">
+
+    <header class="topbar">
+      <div class="topbar-inner">
+
+        <div class="brand-area">
+
+          <a
+            href="./super-admin-dashboard.html"
+            class="back-button"
+            title="Back to Super Admin Dashboard"
+            aria-label="Back to Super Admin Dashboard"
+          >
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M15 18l-6-6 6-6"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </a>
+
+          <img
+            class="brand-logo"
+            src="assets/images/Almafaaz-logo.png"
+            alt="ALMAFAAZ ACADEMY"
+          />
+
+          <div class="brand-text">
+            <div class="brand-title">ALMAFAAZ ACADEMY</div>
+            <div class="brand-subtitle">Exam Officer Management</div>
+          </div>
+
+        </div>
+
+        <div class="top-actions">
+
+          <div class="top-user">
+            <div class="user-avatar" id="userInitials">SA</div>
+            <div class="user-info">
+              <div class="user-name" id="userName">Super Admin</div>
+              <div class="user-role">Super Administrator</div>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            class="logout-button"
+            id="logoutButton"
+          >
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M10 17l5-5-5-5"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M15 12H3"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+              <path
+                d="M20 4v16"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+            </svg>
+            <span>Logout</span>
+          </button>
+
+        </div>
+
+      </div>
+    </header>
+
+    <main class="main">
+
+      <!-- PAGE HEADING -->
+
+      <section class="page-heading">
+
+        <div class="heading-copy">
+
+          <div class="eyebrow">
+            <span class="eyebrow-line"></span>
+            Academic Administration
+          </div>
+
+          <h1>Exam Officers</h1>
+
+          <p class="heading-description">
+            Manage the school's examination officers from one controlled
+            workspace. Create officers, maintain their records, update their
+            status, archive former officers, restore archived records, and
+            permanently remove records when authorised.
+          </p>
+
+        </div>
+
+        <button
+          type="button"
+          class="add-button"
+          id="openCreateButton"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M12 5v14M5 12h14"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
+          Add Exam Officer
+        </button>
+
+      </section>
+
+      <!-- STATS -->
+
+      <section class="stats-grid">
+
+        <article class="stat-card">
+          <div class="stat-label">Total Officers</div>
+          <div class="stat-value" id="statTotal">0</div>
+          <div class="stat-note">All exam officer records</div>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-label">Active</div>
+          <div class="stat-value" id="statActive">0</div>
+          <div class="stat-note">Currently active officers</div>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-label">On Leave</div>
+          <div class="stat-value" id="statLeave">0</div>
+          <div class="stat-note">Temporarily unavailable</div>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-label">Archived</div>
+          <div class="stat-value" id="statArchived">0</div>
+          <div class="stat-note">Archived records</div>
+        </article>
+
+      </section>
+
+      <!-- WORKSPACE -->
+
+      <section class="workspace">
+
+        <div class="toolbar">
+
+          <div class="field search-field">
+
+            <span class="field-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <circle
+                  cx="11"
+                  cy="11"
+                  r="7"
+                  stroke="currentColor"
+                  stroke-width="2"
+                />
+                <path
+                  d="m20 20-4-4"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </span>
+
+            <input
+              type="search"
+              class="input with-icon"
+              id="searchInput"
+              placeholder="Search name, ID, email, phone, department..."
+              autocomplete="off"
+            />
+
+          </div>
+
+          <select class="select" id="statusFilter">
+            <option value="all">All Statuses</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+            <option value="on_leave">On Leave</option>
+            <option value="suspended">Suspended</option>
+            <option value="archived">Archived</option>
+          </select>
+
+          <select class="select" id="employmentFilter">
+            <option value="all">All Employment Types</option>
+            <option value="full_time">Full Time</option>
+            <option value="part_time">Part Time</option>
+            <option value="contract">Contract</option>
+            <option value="temporary">Temporary</option>
+          </select>
+
+          <select class="select" id="departmentFilter">
+            <option value="all">All Departments</option>
+          </select>
+
+          <button
+            type="button"
+            class="refresh-button"
+            id="refreshButton"
+            title="Refresh"
+            aria-label="Refresh"
+          >
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M20 11a8.1 8.1 0 0 0-15.5-2M4 5v4h4"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M4 13a8.1 8.1 0 0 0 15.5 2M20 19v-4h-4"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+
+        </div>
+
+        <!-- DESKTOP -->
+
+        <div class="table-wrap">
+
+          <table>
+
+            <thead>
+              <tr>
+                <th>Exam Officer</th>
+                <th>Contact</th>
+                <th>Department</th>
+                <th>Job Title</th>
+                <th>Employment</th>
+                <th>Status</th>
+                <th style="text-align:right;">Actions</th>
+              </tr>
+            </thead>
+
+            <tbody id="officerTableBody"></tbody>
+
+          </table>
+
+        </div>
+
+        <!-- MOBILE -->
+
+        <div class="mobile-list" id="mobileList"></div>
+
+      </section>
+
+    </main>
+
+    <footer>
+
+      <div class="footer-inner">
+
+        <div>
+          <div class="footer-title">ALMAFAAZ ACADEMY</div>
+          <div class="footer-copy">
+            Copyright © 2026 ALMAFAAZ ACADEMY. All rights reserved.
+          </div>
+        </div>
+
+        <div class="footer-powered">
+          Powered by
+          <strong>Yalerima Technologies Limited</strong>
+        </div>
+
+      </div>
+
+    </footer>
+
+  </div>
+
+  <!-- =========================================================
+       CREATE / EDIT MODAL
+  ========================================================= -->
+
+  <div
+    class="modal-backdrop hidden"
+    id="formModal"
+  >
+
+    <div class="modal">
+
+      <div class="modal-header">
+
+        <div>
+          <h2 class="modal-title" id="formModalTitle">
+            Add Exam Officer
+          </h2>
+
+          <p class="modal-description" id="formModalDescription">
+            Create a new exam officer record.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="close-button"
+          data-close-modal="formModal"
+          aria-label="Close"
+        >
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M6 6l12 12M18 6 6 18"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
+        </button>
+
+      </div>
+
+      <form id="officerForm">
+
+        <div class="modal-body">
+
+          <div class="form-grid">
+
+            <div class="form-group">
+              <label class="form-label">
+                Full Name <span class="required">*</span>
+              </label>
+              <input
+                class="input"
+                id="fullName"
+                required
+                maxlength="150"
+                placeholder="Enter full name"
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">
+                Email Address
+              </label>
+              <input
+                class="input"
+                id="email"
+                type="email"
+                maxlength="180"
+                placeholder="examofficer@example.com"
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">
+                Phone Number
+              </label>
+              <input
+                class="input"
+                id="phone"
+                maxlength="40"
+                placeholder="080..."
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">
+                Department
+              </label>
+              <input
+                class="input"
+                id="department"
+                maxlength="120"
+                placeholder="Examinations"
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">
+                Job Title
+              </label>
+              <input
+                class="input"
+                id="jobTitle"
+                maxlength="120"
+                placeholder="Examination Officer"
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">
+                Employment Type
+              </label>
+
+              <select class="select" id="employmentType">
+                <option value="full_time">Full Time</option>
+                <option value="part_time">Part Time</option>
+                <option value="contract">Contract</option>
+                <option value="temporary">Temporary</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">
+                Status
+              </label>
+
+              <select class="select" id="employmentStatus">
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+                <option value="on_leave">On Leave</option>
+                <option value="suspended">Suspended</option>
+                <option value="archived">Archived</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">
+                Gender
+              </label>
+
+              <select class="select" id="gender">
+                <option value="">Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+                <option value="prefer_not_to_say">Prefer not to say</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">
+                Hire Date
+              </label>
+
+              <input
+                class="input"
+                id="hireDate"
+                type="date"
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">
+                Qualification
+              </label>
+
+              <input
+                class="input"
+                id="qualification"
+                maxlength="180"
+                placeholder="B.Ed, B.Sc, PGDE..."
+              />
+            </div>
+
+            <div class="form-group full">
+              <label class="form-label">
+                Address
+              </label>
+
+              <textarea
+                class="textarea"
+                id="address"
+                maxlength="500"
+                placeholder="Residential or official address..."
+              ></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">
+                Emergency Contact Name
+              </label>
+
+              <input
+                class="input"
+                id="emergencyContactName"
+                maxlength="150"
+                placeholder="Emergency contact"
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">
+                Emergency Contact Phone
+              </label>
+
+              <input
+                class="input"
+                id="emergencyContactPhone"
+                maxlength="40"
+                placeholder="080..."
+              />
+            </div>
+
+            <div class="form-group full">
+              <label class="form-label">
+                Notes
+              </label>
+
+              <textarea
+                class="textarea"
+                id="notes"
+                maxlength="1000"
+                placeholder="Additional examination-office notes..."
+              ></textarea>
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+
+          <button
+            type="button"
+            class="secondary-button"
+            data-close-modal="formModal"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="submit"
+            class="primary-button"
+            id="saveOfficerButton"
+          >
+            Save Exam Officer
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+  <!-- =========================================================
+       VIEW MODAL
+  ========================================================= -->
+
+  <div
+    class="modal-backdrop hidden"
+    id="viewModal"
+  >
+
+    <div class="modal">
+
+      <div class="modal-header">
+
+        <div>
+          <h2 class="modal-title">Exam Officer Profile</h2>
+          <p class="modal-description">
+            Complete personnel information.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="close-button"
+          data-close-modal="viewModal"
+          aria-label="Close"
+        >
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M6 6l12 12M18 6 6 18"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
+        </button>
+
+      </div>
+
+      <div class="modal-body" id="viewModalBody"></div>
+
+      <div class="modal-footer">
+
+        <button
+          type="button"
+          class="secondary-button"
+          data-close-modal="viewModal"
+        >
+          Close
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- =========================================================
+       CONFIRM MODAL
+  ========================================================= -->
+
+  <div
+    class="modal-backdrop hidden"
+    id="confirmModal"
+  >
+
+    <div class="modal small">
+
+      <div class="modal-header">
+
+        <div>
+          <h2 class="modal-title" id="confirmTitle">
+            Confirm Action
+          </h2>
+
+          <p class="modal-description" id="confirmDescription">
+            Please confirm this action.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="close-button"
+          data-close-modal="confirmModal"
+          aria-label="Close"
+        >
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M6 6l12 12M18 6 6 18"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
+        </button>
+
+      </div>
+
+      <div class="modal-body">
+        <p
+          id="confirmMessage"
+          style="
+            margin:0;
+            color:#536174;
+            font-size:13px;
+            line-height:1.7;
+          "
+        ></p>
+      </div>
+
+      <div class="modal-footer">
+
+        <button
+          type="button"
+          class="secondary-button"
+          data-close-modal="confirmModal"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          class="danger-button"
+          id="confirmActionButton"
+        >
+          Confirm
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div id="toastContainer"></div>
+
+  <script>
+    /* =========================================================
+       SUPABASE
+    ========================================================= */
+
+    const SUPABASE_URL =
+      "https://orkokipqrwsqnslbwpbt.supabase.co";
+
+    const SUPABASE_PUBLISHABLE_KEY =
+      "sb_publishable_sjcK3_WrRNCnz04ePDsuHg_GfsHjr0l";
+
+    const { createClient } =
+      window.supabase;
+
+    const supabaseClient =
+      createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+      );
+
+    /* =========================================================
+       RPC NAMES
+       These correspond to the backend routines confirmed for
+       this module.
+    ========================================================= */
+
+    const RPC = {
+      list: "list_exam_officers",
+      get: "get_exam_officer",
+      create: "create_exam_officer",
+      update: "update_exam_officer",
+      archive: "archive_exam_officer",
+      restore: "restore_exam_officer",
+      delete: "delete_exam_officer"
+    };
+
+    /*
+      CENTRAL ARGUMENT MAPPING
+
+      If the SQL function argument names differ, this is the ONLY
+      area that should need adjustment.
+
+      Expected personnel model:
+      full_name
+      email
+      phone
+      department
+      job_title
+      employment_type
+      employment_status
+      gender
+      address
+      hire_date
+      qualification
+      emergency_contact_name
+      emergency_contact_phone
+      notes
+    */
+
+    const RPC_ARGS = {
+
+      create: (data) => ({
+        new_full_name: data.full_name,
+        new_email: data.email || null,
+        new_phone: data.phone || null,
+        new_department: data.department || null,
+        new_job_title: data.job_title || null,
+        new_employment_type:
+          data.employment_type || "full_time",
+        new_employment_status:
+          data.employment_status || "active",
+        new_gender: data.gender || null,
+        new_address: data.address || null,
+        new_hire_date: data.hire_date || null,
+        new_qualification:
+          data.qualification || null,
+        new_emergency_contact_name:
+          data.emergency_contact_name || null,
+        new_emergency_contact_phone:
+          data.emergency_contact_phone || null,
+        new_notes: data.notes || null
+      }),
+
+      update: (id, data) => ({
+        target_exam_officer_id: id,
+        new_full_name: data.full_name,
+        new_email: data.email || null,
+        new_phone: data.phone || null,
+        new_department: data.department || null,
+        new_job_title: data.job_title || null,
+        new_employment_type:
+          data.employment_type || "full_time",
+        new_employment_status:
+          data.employment_status || "active",
+        new_gender: data.gender || null,
+        new_address: data.address || null,
+        new_hire_date: data.hire_date || null,
+        new_qualification:
+          data.qualification || null,
+        new_emergency_contact_name:
+          data.emergency_contact_name || null,
+        new_emergency_contact_phone:
+          data.emergency_contact_phone || null,
+        new_notes: data.notes || null
+      }),
+
+      get: (id) => ({
+        target_exam_officer_id: id
+      }),
+
+      archive: (id) => ({
+        target_exam_officer_id: id
+      }),
+
+      restore: (id) => ({
+        target_exam_officer_id: id
+      }),
+
+      delete: (id) => ({
+        target_exam_officer_id: id
+      })
+    };
+
+    /* =========================================================
+       STATE
+    ========================================================= */
+
+    let currentUser = null;
+    let officers = [];
+    let filteredOfficers = [];
+    let editingOfficerId = null;
+    let confirmCallback = null;
+
+    /* =========================================================
+       ELEMENTS
+    ========================================================= */
+
+    const $ = (id) =>
+      document.getElementById(id);
+
+    /* =========================================================
+       HELPERS
+    ========================================================= */
+
+    function escapeHTML(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function displayValue(value) {
+      return value === null ||
+             value === undefined ||
+             value === ""
+        ? "Not provided"
+        : escapeHTML(value);
+    }
+
+    function formatDate(value) {
+      if (!value) return "Not provided";
+
+      const date =
+        new Date(value);
+
+      if (Number.isNaN(date.getTime())) {
+        return escapeHTML(value);
+      }
+
+      return new Intl.DateTimeFormat(
+        "en-NG",
+        {
+          year: "numeric",
+          month: "short",
+          day: "numeric"
+        }
+      ).format(date);
+    }
+
+    function formatLabel(value) {
+      if (!value) return "Not provided";
+
+      return String(value)
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, char =>
+          char.toUpperCase()
+        );
+    }
+
+    function initials(name) {
+      const parts =
+        String(name || "Exam Officer")
+          .trim()
+          .split(/\s+/)
+          .filter(Boolean);
+
+      if (!parts.length) return "EO";
+
+      if (parts.length === 1) {
+        return parts[0]
+          .slice(0, 2)
+          .toUpperCase();
+      }
+
+      return (
+        parts[0][0] +
+        parts[parts.length - 1][0]
+      ).toUpperCase();
+    }
+
+    function normalizeOfficer(row) {
+      /*
+        The normalizer makes the UI tolerant of common SQL aliases.
+      */
+
+      return {
+        id:
+          row.id ??
+          row.exam_officer_id,
+
+        employee_code:
+          row.employee_code ??
+          row.officer_code ??
+          row.exam_officer_code ??
+          row.staff_code ??
+          "",
+
+        full_name:
+          row.full_name ??
+          row.name ??
+          "",
+
+        email:
+          row.email ?? "",
+
+        phone:
+          row.phone ?? "",
+
+        department:
+          row.department ?? "",
+
+        job_title:
+          row.job_title ??
+          row.position ??
+          "",
+
+        employment_type:
+          row.employment_type ??
+          "",
+
+        employment_status:
+          row.employment_status ??
+          row.account_status ??
+          row.status ??
+          "",
+
+        gender:
+          row.gender ?? "",
+
+        address:
+          row.address ?? "",
+
+        hire_date:
+          row.hire_date ?? null,
+
+        qualification:
+          row.qualification ?? "",
+
+        emergency_contact_name:
+          row.emergency_contact_name ?? "",
+
+        emergency_contact_phone:
+          row.emergency_contact_phone ?? "",
+
+        notes:
+          row.notes ?? "",
+
+        auth_user_id:
+          row.auth_user_id ?? null,
+
+        created_at:
+          row.created_at ?? null,
+
+        updated_at:
+          row.updated_at ?? null
+      };
+    }
+
+    /* =========================================================
+       TOAST
+    ========================================================= */
+
+    function toast(
+      title,
+      message,
+      type = "info"
+    ) {
+      const item =
+        document.createElement("div");
+
+      item.className =
+        `toast ${type}`;
+
+      item.innerHTML = `
+        <div>
+          <div class="toast-title">
+            ${escapeHTML(title)}
+          </div>
+          <div class="toast-message">
+            ${escapeHTML(message)}
+          </div>
+        </div>
+      `;
+
+      $("toastContainer")
+        .appendChild(item);
+
+      setTimeout(() => {
+        item.remove();
+      }, 5000);
+    }
+
+    /* =========================================================
+       MODALS
+    ========================================================= */
+
+    function openModal(id) {
+      $(id).classList.remove("hidden");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeModal(id) {
+      $(id).classList.add("hidden");
+
+      const anyOpen =
+        document.querySelector(
+          ".modal-backdrop:not(.hidden)"
+        );
+
+      if (!anyOpen) {
+        document.body.style.overflow = "";
+      }
+    }
+
+    document
+      .querySelectorAll("[data-close-modal]")
+      .forEach(button => {
+        button.addEventListener(
+          "click",
+          () => {
+            closeModal(
+              button.dataset.closeModal
+            );
+          }
+        );
+      });
+
+    document
+      .querySelectorAll(".modal-backdrop")
+      .forEach(backdrop => {
+        backdrop.addEventListener(
+          "click",
+          event => {
+            if (
+              event.target === backdrop
+            ) {
+              closeModal(backdrop.id);
+            }
+          }
+        );
+      });
+
+    /* =========================================================
+       AUTHORIZATION
+    ========================================================= */
+
+    async function verifySuperAdmin() {
+
+      const {
+        data: sessionData,
+        error: sessionError
+      } =
+        await supabaseClient
+          .auth
+          .getSession();
+
+      if (
+        sessionError ||
+        !sessionData.session
+      ) {
+        window.location.href =
+          "./super-admin-login.html";
+        return false;
+      }
+
+      currentUser =
+        sessionData.session.user;
+
+      const {
+        data: profile,
+        error: profileError
+      } =
+        await supabaseClient
+          .from("profiles")
+          .select(
+            "id, full_name, role, account_status"
+          )
+          .eq(
+            "id",
+            currentUser.id
+          )
+          .maybeSingle();
+
+      if (
+        profileError ||
+        !profile ||
+        profile.role !== "super_admin" ||
+        profile.account_status !== "active"
+      ) {
+
+        await supabaseClient
+          .auth
+          .signOut();
+
+        window.location.href =
+          "./super-admin-login.html";
+
+        return false;
+      }
+
+      $("userName").textContent =
+        profile.full_name ||
+        currentUser.email ||
+        "Super Admin";
+
+      $("userInitials").textContent =
+        initials(
+          profile.full_name ||
+          currentUser.email ||
+          "Super Admin"
+        );
+
+      return true;
+    }
+
+    /* =========================================================
+       LOAD OFFICERS
+    ========================================================= */
+
+    async function loadOfficers() {
+
+      renderLoading();
+
+      const {
+        data,
+        error
+      } =
+        await supabaseClient
+          .rpc(RPC.list);
+
+      if (error) {
+
+        renderError(
+          error.message
+        );
+
+        toast(
+          "Unable to load exam officers",
+          error.message,
+          "error"
+        );
+
+        return;
+      }
+
+      officers =
+        Array.isArray(data)
+          ? data.map(normalizeOfficer)
+          : [];
+
+      updateStats();
+      buildDepartmentFilter();
+      applyFilters();
+    }
+
+    /* =========================================================
+       LOADING / ERROR
+    ========================================================= */
+
+    function renderLoading() {
+
+      $("officerTableBody").innerHTML = `
+        <tr>
+          <td colspan="7">
+            <div class="state">
+              <div class="state-loader"></div>
+              <div class="state-title">
+                Loading Exam Officers
+              </div>
+              <div class="state-text">
+                Retrieving examination personnel records...
+              </div>
+            </div>
+          </td>
+        </tr>
+      `;
+
+      $("mobileList").innerHTML = `
+        <div class="state">
+          <div class="state-loader"></div>
+          <div class="state-title">
+            Loading Exam Officers
+          </div>
+        </div>
+      `;
+    }
+
+    function renderError(message) {
+
+      $("officerTableBody").innerHTML = `
+        <tr>
+          <td colspan="7">
+            <div class="state">
+              <div class="state-title">
+                Unable to load records
+              </div>
+              <div class="state-text">
+                ${escapeHTML(message)}
+              </div>
+            </div>
+          </td>
+        </tr>
+      `;
+
+      $("mobileList").innerHTML = `
+        <div class="state">
+          <div class="state-title">
+            Unable to load records
+          </div>
+          <div class="state-text">
+            ${escapeHTML(message)}
+          </div>
+        </div>
+      `;
+    }
+
+    /* =========================================================
+       STATS
+    ========================================================= */
+
+    function updateStats() {
+
+      $("statTotal").textContent =
+        officers.length;
+
+      $("statActive").textContent =
+        officers.filter(
+          o =>
+            o.employment_status ===
+            "active"
+        ).length;
+
+      $("statLeave").textContent =
+        officers.filter(
+          o =>
+            o.employment_status ===
+            "on_leave"
+        ).length;
+
+      $("statArchived").textContent =
+        officers.filter(
+          o =>
+            o.employment_status ===
+            "archived"
+        ).length;
+    }
+
+    /* =========================================================
+       DEPARTMENT FILTER
+    ========================================================= */
+
+    function buildDepartmentFilter() {
+
+      const select =
+        $("departmentFilter");
+
+      const current =
+        select.value;
+
+      const departments =
+        [...new Set(
+          officers
+            .map(o =>
+              String(
+                o.department || ""
+              ).trim()
+            )
+            .filter(Boolean)
+        )]
+        .sort(
+          (a, b) =>
+            a.localeCompare(b)
+        );
+
+      select.innerHTML =
+        `<option value="all">
+          All Departments
+        </option>`;
+
+      departments.forEach(
+        department => {
+
+          const option =
+            document.createElement(
+              "option"
+            );
+
+          option.value =
+            department;
+
+          option.textContent =
+            department;
+
+          select.appendChild(
+            option
+          );
+        }
+      );
+
+      if (
+        departments.includes(current)
+      ) {
+        select.value = current;
+      }
+    }
+
+    /* =========================================================
+       FILTERING
+    ========================================================= */
+
+    function applyFilters() {
+
+      const search =
+        $("searchInput")
+          .value
+          .trim()
+          .toLowerCase();
+
+      const status =
+        $("statusFilter").value;
+
+      const employment =
+        $("employmentFilter").value;
+
+      const department =
+        $("departmentFilter").value;
+
+      filteredOfficers =
+        officers.filter(
+          officer => {
+
+            const searchable =
+              [
+                officer.employee_code,
+                officer.full_name,
+                officer.email,
+                officer.phone,
+                officer.department,
+                officer.job_title,
+                officer.qualification
+              ]
+              .join(" ")
+              .toLowerCase();
+
+            if (
+              search &&
+              !searchable.includes(search)
+            ) {
+              return false;
+            }
+
+            if (
+              status !== "all" &&
+              officer.employment_status !==
+                status
+            ) {
+              return false;
+            }
+
+            if (
+              employment !== "all" &&
+              officer.employment_type !==
+                employment
+            ) {
+              return false;
+            }
+
+            if (
+              department !== "all" &&
+              officer.department !==
+                department
+            ) {
+              return false;
+            }
+
+            return true;
+          }
+        );
+
+      renderOfficers();
+    }
+
+    /* =========================================================
+       STATUS BADGE
+    ========================================================= */
+
+    function statusBadge(status) {
+
+      const safe =
+        status || "inactive";
+
+      let className =
+        "badge-inactive";
+
+      if (safe === "active") {
+        className =
+          "badge-active";
+      }
+
+      if (safe === "on_leave") {
+        className =
+          "badge-leave";
+      }
+
+      if (safe === "suspended") {
+        className =
+          "badge-suspended";
+      }
+
+      if (safe === "archived") {
+        className =
+          "badge-archived";
+      }
+
+      return `
+        <span class="badge ${className}">
+          ${escapeHTML(
+            formatLabel(safe)
+          )}
+        </span>
+      `;
+    }
+
+    /* =========================================================
+       DESKTOP TABLE
+    ========================================================= */
+
+    function renderOfficers() {
+
+      if (!filteredOfficers.length) {
+
+        $("officerTableBody").innerHTML = `
+          <tr>
+            <td colspan="7">
+              <div class="state">
+                <div class="state-title">
+                  No Exam Officers Found
+                </div>
+                <div class="state-text">
+                  No records match the current
+                  search or filter selection.
+                </div>
+              </div>
+            </td>
+          </tr>
+        `;
+
+        $("mobileList").innerHTML = `
+          <div class="state">
+            <div class="state-title">
+              No Exam Officers Found
+            </div>
+            <div class="state-text">
+              Try changing your search or filters,
+              or create a new exam officer.
+            </div>
+          </div>
+        `;
+
+        return;
+      }
+
+      $("officerTableBody").innerHTML =
+        filteredOfficers
+          .map(renderTableRow)
+          .join("");
+
+      $("mobileList").innerHTML =
+        filteredOfficers
+          .map(renderMobileCard)
+          .join("");
+    }
+
+    function renderTableRow(officer) {
+
+      return `
+        <tr>
+
+          <td>
+            <div class="officer-cell">
+
+              <div class="officer-avatar">
+                ${escapeHTML(
+                  initials(
+                    officer.full_name
+                  )
+                )}
+              </div>
+
+              <div>
+                <div class="officer-name">
+                  ${displayValue(
+                    officer.full_name
+                  )}
+                </div>
+
+                <div class="officer-code">
+                  ${displayValue(
+                    officer.employee_code
+                  )}
+                </div>
+              </div>
+
+            </div>
+          </td>
+
+          <td>
+            <div>
+              ${displayValue(
+                officer.email
+              )}
+            </div>
+            <div
+              class="muted"
+              style="margin-top:4px;font-size:11px;"
+            >
+              ${displayValue(
+                officer.phone
+              )}
+            </div>
+          </td>
+
+          <td>
+            ${displayValue(
+              officer.department
+            )}
+          </td>
+
+          <td>
+            ${displayValue(
+              officer.job_title
+            )}
+          </td>
+
+          <td>
+            ${displayValue(
+              formatLabel(
+                officer.employment_type
+              )
+            )}
+          </td>
+
+          <td>
+            ${statusBadge(
+              officer.employment_status
+            )}
+          </td>
+
+          <td>
+
+            <div class="action-group">
+
+              <button
+                type="button"
+                class="action-button primary"
+                onclick="viewOfficer('${officer.id}')"
+              >
+                View
+              </button>
+
+              <button
+                type="button"
+                class="action-button"
+                onclick="editOfficer('${officer.id}')"
+              >
+                Edit
+              </button>
+
+              ${
+                officer.employment_status ===
+                "archived"
+
+                ? `
+                  <button
+                    type="button"
+                    class="action-button success"
+                    onclick="restoreOfficer('${officer.id}')"
+                  >
+                    Restore
+                  </button>
+                `
+
+                : `
+                  <button
+                    type="button"
+                    class="action-button"
+                    onclick="archiveOfficer('${officer.id}')"
+                  >
+                    Archive
+                  </button>
+                `
+              }
+
+              <button
+                type="button"
+                class="action-button danger"
+                onclick="deleteOfficer('${officer.id}')"
+              >
+                Delete
+              </button>
+
+            </div>
+
+          </td>
+
+        </tr>
+      `;
+    }
+
+    /* =========================================================
+       MOBILE CARD
+    ========================================================= */
+
+    function renderMobileCard(officer) {
+
+      return `
+        <article class="mobile-card">
+
+          <div class="mobile-card-top">
+
+            <div class="mobile-officer">
+
+              <div class="officer-avatar">
+                ${escapeHTML(
+                  initials(
+                    officer.full_name
+                  )
+                )}
+              </div>
+
+              <div style="min-width:0;">
+
+                <div class="officer-name">
+                  ${displayValue(
+                    officer.full_name
+                  )}
+                </div>
+
+                <div class="officer-code">
+                  ${displayValue(
+                    officer.employee_code
+                  )}
+                </div>
+
+              </div>
+
+            </div>
+
+            ${statusBadge(
+              officer.employment_status
+            )}
+
+          </div>
+
+          <div class="mobile-meta">
+
+            <div class="meta-item">
+              <small>Department</small>
+              <span>
+                ${displayValue(
+                  officer.department
+                )}
+              </span>
+            </div>
+
+            <div class="meta-item">
+              <small>Job Title</small>
+              <span>
+                ${displayValue(
+                  officer.job_title
+                )}
+              </span>
+            </div>
+
+            <div class="meta-item">
+              <small>Email</small>
+              <span>
+                ${displayValue(
+                  officer.email
+                )}
+              </span>
+            </div>
+
+            <div class="meta-item">
+              <small>Phone</small>
+              <span>
+                ${displayValue(
+                  officer.phone
+                )}
+              </span>
+            </div>
+
+          </div>
+
+          <div class="mobile-actions">
+
+            <button
+              type="button"
+              class="action-button primary"
+              onclick="viewOfficer('${officer.id}')"
+            >
+              View
+            </button>
+
+            <button
+              type="button"
+              class="action-button"
+              onclick="editOfficer('${officer.id}')"
+            >
+              Edit
+            </button>
+
+            ${
+              officer.employment_status ===
+              "archived"
+
+              ? `
+                <button
+                  type="button"
+                  class="action-button success"
+                  onclick="restoreOfficer('${officer.id}')"
+                >
+                  Restore
+                </button>
+              `
+
+              : `
+                <button
+                  type="button"
+                  class="action-button"
+                  onclick="archiveOfficer('${officer.id}')"
+                >
+                  Archive
+                </button>
+              `
+            }
+
+            <button
+              type="button"
+              class="action-button danger"
+              onclick="deleteOfficer('${officer.id}')"
+            >
+              Delete
+            </button>
+
+          </div>
+
+        </article>
+      `;
+    }
+
+    /* =========================================================
+       FORM
+    ========================================================= */
+
+    function clearForm() {
+
+      $("officerForm").reset();
+
+      $("employmentType").value =
+        "full_time";
+
+      $("employmentStatus").value =
+        "active";
+
+      editingOfficerId = null;
+    }
+
+    function fillForm(officer) {
+
+      $("fullName").value =
+        officer.full_name || "";
+
+      $("email").value =
+        officer.email || "";
+
+      $("phone").value =
+        officer.phone || "";
+
+      $("department").value =
+        officer.department || "";
+
+      $("jobTitle").value =
+        officer.job_title || "";
+
+      $("employmentType").value =
+        officer.employment_type ||
+        "full_time";
+
+      $("employmentStatus").value =
+        officer.employment_status ||
+        "active";
+
+      $("gender").value =
+        officer.gender || "";
+
+      $("hireDate").value =
+        officer.hire_date
+          ? String(
+              officer.hire_date
+            ).slice(0, 10)
+          : "";
+
+      $("qualification").value =
+        officer.qualification || "";
+
+      $("address").value =
+        officer.address || "";
+
+      $("emergencyContactName").value =
+        officer.emergency_contact_name ||
+        "";
+
+      $("emergencyContactPhone").value =
+        officer.emergency_contact_phone ||
+        "";
+
+      $("notes").value =
+        officer.notes || "";
+    }
+
+    $("openCreateButton")
+      .addEventListener(
+        "click",
+        () => {
+
+          clearForm();
+
+          $("formModalTitle")
+            .textContent =
+            "Add Exam Officer";
+
+          $("formModalDescription")
+            .textContent =
+            "Create a new examination officer record.";
+
+          $("saveOfficerButton")
+            .textContent =
+            "Create Exam Officer";
+
+          openModal("formModal");
+        }
+      );
+
+    /* =========================================================
+       CREATE / UPDATE
+    ========================================================= */
+
+    $("officerForm")
+      .addEventListener(
+        "submit",
+        async event => {
+
+          event.preventDefault();
+
+          const fullName =
+            $("fullName")
+              .value
+              .trim();
+
+          if (!fullName) {
+            toast(
+              "Full name required",
+              "Enter the exam officer's full name.",
+              "error"
+            );
+            return;
+          }
+
+          const data = {
+
+            full_name:
+              fullName,
+
+            email:
+              $("email")
+                .value
+                .trim(),
+
+            phone:
+              $("phone")
+                .value
+                .trim(),
+
+            department:
+              $("department")
+                .value
+                .trim(),
+
+            job_title:
+              $("jobTitle")
+                .value
+                .trim(),
+
+            employment_type:
+              $("employmentType")
+                .value,
+
+            employment_status:
+              $("employmentStatus")
+                .value,
+
+            gender:
+              $("gender")
+                .value,
+
+            address:
+              $("address")
+                .value
+                .trim(),
+
+            hire_date:
+              $("hireDate")
+                .value || null,
+
+            qualification:
+              $("qualification")
+                .value
+                .trim(),
+
+            emergency_contact_name:
+              $("emergencyContactName")
+                .value
+                .trim(),
+
+            emergency_contact_phone:
+              $("emergencyContactPhone")
+                .value
+                .trim(),
+
+            notes:
+              $("notes")
+                .value
+                .trim()
+          };
+
+          const button =
+            $("saveOfficerButton");
+
+          button.disabled = true;
+          button.textContent =
+            editingOfficerId
+              ? "Updating..."
+              : "Creating...";
+
+          let result;
+
+          if (editingOfficerId) {
+
+            result =
+              await supabaseClient
+                .rpc(
+                  RPC.update,
+                  RPC_ARGS.update(
+                    editingOfficerId,
+                    data
+                  )
+                );
+
+          } else {
+
+            result =
+              await supabaseClient
+                .rpc(
+                  RPC.create,
+                  RPC_ARGS.create(data)
+                );
+          }
+
+          button.disabled = false;
+
+          if (result.error) {
+
+            toast(
+              editingOfficerId
+                ? "Update failed"
+                : "Creation failed",
+              result.error.message,
+              "error"
+            );
+
+            return;
+          }
+
+          closeModal("formModal");
+
+          toast(
+            editingOfficerId
+              ? "Exam Officer updated"
+              : "Exam Officer created",
+            editingOfficerId
+              ? "The officer record has been updated successfully."
+              : "The new exam officer has been added successfully.",
+            "success"
+          );
+
+          clearForm();
+
+          await loadOfficers();
+        }
+      );
+
+    /* =========================================================
+       VIEW
+    ========================================================= */
+
+    async function viewOfficer(id) {
+
+      const officer =
+        officers.find(
+          item =>
+            item.id === id
+        );
+
+      if (!officer) {
+        toast(
+          "Record not found",
+          "The selected exam officer is no longer available.",
+          "error"
+        );
+        return;
+      }
+
+      /*
+        First show the available record immediately.
+        Then request the authoritative backend record.
+      */
+
+      renderOfficerDetails(officer);
+
+      openModal("viewModal");
+
+      const {
+        data,
+        error
+      } =
+        await supabaseClient
+          .rpc(
+            RPC.get,
+            RPC_ARGS.get(id)
+          );
+
+      if (!error && data) {
+
+        const row =
+          Array.isArray(data)
+            ? data[0]
+            : data;
+
+        if (row) {
+          renderOfficerDetails(
+            normalizeOfficer(row)
+          );
+        }
+      }
+    }
+
+    function renderOfficerDetails(officer) {
+
+      $("viewModalBody").innerHTML = `
+
+        <div class="detail-header">
+
+          <div class="detail-avatar">
+            ${escapeHTML(
+              initials(
+                officer.full_name
+              )
+            )}
+          </div>
+
+          <div>
+
+            <div class="detail-name">
+              ${displayValue(
+                officer.full_name
+              )}
+            </div>
+
+            <div class="detail-code">
+              ${displayValue(
+                officer.employee_code
+              )}
+            </div>
+
+          </div>
+
+          <div style="margin-left:auto;">
+            ${statusBadge(
+              officer.employment_status
+            )}
+          </div>
+
+        </div>
+
+        <div class="details-grid">
+
+          <div class="detail-item">
+            <div class="detail-item-label">
+              Email
+            </div>
+            <div class="detail-item-value">
+              ${displayValue(
+                officer.email
+              )}
+            </div>
+          </div>
+
+          <div class="detail-item">
+            <div class="detail-item-label">
+              Phone
+            </div>
+            <div class="detail-item-value">
+              ${displayValue(
+                officer.phone
+              )}
+            </div>
+          </div>
+
+          <div class="detail-item">
+            <div class="detail-item-label">
+              Department
+            </div>
+            <div class="detail-item-value">
+              ${displayValue(
+                officer.department
+              )}
+            </div>
+          </div>
+
+          <div class="detail-item">
+            <div class="detail-item-label">
+              Job Title
+            </div>
+            <div class="detail-item-value">
+              ${displayValue(
+                officer.job_title
+              )}
+            </div>
+          </div>
+
+          <div class="detail-item">
+            <div class="detail-item-label">
+              Employment Type
+            </div>
+            <div class="detail-item-value">
+              ${displayValue(
+                formatLabel(
+                  officer.employment_type
+                )
+              )}
+            </div>
+          </div>
+
+          <div class="detail-item">
+            <div class="detail-item-label">
+              Gender
+            </div>
+            <div class="detail-item-value">
+              ${displayValue(
+                formatLabel(
+                  officer.gender
+                )
+              )}
+            </div>
+          </div>
+
+          <div class="detail-item">
+            <div class="detail-item-label">
+              Hire Date
+            </div>
+            <div class="detail-item-value">
+              ${formatDate(
+                officer.hire_date
+              )}
+            </div>
+          </div>
+
+          <div class="detail-item">
+            <div class="detail-item-label">
+              Qualification
+            </div>
+            <div class="detail-item-value">
+              ${displayValue(
+                officer.qualification
+              )}
+            </div>
+          </div>
+
+          <div class="detail-item full">
+            <div class="detail-item-label">
+              Address
+            </div>
+            <div class="detail-item-value">
+              ${displayValue(
+                officer.address
+              )}
+            </div>
+          </div>
+
+          <div class="detail-item">
+            <div class="detail-item-label">
+              Emergency Contact
+            </div>
+            <div class="detail-item-value">
+              ${displayValue(
+                officer.emergency_contact_name
+              )}
+            </div>
+          </div>
+
+          <div class="detail-item">
+            <div class="detail-item-label">
+              Emergency Phone
+            </div>
+            <div class="detail-item-value">
+              ${displayValue(
+                officer.emergency_contact_phone
+              )}
+            </div>
+          </div>
+
+          <div class="detail-item full">
+            <div class="detail-item-label">
+              Notes
+            </div>
+            <div class="detail-item-value">
+              ${displayValue(
+                officer.notes
+              )}
+            </div>
+          </div>
+
+          <div class="detail-item">
+            <div class="detail-item-label">
+              Created
+            </div>
+            <div class="detail-item-value">
+              ${formatDate(
+                officer.created_at
+              )}
+            </div>
+          </div>
+
+          <div class="detail-item">
+            <div class="detail-item-label">
+              Last Updated
+            </div>
+            <div class="detail-item-value">
+              ${formatDate(
+                officer.updated_at
+              )}
+            </div>
+          </div>
+
+        </div>
+      `;
+    }
+
+    /* =========================================================
+       EDIT
+    ========================================================= */
+
+    async function editOfficer(id) {
+
+      const officer =
+        officers.find(
+          item =>
+            item.id === id
+        );
+
+      if (!officer) {
+        toast(
+          "Record not found",
+          "The selected officer could not be found.",
+          "error"
+        );
+        return;
+      }
+
+      editingOfficerId = id;
+
+      fillForm(officer);
+
+      $("formModalTitle")
+        .textContent =
+        "Edit Exam Officer";
+
+      $("formModalDescription")
+        .textContent =
+        "Update this examination officer's personnel record.";
+
+      $("saveOfficerButton")
+        .textContent =
+        "Update Exam Officer";
+
+      openModal("formModal");
+
+      /*
+        Get the authoritative record.
+      */
+
+      const {
+        data,
+        error
+      } =
+        await supabaseClient
+          .rpc(
+            RPC.get,
+            RPC_ARGS.get(id)
+          );
+
+      if (!error && data) {
+
+        const row =
+          Array.isArray(data)
+            ? data[0]
+            : data;
+
+        if (row) {
+          fillForm(
+            normalizeOfficer(row)
+          );
+        }
+      }
+    }
+
+    /* =========================================================
+       ARCHIVE
+    ========================================================= */
+
+    function archiveOfficer(id) {
+
+      const officer =
+        officers.find(
+          item =>
+            item.id === id
+        );
+
+      if (!officer) return;
+
+      askConfirmation(
+        "Archive Exam Officer",
+        `Archive ${officer.full_name}? The record will remain in the database but will no longer be treated as an active officer.`,
+        "Archive Officer",
+        "danger",
+        async () => {
+
+          const {
+            error
+          } =
+            await supabaseClient
+              .rpc(
+                RPC.archive,
+                RPC_ARGS.archive(id)
+              );
+
+          if (error) {
+
+            toast(
+              "Archive failed",
+              error.message,
+              "error"
+            );
+
+            return;
+          }
+
+          toast(
+            "Officer archived",
+            `${officer.full_name} has been archived.`,
+            "success"
+          );
+
+          await loadOfficers();
+        }
+      );
+    }
+
+    /* =========================================================
+       RESTORE
+    ========================================================= */
+
+    function restoreOfficer(id) {
+
+      const officer =
+        officers.find(
+          item =>
+            item.id === id
+        );
+
+      if (!officer) return;
+
+      askConfirmation(
+        "Restore Exam Officer",
+        `Restore ${officer.full_name} to active management?`,
+        "Restore Officer",
+        "success",
+        async () => {
+
+          const {
+            error
+          } =
+            await supabaseClient
+              .rpc(
+                RPC.restore,
+                RPC_ARGS.restore(id)
+              );
+
+          if (error) {
+
+            toast(
+              "Restore failed",
+              error.message,
+              "error"
+            );
+
+            return;
+          }
+
+          toast(
+            "Officer restored",
+            `${officer.full_name} has been restored.`,
+            "success"
+          );
+
+          await loadOfficers();
+        }
+      );
+    }
+
+    /* =========================================================
+       DELETE
+    ========================================================= */
+
+    function deleteOfficer(id) {
+
+      const officer =
+        officers.find(
+          item =>
+            item.id === id
+        );
+
+      if (!officer) return;
+
+      askConfirmation(
+        "Permanently Delete Record",
+        `This will permanently delete the exam officer record for ${officer.full_name}. This action should only be used when the record genuinely needs to be removed.`,
+        "Delete Permanently",
+        "danger",
+        async () => {
+
+          const {
+            error
+          } =
+            await supabaseClient
+              .rpc(
+                RPC.delete,
+                RPC_ARGS.delete(id)
+              );
+
+          if (error) {
+
+            toast(
+              "Delete failed",
+              error.message,
+              "error"
+            );
+
+            return;
+          }
+
+          toast(
+            "Officer deleted",
+            `${officer.full_name}'s record has been deleted.`,
+            "success"
+          );
+
+          await loadOfficers();
+        }
+      );
+    }
+
+    /* =========================================================
+       CONFIRMATION
+    ========================================================= */
+
+    function askConfirmation(
+      title,
+      message,
+      buttonText,
+      buttonType,
+      callback
+    ) {
+
+      $("confirmTitle")
+        .textContent = title;
+
+      $("confirmDescription")
+        .textContent =
+        "This action requires confirmation.";
+
+      $("confirmMessage")
+        .textContent = message;
+
+      const button =
+        $("confirmActionButton");
+
+      button.textContent =
+        buttonText;
+
+      button.className =
+        buttonType === "success"
+          ? "primary-button"
+          : "danger-button";
+
+      confirmCallback =
+        callback;
+
+      openModal("confirmModal");
+    }
+
+    $("confirmActionButton")
+      .addEventListener(
+        "click",
+        async () => {
+
+          const callback =
+            confirmCallback;
+
+          confirmCallback = null;
+
+          closeModal(
+            "confirmModal"
+          );
+
+          if (callback) {
+            await callback();
+          }
+        }
+      );
+
+    /* =========================================================
+       SEARCH / FILTER EVENTS
+    ========================================================= */
+
+    $("searchInput")
+      .addEventListener(
+        "input",
+        applyFilters
+      );
+
+    $("statusFilter")
+      .addEventListener(
+        "change",
+        applyFilters
+      );
+
+    $("employmentFilter")
+      .addEventListener(
+        "change",
+        applyFilters
+      );
+
+    $("departmentFilter")
+      .addEventListener(
+        "change",
+        applyFilters
+      );
+
+    $("refreshButton")
+      .addEventListener(
+        "click",
+        loadOfficers
+      );
+
+    /* =========================================================
+       LOGOUT
+    ========================================================= */
+
+    $("logoutButton")
+      .addEventListener(
+        "click",
+        async () => {
+
+          $("logoutButton")
+            .disabled = true;
+
+          const {
+            error
+          } =
+            await supabaseClient
+              .auth
+              .signOut();
+
+          if (error) {
+
+            $("logoutButton")
+              .disabled = false;
+
+            toast(
+              "Logout failed",
+              error.message,
+              "error"
+            );
+
+            return;
+          }
+
+          window.location.href =
+            "./super-admin-login.html";
+        }
+      );
+
+    /* =========================================================
+       ESCAPE KEY
+    ========================================================= */
+
+    document.addEventListener(
+      "keydown",
+      event => {
+
+        if (
+          event.key !== "Escape"
+        ) {
+
+          return;
+        }
+
+        document
+          .querySelectorAll(
+            ".modal-backdrop:not(.hidden)"
+          )
+          .forEach(
+            modal => {
+              closeModal(
+                modal.id
+              );
+            }
+          );
+      }
+    );
+
+    /* =========================================================
+       BOOT
+    ========================================================= */
+
+    async function boot() {
+
+      try {
+
+        const authorized =
+          await verifySuperAdmin();
+
+        if (!authorized) {
+          return;
+        }
+
+        $("app")
+          .classList
+          .remove("hidden");
+
+        $("bootScreen")
+          .classList
+          .add("hidden");
+
+        await loadOfficers();
+
+      } catch (error) {
+
+        console.error(error);
+
+        toast(
+          "Application error",
+          error.message ||
+            "Unable to initialise the page.",
+          "error"
+        );
+
+        $("bootScreen")
+          .classList
+          .add("hidden");
+
+        $("app")
+          .classList
+          .remove("hidden");
+      }
+    }
+
+    boot();
+
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,7624 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
+
+<title>
+  Students | ALMAFAAZ ACADEMY
+</title>
+
+<meta
+  name="description"
+  content="Student Management — ALMAFAAZ ACADEMY"
+/>
+
+<script
+  src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+></script>
+
+<style>
+
+:root {
+
+  --navy: #071426;
+  --navy2: #0d213a;
+
+  --blue: #164b7b;
+  --blue2: #246da5;
+
+  --orange: #ff7a00;
+  --orange2: #ff922f;
+  --orangeSoft: #fff1e5;
+
+  --white: #ffffff;
+
+  --page: #f3f6f9;
+  --panel: #ffffff;
+  --soft: #f8fafc;
+
+  --text: #17263a;
+  --muted: #718094;
+
+  --border: #dfe6ed;
+
+  --green: #158557;
+  --greenSoft: #e8f7ef;
+
+  --red: #c63838;
+  --redSoft: #fdeaea;
+
+  --yellow: #a36b00;
+  --yellowSoft: #fff5d9;
+
+  --purple: #7151a2;
+  --purpleSoft: #f1ebf9;
+
+  --shadow:
+    0 12px 35px rgba(7,20,38,.08);
+
+  --shadowLarge:
+    0 25px 70px rgba(3,15,29,.25);
+
+  --radius: 16px;
+
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+
+  margin: 0;
+
+  min-height: 100vh;
+
+  color: var(--text);
+
+  background:
+
+    radial-gradient(
+      circle at 0% 0%,
+      rgba(255,122,0,.065),
+      transparent 27%
+    ),
+
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(36,109,165,.07),
+      transparent 28%
+    ),
+
+    var(--page);
+
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.hidden {
+  display: none !important;
+}
+
+
+/* =========================================================
+   BOOT
+========================================================= */
+
+#bootScreen {
+
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 9999;
+
+  display: grid;
+
+  place-items: center;
+
+  color: white;
+
+  background:
+    radial-gradient(
+      circle at center top,
+      rgba(255,122,0,.12),
+      transparent 38%
+    ),
+
+    var(--navy);
+
+}
+
+.boot-card {
+
+  width:
+    min(420px, calc(100% - 30px));
+
+  padding: 38px;
+
+  text-align: center;
+
+  border:
+    1px solid rgba(255,255,255,.1);
+
+  border-radius: 23px;
+
+  background:
+    rgba(255,255,255,.045);
+
+  backdrop-filter: blur(20px);
+
+}
+
+.boot-logo {
+
+  width: 82px;
+  height: 82px;
+
+  object-fit: contain;
+
+  padding: 5px;
+
+  margin-bottom: 20px;
+
+  background: white;
+
+  border-radius: 18px;
+
+}
+
+.spinner {
+
+  width: 34px;
+  height: 34px;
+
+  margin: 22px auto 0;
+
+  border:
+    3px solid rgba(255,255,255,.14);
+
+  border-top-color:
+    var(--orange);
+
+  border-radius: 50%;
+
+  animation:
+    spin .8s linear infinite;
+
+}
+
+@keyframes spin {
+
+  to {
+    transform: rotate(360deg);
+  }
+
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+.topbar {
+
+  position: sticky;
+
+  top: 0;
+
+  z-index: 100;
+
+  min-height: 76px;
+
+  background:
+    rgba(7,20,38,.97);
+
+  border-bottom:
+    1px solid rgba(255,255,255,.08);
+
+  box-shadow:
+    0 8px 28px rgba(0,0,0,.15);
+
+  backdrop-filter:
+    blur(18px);
+
+}
+
+.topbar-inner {
+
+  width:
+    min(1500px, calc(100% - 32px));
+
+  min-height: 76px;
+
+  margin: auto;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 20px;
+
+}
+
+.brand {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 11px;
+
+}
+
+.back {
+
+  width: 42px;
+  height: 42px;
+
+  display: grid;
+
+  place-items: center;
+
+  color: white;
+
+  background:
+    rgba(255,255,255,.055);
+
+  border:
+    1px solid rgba(255,255,255,.1);
+
+  border-radius: 11px;
+
+  transition: .2s;
+
+}
+
+.back:hover {
+
+  color: var(--orange);
+
+  border-color:
+    rgba(255,122,0,.4);
+
+  background:
+    rgba(255,122,0,.1);
+
+  transform:
+    translateX(-2px);
+
+}
+
+.logo {
+
+  width: 44px;
+  height: 44px;
+
+  object-fit: contain;
+
+  padding: 4px;
+
+  background: white;
+
+  border-radius: 10px;
+
+}
+
+.brand-title {
+
+  color: white;
+
+  font-size: 14px;
+
+  font-weight: 900;
+
+}
+
+.brand-subtitle {
+
+  margin-top: 3px;
+
+  color:
+    rgba(255,255,255,.48);
+
+  font-size: 10px;
+
+}
+
+.top-right {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+}
+
+.admin {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 9px;
+
+  padding: 7px 11px;
+
+  color: white;
+
+  background:
+    rgba(255,255,255,.05);
+
+  border:
+    1px solid rgba(255,255,255,.08);
+
+  border-radius: 12px;
+
+}
+
+.admin-avatar {
+
+  width: 32px;
+  height: 32px;
+
+  display: grid;
+
+  place-items: center;
+
+  color: white;
+
+  background:
+    var(--orange);
+
+  border-radius: 9px;
+
+  font-size: 11px;
+
+  font-weight: 900;
+
+}
+
+.admin-name {
+
+  font-size: 11px;
+
+  font-weight: 800;
+
+}
+
+.admin-role {
+
+  margin-top: 2px;
+
+  color:
+    rgba(255,255,255,.46);
+
+  font-size: 9px;
+
+}
+
+.logout {
+
+  height: 42px;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  padding: 0 14px;
+
+  color: white;
+
+  background:
+    rgba(255,255,255,.055);
+
+  border:
+    1px solid rgba(255,255,255,.1);
+
+  border-radius: 10px;
+
+}
+
+.logout:hover {
+
+  color: #ffadad;
+
+  background:
+    rgba(198,56,56,.12);
+
+}
+
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+main {
+
+  width:
+    min(1500px, calc(100% - 32px));
+
+  margin: auto;
+
+  padding:
+    34px 0 60px;
+
+}
+
+.heading {
+
+  display: flex;
+
+  align-items: flex-end;
+
+  justify-content: space-between;
+
+  gap: 25px;
+
+  margin-bottom: 25px;
+
+}
+
+.eyebrow {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  margin-bottom: 8px;
+
+  color:
+    var(--orange);
+
+  font-size: 10px;
+
+  font-weight: 900;
+
+  letter-spacing: 1.2px;
+
+  text-transform: uppercase;
+
+}
+
+.eyebrow-line {
+
+  width: 25px;
+  height: 2px;
+
+  background:
+    var(--orange);
+
+  border-radius: 2px;
+
+}
+
+h1 {
+
+  margin: 0;
+
+  color: var(--navy);
+
+  font-size:
+    clamp(29px, 4vw, 43px);
+
+  line-height: 1;
+
+  letter-spacing: -1.5px;
+
+}
+
+.description {
+
+  max-width: 780px;
+
+  margin:
+    11px 0 0;
+
+  color: var(--muted);
+
+  font-size: 13px;
+
+  line-height: 1.65;
+
+}
+
+.add-button {
+
+  height: 48px;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 8px;
+
+  padding: 0 19px;
+
+  color: white;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--orange),
+      var(--orange2)
+    );
+
+  border: 0;
+
+  border-radius: 11px;
+
+  font-size: 12px;
+
+  font-weight: 900;
+
+  white-space: nowrap;
+
+  box-shadow:
+    0 10px 25px rgba(255,122,0,.2);
+
+  transition: .2s;
+
+}
+
+.add-button:hover {
+
+  transform:
+    translateY(-2px);
+
+  box-shadow:
+    0 15px 33px rgba(255,122,0,.28);
+
+}
+
+
+/* =========================================================
+   STATS
+========================================================= */
+
+.stats {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(5, minmax(0,1fr));
+
+  gap: 12px;
+
+  margin-bottom: 20px;
+
+}
+
+.stat {
+
+  position: relative;
+
+  overflow: hidden;
+
+  min-height: 113px;
+
+  padding: 18px;
+
+  background:
+    rgba(255,255,255,.82);
+
+  border:
+    1px solid rgba(220,227,235,.9);
+
+  border-radius: 14px;
+
+  box-shadow:
+    0 6px 20px rgba(10,32,58,.05);
+
+}
+
+.stat::after {
+
+  content: "";
+
+  position: absolute;
+
+  width: 85px;
+  height: 85px;
+
+  right: -28px;
+  bottom: -44px;
+
+  border-radius: 50%;
+
+  background:
+    rgba(255,122,0,.07);
+
+}
+
+.stat-label {
+
+  color: var(--muted);
+
+  font-size: 9px;
+
+  font-weight: 900;
+
+  letter-spacing: .7px;
+
+  text-transform: uppercase;
+
+}
+
+.stat-value {
+
+  margin-top: 9px;
+
+  color: var(--navy);
+
+  font-size: 27px;
+
+  font-weight: 900;
+
+  letter-spacing: -.7px;
+
+}
+
+.stat-note {
+
+  margin-top: 3px;
+
+  color: #8a96a5;
+
+  font-size: 9px;
+
+}
+
+
+/* =========================================================
+   WORKSPACE
+========================================================= */
+
+.workspace {
+
+  overflow: hidden;
+
+  background:
+    rgba(255,255,255,.82);
+
+  border:
+    1px solid rgba(220,227,235,.95);
+
+  border-radius: 18px;
+
+  box-shadow:
+    var(--shadow);
+
+  backdrop-filter:
+    blur(18px);
+
+}
+
+.toolbar {
+
+  padding: 16px;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(260px,1fr)
+    165px
+    165px
+    185px
+    44px;
+
+  gap: 8px;
+
+  background:
+    rgba(248,250,252,.92);
+
+  border-bottom:
+    1px solid var(--border);
+
+}
+
+.search {
+
+  position: relative;
+
+}
+
+.search svg {
+
+  position: absolute;
+
+  left: 12px;
+
+  top: 50%;
+
+  transform:
+    translateY(-50%);
+
+  color: #8996a6;
+
+  pointer-events: none;
+
+}
+
+.input,
+.select,
+.textarea {
+
+  width: 100%;
+
+  color: var(--text);
+
+  background: white;
+
+  border:
+    1px solid var(--border);
+
+  outline: none;
+
+  border-radius: 9px;
+
+  transition: .18s;
+
+}
+
+.input,
+.select {
+
+  height: 43px;
+
+  padding:
+    0 11px;
+
+}
+
+.search .input {
+
+  padding-left: 38px;
+
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+
+  border-color:
+    rgba(255,122,0,.7);
+
+  box-shadow:
+    0 0 0 3px
+    rgba(255,122,0,.08);
+
+}
+
+.refresh {
+
+  width: 43px;
+  height: 43px;
+
+  display: grid;
+
+  place-items: center;
+
+  color: var(--blue);
+
+  background: white;
+
+  border:
+    1px solid var(--border);
+
+  border-radius: 9px;
+
+}
+
+.refresh:hover {
+
+  color:
+    var(--orange);
+
+  border-color:
+    var(--orange);
+
+}
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.table-wrap {
+
+  overflow-x: auto;
+
+}
+
+table {
+
+  width: 100%;
+
+  min-width: 1180px;
+
+  border-collapse: collapse;
+
+}
+
+th {
+
+  padding:
+    14px 16px;
+
+  color: #728093;
+
+  background: #fafbfc;
+
+  border-bottom:
+    1px solid var(--border);
+
+  text-align: left;
+
+  font-size: 9px;
+
+  font-weight: 900;
+
+  letter-spacing: .7px;
+
+  text-transform: uppercase;
+
+}
+
+td {
+
+  padding:
+    14px 16px;
+
+  border-bottom:
+    1px solid #edf0f3;
+
+  font-size: 11px;
+
+  vertical-align: middle;
+
+}
+
+tbody tr:hover {
+
+  background:
+    rgba(255,122,0,.02);
+
+}
+
+.student {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+}
+
+.avatar {
+
+  width: 42px;
+  height: 42px;
+
+  flex: 0 0 auto;
+
+  display: grid;
+
+  place-items: center;
+
+  color: white;
+
+  background:
+    linear-gradient(
+      145deg,
+      var(--blue),
+      var(--blue2)
+    );
+
+  border-radius: 11px;
+
+  font-size: 11px;
+
+  font-weight: 900;
+
+}
+
+.student-name {
+
+  color: var(--navy);
+
+  font-weight: 900;
+
+}
+
+.admission {
+
+  margin-top: 3px;
+
+  color: #8996a5;
+
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+
+  font-size: 9px;
+
+}
+
+.secondary {
+
+  margin-top: 3px;
+
+  color: var(--muted);
+
+  font-size: 9px;
+
+}
+
+.badge {
+
+  display: inline-flex;
+
+  align-items: center;
+
+  min-height: 24px;
+
+  padding:
+    0 8px;
+
+  border-radius: 999px;
+
+  font-size: 8px;
+
+  font-weight: 900;
+
+  white-space: nowrap;
+
+}
+
+.badge-active {
+
+  color: var(--green);
+
+  background:
+    var(--greenSoft);
+
+}
+
+.badge-inactive {
+
+  color: #657385;
+
+  background: #edf1f5;
+
+}
+
+.badge-suspended {
+
+  color: var(--red);
+
+  background:
+    var(--redSoft);
+
+}
+
+.badge-graduated {
+
+  color: var(--blue);
+
+  background: #e8f1f9;
+
+}
+
+.badge-withdrawn {
+
+  color: var(--yellow);
+
+  background:
+    var(--yellowSoft);
+
+}
+
+.badge-archived {
+
+  color: var(--purple);
+
+  background:
+    var(--purpleSoft);
+
+}
+
+.actions {
+
+  display: flex;
+
+  justify-content: flex-end;
+
+  gap: 5px;
+
+}
+
+.action {
+
+  height: 31px;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding:
+    0 9px;
+
+  color: var(--blue);
+
+  background: white;
+
+  border:
+    1px solid var(--border);
+
+  border-radius: 7px;
+
+  font-size: 9px;
+
+  font-weight: 900;
+
+  white-space: nowrap;
+
+}
+
+.action:hover {
+
+  background:
+    #f7f9fb;
+
+  border-color:
+    #c5ced8;
+
+}
+
+.action.orange:hover {
+
+  color:
+    var(--orange);
+
+  background:
+    var(--orangeSoft);
+
+  border-color:
+    rgba(255,122,0,.3);
+
+}
+
+.action.green:hover {
+
+  color: var(--green);
+
+  background:
+    var(--greenSoft);
+
+}
+
+.action.red:hover {
+
+  color: var(--red);
+
+  background:
+    var(--redSoft);
+
+}
+
+
+/* =========================================================
+   MOBILE STUDENT LIST
+========================================================= */
+
+.mobile-list {
+
+  display: none;
+
+  padding: 13px;
+
+  gap: 11px;
+
+}
+
+.mobile-card {
+
+  padding: 15px;
+
+  background: white;
+
+  border:
+    1px solid var(--border);
+
+  border-radius: 14px;
+
+  box-shadow:
+    0 5px 16px
+    rgba(10,32,58,.05);
+
+}
+
+.mobile-top {
+
+  display: flex;
+
+  align-items: flex-start;
+
+  justify-content: space-between;
+
+  gap: 10px;
+
+}
+
+.mobile-person {
+
+  display: flex;
+
+  gap: 9px;
+
+  min-width: 0;
+
+}
+
+.mobile-meta {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(2,minmax(0,1fr));
+
+  gap: 10px;
+
+  margin-top: 14px;
+
+}
+
+.meta-label {
+
+  display: block;
+
+  margin-bottom: 3px;
+
+  color: #8b98a7;
+
+  font-size: 8px;
+
+  font-weight: 900;
+
+  letter-spacing: .5px;
+
+  text-transform: uppercase;
+
+}
+
+.meta-value {
+
+  color: var(--text);
+
+  font-size: 10px;
+
+  word-break: break-word;
+
+}
+
+.mobile-actions {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(2,1fr);
+
+  gap: 7px;
+
+  margin-top: 14px;
+
+}
+
+.mobile-actions .action {
+
+  width: 100%;
+
+}
+
+
+/* =========================================================
+   MODALS
+========================================================= */
+
+.modal-bg {
+
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 500;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 16px;
+
+  background:
+    rgba(3,15,29,.7);
+
+  backdrop-filter:
+    blur(7px);
+
+}
+
+.modal {
+
+  width:
+    min(900px,100%);
+
+  max-height:
+    calc(100vh - 32px);
+
+  overflow: auto;
+
+  background: white;
+
+  border-radius: 19px;
+
+  box-shadow:
+    var(--shadowLarge);
+
+  animation:
+    modalIn .18s ease;
+
+}
+
+.modal.small {
+
+  width:
+    min(500px,100%);
+
+}
+
+@keyframes modalIn {
+
+  from {
+
+    opacity: 0;
+
+    transform:
+      translateY(12px)
+      scale(.985);
+
+  }
+
+  to {
+
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+
+  }
+
+}
+
+.modal-head {
+
+  position: sticky;
+
+  top: 0;
+
+  z-index: 5;
+
+  padding:
+    18px 20px;
+
+  display: flex;
+
+  justify-content: space-between;
+
+  gap: 20px;
+
+  background:
+    rgba(255,255,255,.97);
+
+  border-bottom:
+    1px solid var(--border);
+
+  backdrop-filter:
+    blur(10px);
+
+}
+
+.modal-title {
+
+  margin: 0;
+
+  color: var(--navy);
+
+  font-size: 19px;
+
+  font-weight: 900;
+
+}
+
+.modal-subtitle {
+
+  margin:
+    4px 0 0;
+
+  color: var(--muted);
+
+  font-size: 10px;
+
+  line-height: 1.5;
+
+}
+
+.close {
+
+  width: 34px;
+  height: 34px;
+
+  flex: 0 0 auto;
+
+  display: grid;
+
+  place-items: center;
+
+  color: #68778b;
+
+  background: #f3f5f7;
+
+  border:
+    1px solid var(--border);
+
+  border-radius: 8px;
+
+}
+
+.close:hover {
+
+  color: var(--red);
+
+  background:
+    var(--redSoft);
+
+}
+
+.modal-body {
+
+  padding: 21px;
+
+}
+
+.form-section {
+
+  margin-bottom: 23px;
+
+}
+
+.form-section:last-child {
+
+  margin-bottom: 0;
+
+}
+
+.section-heading {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  margin-bottom: 12px;
+
+  padding-bottom: 8px;
+
+  border-bottom:
+    1px solid #edf0f3;
+
+  color: var(--navy);
+
+  font-size: 12px;
+
+  font-weight: 900;
+
+}
+
+.section-heading::before {
+
+  content: "";
+
+  width: 4px;
+  height: 17px;
+
+  background:
+    var(--orange);
+
+  border-radius: 4px;
+
+}
+
+.form-grid {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3,minmax(0,1fr));
+
+  gap: 14px;
+
+}
+
+.form-group.full {
+
+  grid-column:
+    1 / -1;
+
+}
+
+.label {
+
+  display: block;
+
+  margin-bottom: 6px;
+
+  color: #405066;
+
+  font-size: 9px;
+
+  font-weight: 900;
+
+}
+
+.required {
+
+  color:
+    var(--orange);
+
+}
+
+.textarea {
+
+  min-height: 95px;
+
+  padding: 11px;
+
+  resize: vertical;
+
+}
+
+.modal-foot {
+
+  position: sticky;
+
+  bottom: 0;
+
+  z-index: 5;
+
+  padding:
+    14px 20px;
+
+  display: flex;
+
+  justify-content: flex-end;
+
+  gap: 8px;
+
+  background:
+    #fafbfc;
+
+  border-top:
+    1px solid var(--border);
+
+}
+
+.btn {
+
+  min-height: 41px;
+
+  padding:
+    0 15px;
+
+  border-radius: 9px;
+
+  font-size: 10px;
+
+  font-weight: 900;
+
+}
+
+.btn-secondary {
+
+  color: var(--blue);
+
+  background: white;
+
+  border:
+    1px solid var(--border);
+
+}
+
+.btn-primary {
+
+  color: white;
+
+  background:
+    var(--orange);
+
+  border:
+    1px solid var(--orange);
+
+}
+
+.btn-danger {
+
+  color: white;
+
+  background:
+    var(--red);
+
+  border:
+    1px solid var(--red);
+
+}
+
+
+/* =========================================================
+   PROFILE
+========================================================= */
+
+.profile-head {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 14px;
+
+  padding-bottom: 19px;
+
+  margin-bottom: 19px;
+
+  border-bottom:
+    1px solid var(--border);
+
+}
+
+.profile-photo {
+
+  width: 82px;
+  height: 82px;
+
+  flex: 0 0 auto;
+
+  display: grid;
+
+  place-items: center;
+
+  overflow: hidden;
+
+  color: white;
+
+  background:
+    linear-gradient(
+      145deg,
+      var(--blue),
+      var(--blue2)
+    );
+
+  border-radius: 15px;
+
+  font-size: 20px;
+
+  font-weight: 900;
+
+}
+
+.profile-photo img {
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+}
+
+.profile-name {
+
+  color: var(--navy);
+
+  font-size: 20px;
+
+  font-weight: 900;
+
+}
+
+.profile-admission {
+
+  margin-top: 5px;
+
+  color: #8491a2;
+
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+
+  font-size: 10px;
+
+}
+
+.profile-grid {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3,minmax(0,1fr));
+
+  gap: 10px;
+
+}
+
+.detail {
+
+  padding: 12px;
+
+  background:
+    #f7f9fb;
+
+  border:
+    1px solid #e9edf1;
+
+  border-radius: 10px;
+
+}
+
+.detail.full {
+
+  grid-column:
+    1 / -1;
+
+}
+
+.detail-label {
+
+  margin-bottom: 4px;
+
+  color: #8995a4;
+
+  font-size: 8px;
+
+  font-weight: 900;
+
+  letter-spacing: .55px;
+
+  text-transform: uppercase;
+
+}
+
+.detail-value {
+
+  color: var(--text);
+
+  font-size: 10px;
+
+  font-weight: 650;
+
+  line-height: 1.55;
+
+  word-break: break-word;
+
+}
+
+
+/* =========================================================
+   STATES
+========================================================= */
+
+.state {
+
+  padding: 58px 25px;
+
+  text-align: center;
+
+}
+
+.state-spinner {
+
+  width: 30px;
+  height: 30px;
+
+  margin:
+    0 auto 14px;
+
+  border:
+    3px solid #e6ebf0;
+
+  border-top-color:
+    var(--orange);
+
+  border-radius: 50%;
+
+  animation:
+    spin .8s linear infinite;
+
+}
+
+.state-title {
+
+  color: var(--navy);
+
+  font-size: 15px;
+
+  font-weight: 900;
+
+}
+
+.state-text {
+
+  max-width: 520px;
+
+  margin:
+    7px auto 0;
+
+  color: var(--muted);
+
+  font-size: 11px;
+
+  line-height: 1.6;
+
+}
+
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+#toasts {
+
+  position: fixed;
+
+  right: 18px;
+
+  bottom: 18px;
+
+  z-index: 1000;
+
+  width:
+    min(390px,calc(100% - 36px));
+
+  display: grid;
+
+  gap: 8px;
+
+}
+
+.toast {
+
+  padding: 13px 14px;
+
+  color: white;
+
+  background:
+    rgba(7,20,38,.97);
+
+  border:
+    1px solid rgba(255,255,255,.1);
+
+  border-left:
+    4px solid var(--orange);
+
+  border-radius: 10px;
+
+  box-shadow:
+    var(--shadowLarge);
+
+  animation:
+    toastIn .2s ease;
+
+}
+
+.toast.success {
+
+  border-left-color:
+    var(--green);
+
+}
+
+.toast.error {
+
+  border-left-color:
+    var(--red);
+
+}
+
+.toast-title {
+
+  font-size: 11px;
+
+  font-weight: 900;
+
+}
+
+.toast-message {
+
+  margin-top: 3px;
+
+  color:
+    rgba(255,255,255,.67);
+
+  font-size: 9px;
+
+  line-height: 1.5;
+
+}
+
+@keyframes toastIn {
+
+  from {
+
+    opacity: 0;
+
+    transform:
+      translateY(8px);
+
+  }
+
+  to {
+
+    opacity: 1;
+
+    transform:
+      translateY(0);
+
+  }
+
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+footer {
+
+  padding:
+    29px 0 34px;
+
+  color: white;
+
+  background:
+    var(--navy);
+
+}
+
+.footer-inner {
+
+  width:
+    min(1500px,calc(100% - 32px));
+
+  margin: auto;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 20px;
+
+}
+
+.footer-title {
+
+  font-size: 13px;
+
+  font-weight: 900;
+
+}
+
+.footer-copy {
+
+  margin-top: 4px;
+
+  color:
+    rgba(255,255,255,.44);
+
+  font-size: 9px;
+
+}
+
+.powered {
+
+  color:
+    rgba(255,255,255,.57);
+
+  font-size: 10px;
+
+}
+
+.powered strong {
+
+  color:
+    var(--orange);
+
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1200px) {
+
+  .stats {
+
+    grid-template-columns:
+      repeat(3,1fr);
+
+  }
+
+  .toolbar {
+
+    grid-template-columns:
+      1fr 165px 165px 44px;
+
+  }
+
+  .search {
+
+    grid-column:
+      1 / -1;
+
+  }
+
+}
+
+@media (max-width: 950px) {
+
+  .stats {
+
+    grid-template-columns:
+      repeat(2,1fr);
+
+  }
+
+  .heading {
+
+    align-items:
+      flex-start;
+
+    flex-direction:
+      column;
+
+  }
+
+  .add-button {
+
+    width: 100%;
+
+  }
+
+  .table-wrap {
+
+    display: none;
+
+  }
+
+  .mobile-list {
+
+    display: grid;
+
+  }
+
+  .toolbar {
+
+    grid-template-columns:
+      1fr 1fr;
+
+  }
+
+  .search {
+
+    grid-column:
+      1 / -1;
+
+  }
+
+  .refresh {
+
+    width: 100%;
+
+  }
+
+  .form-grid {
+
+    grid-template-columns:
+      repeat(2,1fr);
+
+  }
+
+  .profile-grid {
+
+    grid-template-columns:
+      repeat(2,1fr);
+
+  }
+
+}
+
+@media (max-width: 620px) {
+
+  main,
+  .topbar-inner,
+  .footer-inner {
+
+    width:
+      calc(100% - 22px);
+
+  }
+
+  .brand-subtitle {
+
+    display: none;
+
+  }
+
+  .admin {
+
+    display: none;
+
+  }
+
+  .logout span {
+
+    display: none;
+
+  }
+
+  .stats {
+
+    gap: 8px;
+
+  }
+
+  .stat {
+
+    min-height: 100px;
+
+    padding: 14px;
+
+  }
+
+  .stat-value {
+
+    font-size: 23px;
+
+  }
+
+  .toolbar {
+
+    grid-template-columns:
+      1fr;
+
+  }
+
+  .search {
+
+    grid-column:
+      auto;
+
+  }
+
+  .form-grid,
+  .profile-grid {
+
+    grid-template-columns:
+      1fr;
+
+  }
+
+  .form-group.full,
+  .detail.full {
+
+    grid-column:
+      auto;
+
+  }
+
+  .modal-bg {
+
+    padding: 8px;
+
+  }
+
+  .modal-body {
+
+    padding: 16px;
+
+  }
+
+  .modal-foot {
+
+    flex-direction:
+      column-reverse;
+
+  }
+
+  .modal-foot .btn {
+
+    width: 100%;
+
+  }
+
+  .footer-inner {
+
+    align-items:
+      flex-start;
+
+    flex-direction:
+      column;
+
+  }
+
+}
+
+
+/* =========================================================
+   PRINT / PDF
+========================================================= */
+
+@media print {
+
+  body {
+
+    background: white !important;
+
+  }
+
+  body * {
+
+    visibility: hidden;
+
+  }
+
+  #printArea,
+  #printArea * {
+
+    visibility: visible;
+
+  }
+
+  #printArea {
+
+    position: absolute;
+
+    inset: 0;
+
+    width: 100%;
+
+    margin: 0;
+
+    padding: 20mm;
+
+    background: white;
+
+  }
+
+  .no-print {
+
+    display: none !important;
+
+  }
+
+  @page {
+
+    size: A4;
+
+    margin: 0;
+
+  }
+
+}
+
+#printArea {
+
+  display: none;
+
+}
+
+@media print {
+
+  #printArea {
+
+    display: block;
+
+  }
+
+}
+
+.print-header {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding-bottom: 15px;
+
+  margin-bottom: 18px;
+
+  border-bottom:
+    2px solid #17263a;
+
+}
+
+.print-brand {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+}
+
+.print-logo {
+
+  width: 65px;
+  height: 65px;
+
+  object-fit: contain;
+
+}
+
+.print-school {
+
+  font-size: 18px;
+
+  font-weight: 900;
+
+  color: #071426;
+
+}
+
+.print-subtitle {
+
+  margin-top: 4px;
+
+  font-size: 10px;
+
+  color: #667487;
+
+}
+
+.print-title {
+
+  margin-bottom: 15px;
+
+  color: #071426;
+
+  font-size: 16px;
+
+  font-weight: 900;
+
+  text-transform: uppercase;
+
+  letter-spacing: .6px;
+
+}
+
+.print-student-head {
+
+  display: flex;
+
+  gap: 18px;
+
+  padding: 14px;
+
+  margin-bottom: 16px;
+
+  border: 1px solid #dfe5ec;
+
+  border-radius: 8px;
+
+}
+
+.print-photo {
+
+  width: 90px;
+  height: 105px;
+
+  display: grid;
+
+  place-items: center;
+
+  overflow: hidden;
+
+  flex: 0 0 auto;
+
+  background: #f0f3f6;
+
+  border: 1px solid #d4dce5;
+
+}
+
+.print-photo img {
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+}
+
+.print-photo-placeholder {
+
+  color: #7b8795;
+
+  font-size: 9px;
+
+  text-align: center;
+
+}
+
+.print-student-name {
+
+  font-size: 18px;
+
+  font-weight: 900;
+
+  color: #071426;
+
+}
+
+.print-admission {
+
+  margin-top: 5px;
+
+  color: #667487;
+
+  font-size: 10px;
+
+}
+
+.print-status {
+
+  margin-top: 8px;
+
+  font-size: 9px;
+
+  font-weight: 800;
+
+}
+
+.print-section {
+
+  margin-top: 15px;
+
+  padding-bottom: 5px;
+
+  color: #071426;
+
+  border-bottom:
+    1px solid #dfe5ec;
+
+  font-size: 11px;
+
+  font-weight: 900;
+
+  text-transform: uppercase;
+
+}
+
+.print-grid {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(2,1fr);
+
+  gap: 10px;
+
+  margin-top: 10px;
+
+}
+
+.print-field {
+
+  padding: 8px;
+
+  border-bottom:
+    1px solid #edf0f3;
+
+}
+
+.print-label {
+
+  color: #7a8795;
+
+  font-size: 7px;
+
+  font-weight: 900;
+
+  text-transform: uppercase;
+
+}
+
+.print-value {
+
+  margin-top: 3px;
+
+  color: #17263a;
+
+  font-size: 9px;
+
+}
+
+.print-footer {
+
+  margin-top: 25px;
+
+  padding-top: 10px;
+
+  border-top:
+    1px solid #dfe5ec;
+
+  display: flex;
+
+  justify-content: space-between;
+
+  color: #718094;
+
+  font-size: 7px;
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- ========================================================
+     BOOT
+========================================================= -->
+
+<div id="bootScreen">
+
+  <div class="boot-card">
+
+    <img
+      src="assets/images/Almafaaz-logo.png"
+      class="boot-logo"
+      alt="ALMAFAAZ ACADEMY"
+    >
+
+    <div
+      style="
+        font-size:18px;
+        font-weight:900;
+      "
+    >
+      Student Management
+    </div>
+
+    <div
+      style="
+        margin-top:6px;
+        color:rgba(255,255,255,.55);
+        font-size:10px;
+      "
+    >
+      Verifying Super Admin access...
+    </div>
+
+    <div class="spinner"></div>
+
+  </div>
+
+</div>
+
+
+<!-- ========================================================
+     APP
+========================================================= -->
+
+<div
+  id="app"
+  class="hidden"
+>
+
+
+<header class="topbar">
+
+  <div class="topbar-inner">
+
+    <div class="brand">
+
+      <a
+        class="back"
+        href="./super-admin-dashboard.html"
+        title="Back to Super Admin Dashboard"
+      >
+
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+        >
+
+          <path
+            d="M15 18l-6-6 6-6"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+
+        </svg>
+
+      </a>
+
+
+      <img
+        src="assets/images/Almafaaz-logo.png"
+        class="logo"
+        alt="ALMAFAAZ ACADEMY"
+      >
+
+
+      <div>
+
+        <div class="brand-title">
+          ALMAFAAZ ACADEMY
+        </div>
+
+        <div class="brand-subtitle">
+          Student Management
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="top-right">
+
+      <div class="admin">
+
+        <div
+          class="admin-avatar"
+          id="adminInitials"
+        >
+          SA
+        </div>
+
+        <div>
+
+          <div
+            class="admin-name"
+            id="adminName"
+          >
+            Super Admin
+          </div>
+
+          <div class="admin-role">
+            Super Administrator
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <button
+        type="button"
+        class="logout"
+        id="logoutButton"
+      >
+
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+        >
+
+          <path
+            d="M10 17l5-5-5-5"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+
+          <path
+            d="M15 12H3"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+
+          <path
+            d="M20 4v16"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+
+        </svg>
+
+        <span>
+          Logout
+        </span>
+
+      </button>
+
+    </div>
+
+  </div>
+
+</header>
+
+
+<main>
+
+
+<!-- ========================================================
+     HEADING
+========================================================= -->
+
+<section class="heading">
+
+  <div>
+
+    <div class="eyebrow">
+
+      <span class="eyebrow-line"></span>
+
+      Academic Records
+
+    </div>
+
+
+    <h1>
+      Students
+    </h1>
+
+
+    <p class="description">
+
+      Manage complete student records including admission
+      information, class placement, personal details,
+      parent or guardian information, emergency contacts,
+      academic status and printable student profiles.
+
+    </p>
+
+  </div>
+
+
+  <button
+    type="button"
+    class="add-button"
+    id="addStudentButton"
+  >
+
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+    >
+
+      <path
+        d="M12 5v14M5 12h14"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+      />
+
+    </svg>
+
+    Add Student
+
+  </button>
+
+</section>
+
+
+<!-- ========================================================
+     STATS
+========================================================= -->
+
+<section class="stats">
+
+
+  <article class="stat">
+
+    <div class="stat-label">
+      Total Students
+    </div>
+
+    <div
+      class="stat-value"
+      id="totalCount"
+    >
+      0
+    </div>
+
+    <div class="stat-note">
+      All student records
+    </div>
+
+  </article>
+
+
+  <article class="stat">
+
+    <div class="stat-label">
+      Active
+    </div>
+
+    <div
+      class="stat-value"
+      id="activeCount"
+    >
+      0
+    </div>
+
+    <div class="stat-note">
+      Currently enrolled
+    </div>
+
+  </article>
+
+
+  <article class="stat">
+
+    <div class="stat-label">
+      Male
+    </div>
+
+    <div
+      class="stat-value"
+      id="maleCount"
+    >
+      0
+    </div>
+
+    <div class="stat-note">
+      Male students
+    </div>
+
+  </article>
+
+
+  <article class="stat">
+
+    <div class="stat-label">
+      Female
+    </div>
+
+    <div
+      class="stat-value"
+      id="femaleCount"
+    >
+      0
+    </div>
+
+    <div class="stat-note">
+      Female students
+    </div>
+
+  </article>
+
+
+  <article class="stat">
+
+    <div class="stat-label">
+      Archived
+    </div>
+
+    <div
+      class="stat-value"
+      id="archivedCount"
+    >
+      0
+    </div>
+
+    <div class="stat-note">
+      Archived records
+    </div>
+
+  </article>
+
+
+</section>
+
+
+<!-- ========================================================
+     WORKSPACE
+========================================================= -->
+
+<section class="workspace">
+
+
+<div class="toolbar">
+
+
+  <div class="search">
+
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+    >
+
+      <circle
+        cx="11"
+        cy="11"
+        r="7"
+        stroke="currentColor"
+        stroke-width="2"
+      />
+
+      <path
+        d="m20 20-4-4"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+      />
+
+    </svg>
+
+
+    <input
+      id="search"
+      class="input"
+      type="search"
+      placeholder="Search student, admission number, parent..."
+      autocomplete="off"
+    >
+
+  </div>
+
+
+  <select
+    id="classFilter"
+    class="select"
+  >
+
+    <option value="all">
+      All Classes
+    </option>
+
+  </select>
+
+
+  <select
+    id="statusFilter"
+    class="select"
+  >
+
+    <option value="all">
+      All Statuses
+    </option>
+
+    <option value="active">
+      Active
+    </option>
+
+    <option value="inactive">
+      Inactive
+    </option>
+
+    <option value="suspended">
+      Suspended
+    </option>
+
+    <option value="graduated">
+      Graduated
+    </option>
+
+    <option value="withdrawn">
+      Withdrawn
+    </option>
+
+    <option value="archived">
+      Archived
+    </option>
+
+  </select>
+
+
+  <select
+    id="genderFilter"
+    class="select"
+  >
+
+    <option value="all">
+      All Genders
+    </option>
+
+    <option value="male">
+      Male
+    </option>
+
+    <option value="female">
+      Female
+    </option>
+
+  </select>
+
+
+  <button
+    type="button"
+    class="refresh"
+    id="refreshButton"
+    title="Refresh students"
+  >
+
+    <svg
+      width="17"
+      height="17"
+      viewBox="0 0 24 24"
+      fill="none"
+    >
+
+      <path
+        d="M20 11a8 8 0 0 0-15.4-2"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+      />
+
+      <path
+        d="M4 5v4h4"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+      />
+
+      <path
+        d="M4 13a8 8 0 0 0 15.4 2"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+      />
+
+      <path
+        d="M20 19v-4h-4"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+      />
+
+    </svg>
+
+  </button>
+
+</div>
+
+
+<!-- DESKTOP TABLE -->
+
+<div class="table-wrap">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>
+  Student
+</th>
+
+<th>
+  Class
+</th>
+
+<th>
+  Gender
+</th>
+
+<th>
+  Parent / Guardian
+</th>
+
+<th>
+  Contact
+</th>
+
+<th>
+  Status
+</th>
+
+<th style="text-align:right;">
+  Actions
+</th>
+
+</tr>
+
+</thead>
+
+
+<tbody id="tableBody"></tbody>
+
+</table>
+
+</div>
+
+
+<!-- MOBILE -->
+
+<div
+  class="mobile-list"
+  id="mobileList"
+></div>
+
+
+</section>
+
+</main>
+
+
+<footer>
+
+<div class="footer-inner">
+
+<div>
+
+  <div class="footer-title">
+    ALMAFAAZ ACADEMY
+  </div>
+
+  <div class="footer-copy">
+    Copyright © 2026 ALMAFAAZ ACADEMY.
+    All rights reserved.
+  </div>
+
+</div>
+
+
+<div class="powered">
+
+  Powered by
+
+  <strong>
+    Yalerima Technologies Limited
+  </strong>
+
+</div>
+
+</div>
+
+</footer>
+
+</div>
+
+
+<!-- ========================================================
+     STUDENT FORM MODAL
+========================================================= -->
+
+<div
+  class="modal-bg hidden"
+  id="studentFormModal"
+>
+
+<div class="modal">
+
+
+<div class="modal-head">
+
+<div>
+
+<h2
+  class="modal-title"
+  id="formTitle"
+>
+  Add Student
+</h2>
+
+<p
+  class="modal-subtitle"
+  id="formSubtitle"
+>
+  Create a complete student record.
+</p>
+
+</div>
+
+
+<button
+  type="button"
+  class="close"
+  data-close="studentFormModal"
+>
+
+<svg
+  width="16"
+  height="16"
+  viewBox="0 0 24 24"
+  fill="none"
+>
+
+<path
+  d="M6 6l12 12M18 6 6 18"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+/>
+
+</svg>
+
+</button>
+
+</div>
+
+
+<form id="studentForm">
+
+
+<div class="modal-body">
+
+
+<!-- PERSONAL -->
+
+<section class="form-section">
+
+<div class="section-heading">
+  Student Identity
+</div>
+
+
+<div class="form-grid">
+
+
+<div class="form-group">
+
+<label class="label">
+First Name
+<span class="required">*</span>
+</label>
+
+<input
+  id="firstName"
+  class="input"
+  required
+  maxlength="100"
+  placeholder="First name"
+>
+
+</div>
+
+
+<div class="form-group">
+
+<label class="label">
+Middle Name
+</label>
+
+<input
+  id="middleName"
+  class="input"
+  maxlength="100"
+  placeholder="Middle name"
+>
+
+</div>
+
+
+<div class="form-group">
+
+<label class="label">
+Last Name
+<span class="required">*</span>
+</label>
+
+<input
+  id="lastName"
+  class="input"
+  required
+  maxlength="100"
+  placeholder="Surname"
+>
+
+</div>
+
+
+<div class="form-group">
+
+<label class="label">
+Date of Birth
+</label>
+
+<input
+  id="dateOfBirth"
+  class="input"
+  type="date"
+>
+
+</div>
+
+
+<div class="form-group">
+
+<label class="label">
+Gender
+</label>
+
+<select
+  id="gender"
+  class="select"
+>
+
+<option value="">
+Select Gender
+</option>
+
+<option value="male">
+Male
+</option>
+
+<option value="female">
+Female
+</option>
+
+<option value="other">
+Other
+</option>
+
+<option value="prefer_not_to_say">
+Prefer not to say
+</option>
+
+</select>
+
+</div>
+
+
+<div class="form-group">
+
+<label class="label">
+Nationality
+</label>
+
+<input
+  id="nationality"
+  class="input"
+  value="Nigerian"
+  maxlength="80"
+>
+
+</div>
+
+
+<div class="form-group">
+
+<label class="label">
+State of Origin
+</label>
+
+<input
+  id="stateOfOrigin"
+  class="input"
+  maxlength="80"
+  placeholder="State"
+>
+
+</div>
+
+
+<div class="form-group">
+
+<label class="label">
+LGA
+</label>
+
+<input
+  id="lga"
+  class="input"
+  maxlength="100"
+  placeholder="Local Government Area"
+>
+
+</div>
+
+
+<div class="form-group">
+
+<label class="label">
+Religion
+</label>
+
+<input
+  id="religion"
+  class="input"
+  maxlength="80"
+>
+
+</div>
+
+
+</div>
+
+</section>
+
+
+<!-- ACADEMIC -->
+
+<section class="form-section">
+
+<div class="section-heading">
+  Admission & Academic Placement
+</div>
+
+
+<div class="form-grid">
+
+
+<div class="form-group">
+
+<label class="label">
+Class
+</label>
+
+<select
+  id="classId"
+  class="select"
+>
+
+<option value="">
+Select Class
+</option>
+
+</select>
+
+</div>
+
+
+<div class="form-group">
+
+<label class="label">
+Admission Date
+</label>
+
+<input
+  id="admissionDate"
+  class="input"
+  type="date"
+>
+
+</div>
+
+
+<div class="form-group">
+
+<label class="label">
+Student Type
+</label>
+
+<select
+  id="studentType"
+  class="select"
+>
+
+<option value="new">
+New Student
+</option>
+
+<option value="returning">
+Returning Student
+</option>
+
+<option value="transfer">
+Transfer Student
+</option>
+
+</select>
+
+</div>
+
+
+<div class="form-group">
+
+<label class="label">
+Student Status
+</label>
+
+<select
+  id="studentStatus"
+  class="select"
+>
+
+<option value="active">
+Active
+</option>
+
+<option value="inactive">
+Inactive
+</option>
+
+<option value="suspended">
+Suspended
+</option>
+
+<option value="graduated">
+Graduated
+</option>
+
+<option value="withdrawn">
+Withdrawn
+</option>
+
+<option value="archived">
+Archived
+</option>
+
+</select>
+
+</div>
+
+
+<div class="form-group full">
+
+<label class="label">
+Previous School
+</label>
+
+<input
+  id="previousSchool"
+  class="input"
+  maxlength="200"
+  placeholder="For new or transfer students"
+>
+
+</div>
+
+
+</div>
+
+</section>
+
+
+<!-- CONTACT -->
+
+<section class="form-section">
+
+<div class="section-heading">
+  Student Contact
+</div>
+
+
+<div class="form-grid">
+
+
+<div class="form-group">
+
+<label class="label">
+Student Phone
+</label>
+
+<input
+  id="phone"
+  class="input"
+  maxlength="40"
+>
+
+</div>
+
+
+<div class="form-group">
+
+<label class="label">
+Student Email
+</label>
+
+<input
+  id="email"
+  class="input"
+  type="email"
+  maxlength="180"
+>
+
+</div>
+
+
+<div class="form-group full">
+
+<label class="label">
+Residential Address
+</label>
+
+<textarea
+  id="address"
+  class="textarea"
+  maxlength="600"
+></textarea>
+
+</div>
+
+
+</div>
+
+</section>
+
+
+<!-- PARENT -->
+
+<section class="form-section">
+
+<div class="section-heading">
+  Parent / Primary Guardian
+</div>
+
+
+<div class="form-grid">
+
+
+<div class="form-group">
+
+<label class="label">
+Full Name
+</label>
+
+<input
+  id="parentGuardianName"
+  class="input"
+  maxlength="150"
+>
+
+</div>
+
+
+<div class="form-group">
+
+<label class="label">
+Relationship
+</label>
+
+<input
+  id="parentGuardianRelationship"
+  class="input"
+  maxlength="80"
+  placeholder="Father, Mother, Guardian..."
+>
+
+</div>
+
+
+<div class="form-group">
+
+<label class="label">
+Phone
+</label>
+
+<input
+  id="parentGuardianPhone"
+  class="input"
+  maxlength="40"
+>
+
+</div>
+
+
+<div class="form-group">
+
+<label class="label">
+Email
+</label>
+
+<input
+  id="parentGuardianEmail"
+  class="input"
+  type="email"
+  maxlength="180"
+>
+
+</div>
+
+
+<div class="form-group full">
+
+<label class="label">
+Address
+</label>
+
+<textarea
+  id="parentGuardianAddress"
+  class="textarea"
+  maxlength="600"
+></textarea>
+
+</div>
+
+
+</div>
+
+</section>
+
+
+<!-- SECOND GUARDIAN -->
+
+<section class="form-section">
+
+<div class="section-heading">
+  Second Guardian
+</div>
+
+
+<div class="form-grid">
+
+
+<div class="form-group">
+
+<label class="label">
+Full Name
+</label>
+
+<input
+  id="secondGuardianName"
+  class="input"
+  maxlength="150"
+>
+
+</div>
+
+
+<div class="form-group">
+
+<label class="label">
+Relationship
+</label>
+
+<input
+  id="secondGuardianRelationship"
+  class="input"
+  maxlength="80"
+>
+
+</div>
+
+
+<div class="form-group">
+
+<label class="label">
+Phone
+</label>
+
+<input
+  id="secondGuardianPhone"
+  class="input"
+  maxlength="40"
+>
+
+</div>
+
+
+<div class="form-group">
+
+<label class="label">
+Email
+</label>
+
+<input
+  id="secondGuardianEmail"
+  class="input"
+  type="email"
+  maxlength="180"
+>
+
+</div>
+
+
+</div>
+
+</section>
+
+
+<!-- EMERGENCY -->
+
+<section class="form-section">
+
+<div class="section-heading">
+  Emergency Contact
+</div>
+
+
+<div class="form-grid">
+
+
+<div class="form-group">
+
+<label class="label">
+Name
+</label>
+
+<input
+  id="emergencyContactName"
+  class="input"
+  maxlength="150"
+>
+
+</div>
+
+
+<div class="form-group">
+
+<label class="label">
+Relationship
+</label>
+
+<input
+  id="emergencyContactRelationship"
+  class="input"
+  maxlength="80"
+>
+
+</div>
+
+
+<div class="form-group">
+
+<label class="label">
+Phone
+</label>
+
+<input
+  id="emergencyContactPhone"
+  class="input"
+  maxlength="40"
+>
+
+</div>
+
+
+</div>
+
+</section>
+
+
+<!-- ADDITIONAL -->
+
+<section class="form-section">
+
+<div class="section-heading">
+  Additional Student Information
+</div>
+
+
+<div class="form-grid">
+
+
+<div class="form-group">
+
+<label class="label">
+Blood Group
+</label>
+
+<select
+  id="bloodGroup"
+  class="select"
+>
+
+<option value="">
+Not Specified
+</option>
+
+<option value="A+">
+A+
+</option>
+
+<option value="A-">
+A-
+</option>
+
+<option value="B+">
+B+
+</option>
+
+<option value="B-">
+B-
+</option>
+
+<option value="AB+">
+AB+
+</option>
+
+<option value="AB-">
+AB-
+</option>
+
+<option value="O+">
+O+
+</option>
+
+<option value="O-">
+O-
+</option>
+
+</select>
+
+</div>
+
+
+<div class="form-group">
+
+<label class="label">
+Genotype
+</label>
+
+<select
+  id="genotype"
+  class="select"
+>
+
+<option value="">
+Not Specified
+</option>
+
+<option value="AA">
+AA
+</option>
+
+<option value="AS">
+AS
+</option>
+
+<option value="AC">
+AC
+</option>
+
+<option value="SS">
+SS
+</option>
+
+<option value="SC">
+SC
+</option>
+
+</select>
+
+</div>
+
+
+<div class="form-group">
+
+<label class="label">
+Passport Photo URL
+</label>
+
+<input
+  id="passportPhotoUrl"
+  class="input"
+  type="url"
+  placeholder="https://..."
+>
+
+</div>
+
+
+<div class="form-group full">
+
+<label class="label">
+Medical Notes
+</label>
+
+<textarea
+  id="medicalNotes"
+  class="textarea"
+  maxlength="1000"
+  placeholder="Relevant medical information..."
+></textarea>
+
+</div>
+
+
+<div class="form-group full">
+
+<label class="label">
+Administrative Notes
+</label>
+
+<textarea
+  id="notes"
+  class="textarea"
+  maxlength="1500"
+></textarea>
+
+</div>
+
+
+</div>
+
+</section>
+
+
+</div>
+
+
+<div class="modal-foot">
+
+<button
+  type="button"
+  class="btn btn-secondary"
+  data-close="studentFormModal"
+>
+Cancel
+</button>
+
+
+<button
+  type="submit"
+  class="btn btn-primary"
+  id="saveStudentButton"
+>
+Create Student
+</button>
+
+</div>
+
+
+</form>
+
+</div>
+
+</div>
+
+
+<!-- ========================================================
+     PROFILE MODAL
+========================================================= -->
+
+<div
+  class="modal-bg hidden"
+  id="profileModal"
+>
+
+<div class="modal">
+
+
+<div class="modal-head">
+
+<div>
+
+<h2 class="modal-title">
+Student Profile
+</h2>
+
+<p class="modal-subtitle">
+Complete student record.
+</p>
+
+</div>
+
+
+<button
+  type="button"
+  class="close"
+  data-close="profileModal"
+>
+
+<svg
+  width="16"
+  height="16"
+  viewBox="0 0 24 24"
+  fill="none"
+>
+
+<path
+  d="M6 6l12 12M18 6 6 18"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+/>
+
+</svg>
+
+</button>
+
+</div>
+
+
+<div
+  class="modal-body"
+  id="profileBody"
+></div>
+
+
+<div class="modal-foot">
+
+<button
+  type="button"
+  class="btn btn-secondary"
+  data-close="profileModal"
+>
+Close
+</button>
+
+
+<button
+  type="button"
+  class="btn btn-primary"
+  id="printProfileButton"
+>
+Print / PDF
+</button>
+
+</div>
+
+
+</div>
+
+</div>
+
+
+<!-- ========================================================
+     CONFIRM MODAL
+========================================================= -->
+
+<div
+  class="modal-bg hidden"
+  id="confirmModal"
+>
+
+<div class="modal small">
+
+
+<div class="modal-head">
+
+<div>
+
+<h2
+  class="modal-title"
+  id="confirmTitle"
+>
+Confirm Action
+</h2>
+
+<p class="modal-subtitle">
+Review this operation before continuing.
+</p>
+
+</div>
+
+
+<button
+  type="button"
+  class="close"
+  data-close="confirmModal"
+>
+
+<svg
+  width="16"
+  height="16"
+  viewBox="0 0 24 24"
+  fill="none"
+>
+
+<path
+  d="M6 6l12 12M18 6 6 18"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+/>
+
+</svg>
+
+</button>
+
+</div>
+
+
+<div class="modal-body">
+
+<p
+  id="confirmMessage"
+  style="
+    margin:0;
+    color:#536174;
+    font-size:12px;
+    line-height:1.7;
+  "
+></p>
+
+</div>
+
+
+<div class="modal-foot">
+
+<button
+  type="button"
+  class="btn btn-secondary"
+  data-close="confirmModal"
+>
+Cancel
+</button>
+
+
+<button
+  type="button"
+  class="btn btn-danger"
+  id="confirmButton"
+>
+Confirm
+</button>
+
+</div>
+
+
+</div>
+
+</div>
+
+
+<!-- ========================================================
+     PRINT AREA
+========================================================= -->
+
+<section
+  id="printArea"
+></section>
+
+
+<div id="toasts"></div>
+
+
+<script>
+
+/* ============================================================
+   SUPABASE
+============================================================ */
+
+const SUPABASE_URL =
+  "https://orkokipqrwsqnslbwpbt.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_sjcK3_WrRNCnz04ePDsuHg_GfsHjr0l";
+
+const {
+  createClient
+} = window.supabase;
+
+const supabaseClient =
+  createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+/* ============================================================
+   RPC NAMES
+============================================================ */
+
+const RPC = {
+
+  list:
+    "list_students",
+
+  get:
+    "get_student",
+
+  create:
+    "create_student",
+
+  update:
+    "update_student",
+
+  archive:
+    "archive_student",
+
+  restore:
+    "restore_student",
+
+  delete:
+    "delete_student"
+
+};
+
+
+/* ============================================================
+   STATE
+============================================================ */
+
+let students = [];
+
+let filteredStudents = [];
+
+let classes = [];
+
+let currentUser = null;
+
+let editingStudentId = null;
+
+let selectedStudent = null;
+
+let confirmationAction = null;
+
+
+/* ============================================================
+   HELPERS
+============================================================ */
+
+const $ = id =>
+  document.getElementById(id);
+
+
+function escapeHTML(value) {
+
+  return String(value ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+
+}
+
+
+function initials(name) {
+
+  const parts =
+    String(name || "Student")
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean);
+
+  if (!parts.length)
+    return "ST";
+
+  if (parts.length === 1)
+    return parts[0]
+      .slice(0,2)
+      .toUpperCase();
+
+  return (
+    parts[0][0] +
+    parts[parts.length - 1][0]
+  ).toUpperCase();
+
+}
+
+
+function fullName(student) {
+
+  return [
+    student.first_name,
+    student.middle_name,
+    student.last_name
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+}
+
+
+function label(value) {
+
+  if (!value)
+    return "Not provided";
+
+  return String(value)
+    .replaceAll("_"," ")
+    .replace(
+      /\b\w/g,
+      c => c.toUpperCase()
+    );
+
+}
+
+
+function dateText(value) {
+
+  if (!value)
+    return "Not provided";
+
+  const date =
+    new Date(value);
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  )
+    return String(value);
+
+  return new Intl.DateTimeFormat(
+    "en-NG",
+    {
+      year: "numeric",
+      month: "short",
+      day: "numeric"
+    }
+  ).format(date);
+
+}
+
+
+/* ============================================================
+   TOAST
+============================================================ */
+
+function toast(
+  title,
+  message,
+  type = "info"
+) {
+
+  const item =
+    document.createElement("div");
+
+  item.className =
+    `toast ${type}`;
+
+  item.innerHTML = `
+
+    <div class="toast-title">
+      ${escapeHTML(title)}
+    </div>
+
+    <div class="toast-message">
+      ${escapeHTML(message)}
+    </div>
+
+  `;
+
+  $("toasts")
+    .appendChild(item);
+
+  setTimeout(
+    () => item.remove(),
+    5000
+  );
+
+}
+
+
+/* ============================================================
+   MODALS
+============================================================ */
+
+function openModal(id) {
+
+  $(id)
+    .classList
+    .remove("hidden");
+
+  document.body.style.overflow =
+    "hidden";
+
+}
+
+
+function closeModal(id) {
+
+  $(id)
+    .classList
+    .add("hidden");
+
+  if (
+    !document.querySelector(
+      ".modal-bg:not(.hidden)"
+    )
+  ) {
+
+    document.body.style.overflow =
+      "";
+
+  }
+
+}
+
+
+document
+  .querySelectorAll("[data-close]")
+  .forEach(button => {
+
+    button.addEventListener(
+      "click",
+      () => {
+
+        closeModal(
+          button.dataset.close
+        );
+
+      }
+    );
+
+  });
+
+
+document
+  .querySelectorAll(".modal-bg")
+  .forEach(background => {
+
+    background.addEventListener(
+      "click",
+      event => {
+
+        if (
+          event.target === background
+        ) {
+
+          closeModal(
+            background.id
+          );
+
+        }
+
+      }
+    );
+
+  });
+
+
+/* ============================================================
+   AUTH
+============================================================ */
+
+async function verifySuperAdmin() {
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .auth
+      .getSession();
+
+
+  if (
+    error ||
+    !data.session
+  ) {
+
+    window.location.href =
+      "./super-admin-login.html";
+
+    return false;
+
+  }
+
+
+  currentUser =
+    data.session.user;
+
+
+  const {
+    data: profile,
+    error: profileError
+  } =
+    await supabaseClient
+      .from("profiles")
+      .select(
+        "id,full_name,role,account_status"
+      )
+      .eq(
+        "id",
+        currentUser.id
+      )
+      .maybeSingle();
+
+
+  if (
+    profileError ||
+    !profile ||
+    profile.role !== "super_admin" ||
+    profile.account_status !== "active"
+  ) {
+
+    await supabaseClient
+      .auth
+      .signOut();
+
+    window.location.href =
+      "./super-admin-login.html";
+
+    return false;
+
+  }
+
+
+  $("adminName")
+    .textContent =
+    profile.full_name ||
+    currentUser.email ||
+    "Super Admin";
+
+
+  $("adminInitials")
+    .textContent =
+    initials(
+      profile.full_name ||
+      currentUser.email
+    );
+
+
+  return true;
+
+}
+
+
+/* ============================================================
+   LOAD CLASSES
+============================================================ */
+
+async function loadClasses() {
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+
+      .from("academic_classes")
+
+      .select(`
+        id,
+        class_code,
+        class_name,
+        section,
+        level_order,
+        is_active
+      `)
+
+      .eq(
+        "is_active",
+        true
+      )
+
+      .order(
+        "level_order",
+        {
+          ascending: true
+        }
+      );
+
+
+  if (error) {
+
+    toast(
+      "Class loading failed",
+      error.message,
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  classes =
+    data || [];
+
+
+  populateClassControls();
+
+}
+
+
+/* ============================================================
+   CLASS CONTROLS
+============================================================ */
+
+function populateClassControls() {
+
+  const filter =
+    $("classFilter");
+
+  const form =
+    $("classId");
+
+
+  filter.innerHTML = `
+    <option value="all">
+      All Classes
+    </option>
+  `;
+
+
+  form.innerHTML = `
+    <option value="">
+      Select Class
+    </option>
+  `;
+
+
+  classes.forEach(item => {
+
+    const text =
+      `${item.class_name}${
+        item.section
+          ? " — " + item.section
+          : ""
+      }`;
+
+
+    const filterOption =
+      document.createElement("option");
+
+    filterOption.value =
+      item.id;
+
+    filterOption.textContent =
+      text;
+
+    filter.appendChild(
+      filterOption
+    );
+
+
+    const formOption =
+      document.createElement("option");
+
+    formOption.value =
+      item.id;
+
+    formOption.textContent =
+      text;
+
+    form.appendChild(
+      formOption
+    );
+
+  });
+
+}
+
+
+/* ============================================================
+   LOAD STUDENTS
+============================================================ */
+
+async function loadStudents() {
+
+  renderLoading();
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .rpc(RPC.list);
+
+
+  if (error) {
+
+    renderError(
+      error.message
+    );
+
+    toast(
+      "Unable to load students",
+      error.message,
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  students =
+    Array.isArray(data)
+      ? data
+      : [];
+
+
+  updateStats();
+
+  applyFilters();
+
+}
+
+
+/* ============================================================
+   LOADING
+============================================================ */
+
+function renderLoading() {
+
+  $("tableBody").innerHTML = `
+
+    <tr>
+
+      <td colspan="7">
+
+        <div class="state">
+
+          <div class="state-spinner"></div>
+
+          <div class="state-title">
+            Loading Students
+          </div>
+
+          <div class="state-text">
+            Retrieving student records...
+          </div>
+
+        </div>
+
+      </td>
+
+    </tr>
+
+  `;
+
+
+  $("mobileList").innerHTML = `
+
+    <div class="state">
+
+      <div class="state-spinner"></div>
+
+      <div class="state-title">
+        Loading Students
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+
+/* ============================================================
+   ERROR
+============================================================ */
+
+function renderError(message) {
+
+  $("tableBody").innerHTML = `
+
+    <tr>
+
+      <td colspan="7">
+
+        <div class="state">
+
+          <div class="state-title">
+            Unable to load students
+          </div>
+
+          <div class="state-text">
+            ${escapeHTML(message)}
+          </div>
+
+        </div>
+
+      </td>
+
+    </tr>
+
+  `;
+
+
+  $("mobileList").innerHTML = `
+
+    <div class="state">
+
+      <div class="state-title">
+        Unable to load students
+      </div>
+
+      <div class="state-text">
+        ${escapeHTML(message)}
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+
+/* ============================================================
+   STATS
+============================================================ */
+
+function updateStats() {
+
+  $("totalCount")
+    .textContent =
+    students.length;
+
+
+  $("activeCount")
+    .textContent =
+    students.filter(
+      s =>
+        s.student_status ===
+        "active"
+    ).length;
+
+
+  $("maleCount")
+    .textContent =
+    students.filter(
+      s =>
+        s.gender ===
+        "male"
+    ).length;
+
+
+  $("femaleCount")
+    .textContent =
+    students.filter(
+      s =>
+        s.gender ===
+        "female"
+    ).length;
+
+
+  $("archivedCount")
+    .textContent =
+    students.filter(
+      s =>
+        s.student_status ===
+        "archived"
+    ).length;
+
+}
+
+
+/* ============================================================
+   FILTER
+============================================================ */
+
+function applyFilters() {
+
+  const query =
+    $("search")
+      .value
+      .trim()
+      .toLowerCase();
+
+
+  const classId =
+    $("classFilter").value;
+
+
+  const status =
+    $("statusFilter").value;
+
+
+  const gender =
+    $("genderFilter").value;
+
+
+  filteredStudents =
+    students.filter(student => {
+
+      const searchable = [
+
+        fullName(student),
+
+        student.admission_number,
+
+        student.phone,
+
+        student.email,
+
+        student.parent_guardian_name,
+
+        student.parent_guardian_phone,
+
+        student.class_name,
+
+        student.class_code
+
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+
+      if (
+        query &&
+        !searchable.includes(query)
+      )
+        return false;
+
+
+      if (
+        classId !== "all" &&
+        student.class_id !== classId
+      )
+        return false;
+
+
+      if (
+        status !== "all" &&
+        student.student_status !== status
+      )
+        return false;
+
+
+      if (
+        gender !== "all" &&
+        student.gender !== gender
+      )
+        return false;
+
+
+      return true;
+
+    });
+
+
+  renderStudents();
+
+}
+
+
+/* ============================================================
+   STATUS BADGE
+============================================================ */
+
+function statusBadge(status) {
+
+  let cls =
+    "badge-inactive";
+
+
+  if (status === "active")
+    cls =
+      "badge-active";
+
+
+  if (status === "suspended")
+    cls =
+      "badge-suspended";
+
+
+  if (status === "graduated")
+    cls =
+      "badge-graduated";
+
+
+  if (status === "withdrawn")
+    cls =
+      "badge-withdrawn";
+
+
+  if (status === "archived")
+    cls =
+      "badge-archived";
+
+
+  return `
+
+    <span class="badge ${cls}">
+      ${escapeHTML(label(status))}
+    </span>
+
+  `;
+
+}
+
+
+/* ============================================================
+   RENDER
+============================================================ */
+
+function renderStudents() {
+
+  if (!filteredStudents.length) {
+
+    $("tableBody").innerHTML = `
+
+      <tr>
+
+        <td colspan="7">
+
+          <div class="state">
+
+            <div class="state-title">
+              No Students Found
+            </div>
+
+            <div class="state-text">
+              No student records match the
+              current search or filters.
+            </div>
+
+          </div>
+
+        </td>
+
+      </tr>
+
+    `;
+
+
+    $("mobileList").innerHTML = `
+
+      <div class="state">
+
+        <div class="state-title">
+          No Students Found
+        </div>
+
+        <div class="state-text">
+          Try another search or add a new student.
+        </div>
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  $("tableBody").innerHTML =
+    filteredStudents
+      .map(studentTableRow)
+      .join("");
+
+
+  $("mobileList").innerHTML =
+    filteredStudents
+      .map(studentMobileCard)
+      .join("");
+
+}
+
+
+/* ============================================================
+   TABLE ROW
+============================================================ */
+
+function studentTableRow(student) {
+
+  const name =
+    fullName(student);
+
+
+  return `
+
+    <tr>
+
+
+      <td>
+
+        <div class="student">
+
+          <div class="avatar">
+            ${escapeHTML(
+              initials(name)
+            )}
+          </div>
+
+          <div>
+
+            <div class="student-name">
+              ${escapeHTML(name)}
+            </div>
+
+            <div class="admission">
+              ${escapeHTML(
+                student.admission_number
+              )}
+            </div>
+
+          </div>
+
+        </div>
+
+      </td>
+
+
+      <td>
+
+        <div>
+          ${escapeHTML(
+            student.class_name ||
+            "Not assigned"
+          )}
+        </div>
+
+        <div class="secondary">
+          ${escapeHTML(
+            student.section ||
+            ""
+          )}
+        </div>
+
+      </td>
+
+
+      <td>
+        ${escapeHTML(
+          label(student.gender)
+        )}
+      </td>
+
+
+      <td>
+
+        <div>
+          ${escapeHTML(
+            student.parent_guardian_name ||
+            "Not provided"
+          )}
+        </div>
+
+        <div class="secondary">
+          ${escapeHTML(
+            student.parent_guardian_relationship ||
+            ""
+          )}
+        </div>
+
+      </td>
+
+
+      <td>
+
+        <div>
+          ${escapeHTML(
+            student.parent_guardian_phone ||
+            student.phone ||
+            "No contact"
+          )}
+        </div>
+
+        <div class="secondary">
+          ${escapeHTML(
+            student.parent_guardian_email ||
+            student.email ||
+            ""
+          )}
+        </div>
+
+      </td>
+
+
+      <td>
+
+        ${statusBadge(
+          student.student_status
+        )}
+
+      </td>
+
+
+      <td>
+
+        <div class="actions">
+
+          <button
+            type="button"
+            class="action orange"
+            onclick="viewStudent('${student.id}')"
+          >
+            View
+          </button>
+
+
+          <button
+            type="button"
+            class="action"
+            onclick="editStudent('${student.id}')"
+          >
+            Edit
+          </button>
+
+
+          ${
+            student.student_status ===
+            "archived"
+
+            ?
+
+            `
+              <button
+                type="button"
+                class="action green"
+                onclick="restoreStudent('${student.id}')"
+              >
+                Restore
+              </button>
+            `
+
+            :
+
+            `
+              <button
+                type="button"
+                class="action"
+                onclick="archiveStudent('${student.id}')"
+              >
+                Archive
+              </button>
+            `
+          }
+
+
+          <button
+            type="button"
+            class="action red"
+            onclick="deleteStudent('${student.id}')"
+          >
+            Delete
+          </button>
+
+        </div>
+
+      </td>
+
+    </tr>
+
+  `;
+
+}
+
+
+/* ============================================================
+   MOBILE CARD
+============================================================ */
+
+function studentMobileCard(student) {
+
+  const name =
+    fullName(student);
+
+
+  return `
+
+    <article class="mobile-card">
+
+
+      <div class="mobile-top">
+
+
+        <div class="mobile-person">
+
+          <div class="avatar">
+            ${escapeHTML(
+              initials(name)
+            )}
+          </div>
+
+
+          <div>
+
+            <div class="student-name">
+              ${escapeHTML(name)}
+            </div>
+
+            <div class="admission">
+              ${escapeHTML(
+                student.admission_number
+              )}
+            </div>
+
+          </div>
+
+        </div>
+
+
+        ${statusBadge(
+          student.student_status
+        )}
+
+      </div>
+
+
+      <div class="mobile-meta">
+
+
+        <div>
+
+          <span class="meta-label">
+            Class
+          </span>
+
+          <span class="meta-value">
+            ${escapeHTML(
+              student.class_name ||
+              "Not assigned"
+            )}
+          </span>
+
+        </div>
+
+
+        <div>
+
+          <span class="meta-label">
+            Gender
+          </span>
+
+          <span class="meta-value">
+            ${escapeHTML(
+              label(student.gender)
+            )}
+          </span>
+
+        </div>
+
+
+        <div>
+
+          <span class="meta-label">
+            Parent
+          </span>
+
+          <span class="meta-value">
+            ${escapeHTML(
+              student.parent_guardian_name ||
+              "Not provided"
+            )}
+          </span>
+
+        </div>
+
+
+        <div>
+
+          <span class="meta-label">
+            Phone
+          </span>
+
+          <span class="meta-value">
+            ${escapeHTML(
+              student.parent_guardian_phone ||
+              student.phone ||
+              "Not provided"
+            )}
+          </span>
+
+        </div>
+
+
+      </div>
+
+
+      <div class="mobile-actions">
+
+
+        <button
+          type="button"
+          class="action orange"
+          onclick="viewStudent('${student.id}')"
+        >
+          View
+        </button>
+
+
+        <button
+          type="button"
+          class="action"
+          onclick="editStudent('${student.id}')"
+        >
+          Edit
+        </button>
+
+
+        ${
+          student.student_status ===
+          "archived"
+
+          ?
+
+          `
+            <button
+              type="button"
+              class="action green"
+              onclick="restoreStudent('${student.id}')"
+            >
+              Restore
+            </button>
+          `
+
+          :
+
+          `
+            <button
+              type="button"
+              class="action"
+              onclick="archiveStudent('${student.id}')"
+            >
+              Archive
+            </button>
+          `
+        }
+
+
+        <button
+          type="button"
+          class="action red"
+          onclick="deleteStudent('${student.id}')"
+        >
+          Delete
+        </button>
+
+
+      </div>
+
+
+    </article>
+
+  `;
+
+}
+
+
+/* ============================================================
+   FORM RESET
+============================================================ */
+
+function resetStudentForm() {
+
+  $("studentForm").reset();
+
+
+  $("nationality").value =
+    "Nigerian";
+
+
+  $("studentStatus").value =
+    "active";
+
+
+  $("studentType").value =
+    "new";
+
+
+  editingStudentId =
+    null;
+
+}
+
+
+/* ============================================================
+   FILL FORM
+============================================================ */
+
+function fillStudentForm(student) {
+
+  $("firstName").value =
+    student.first_name || "";
+
+  $("middleName").value =
+    student.middle_name || "";
+
+  $("lastName").value =
+    student.last_name || "";
+
+  $("dateOfBirth").value =
+    student.date_of_birth
+      ? String(
+          student.date_of_birth
+        ).slice(0,10)
+      : "";
+
+  $("gender").value =
+    student.gender || "";
+
+  $("nationality").value =
+    student.nationality ||
+    "Nigerian";
+
+  $("stateOfOrigin").value =
+    student.state_of_origin ||
+    "";
+
+  $("lga").value =
+    student.lga || "";
+
+  $("religion").value =
+    student.religion || "";
+
+  $("classId").value =
+    student.class_id || "";
+
+  $("admissionDate").value =
+    student.admission_date
+      ? String(
+          student.admission_date
+        ).slice(0,10)
+      : "";
+
+  $("studentType").value =
+    student.student_type ||
+    "new";
+
+  $("studentStatus").value =
+    student.student_status ||
+    "active";
+
+  $("previousSchool").value =
+    student.previous_school ||
+    "";
+
+  $("phone").value =
+    student.phone || "";
+
+  $("email").value =
+    student.email || "";
+
+  $("address").value =
+    student.address || "";
+
+  $("parentGuardianName").value =
+    student.parent_guardian_name ||
+    "";
+
+  $("parentGuardianRelationship").value =
+    student.parent_guardian_relationship ||
+    "";
+
+  $("parentGuardianPhone").value =
+    student.parent_guardian_phone ||
+    "";
+
+  $("parentGuardianEmail").value =
+    student.parent_guardian_email ||
+    "";
+
+  $("parentGuardianAddress").value =
+    student.parent_guardian_address ||
+    "";
+
+  $("secondGuardianName").value =
+    student.second_guardian_name ||
+    "";
+
+  $("secondGuardianRelationship").value =
+    student.second_guardian_relationship ||
+    "";
+
+  $("secondGuardianPhone").value =
+    student.second_guardian_phone ||
+    "";
+
+  $("secondGuardianEmail").value =
+    student.second_guardian_email ||
+    "";
+
+  $("emergencyContactName").value =
+    student.emergency_contact_name ||
+    "";
+
+  $("emergencyContactRelationship").value =
+    student.emergency_contact_relationship ||
+    "";
+
+  $("emergencyContactPhone").value =
+    student.emergency_contact_phone ||
+    "";
+
+  $("bloodGroup").value =
+    student.blood_group ||
+    "";
+
+  $("genotype").value =
+    student.genotype ||
+    "";
+
+  $("passportPhotoUrl").value =
+    student.passport_photo_url ||
+    "";
+
+  $("medicalNotes").value =
+    student.medical_notes ||
+    "";
+
+  $("notes").value =
+    student.notes ||
+    "";
+
+}
+
+
+/* ============================================================
+   ADD STUDENT
+============================================================ */
+
+$("addStudentButton")
+  .addEventListener(
+    "click",
+    () => {
+
+      resetStudentForm();
+
+
+      $("formTitle")
+        .textContent =
+        "Add Student";
+
+
+      $("formSubtitle")
+        .textContent =
+        "Create a complete student record.";
+
+
+      $("saveStudentButton")
+        .textContent =
+        "Create Student";
+
+
+      openModal(
+        "studentFormModal"
+      );
+
+    }
+  );
+
+
+/* ============================================================
+   SAVE STUDENT
+============================================================ */
+
+$("studentForm")
+  .addEventListener(
+    "submit",
+    async event => {
+
+      event.preventDefault();
+
+
+      const payload = {
+
+        first_name:
+          $("firstName")
+            .value
+            .trim(),
+
+        middle_name:
+          $("middleName")
+            .value
+            .trim(),
+
+        last_name:
+          $("lastName")
+            .value
+            .trim(),
+
+        date_of_birth:
+          $("dateOfBirth")
+            .value ||
+          null,
+
+        gender:
+          $("gender")
+            .value,
+
+        nationality:
+          $("nationality")
+            .value
+            .trim(),
+
+        state_of_origin:
+          $("stateOfOrigin")
+            .value
+            .trim(),
+
+        lga:
+          $("lga")
+            .value
+            .trim(),
+
+        religion:
+          $("religion")
+            .value
+            .trim(),
+
+        phone:
+          $("phone")
+            .value
+            .trim(),
+
+        email:
+          $("email")
+            .value
+            .trim(),
+
+        address:
+          $("address")
+            .value
+            .trim(),
+
+        class_id:
+          $("classId")
+            .value ||
+          null,
+
+        admission_date:
+          $("admissionDate")
+            .value ||
+          null,
+
+        student_status:
+          $("studentStatus")
+            .value,
+
+        student_type:
+          $("studentType")
+            .value,
+
+        previous_school:
+          $("previousSchool")
+            .value
+            .trim(),
+
+        parent_guardian_name:
+          $("parentGuardianName")
+            .value
+            .trim(),
+
+        parent_guardian_relationship:
+          $("parentGuardianRelationship")
+            .value
+            .trim(),
+
+        parent_guardian_phone:
+          $("parentGuardianPhone")
+            .value
+            .trim(),
+
+        parent_guardian_email:
+          $("parentGuardianEmail")
+            .value
+            .trim(),
+
+        parent_guardian_address:
+          $("parentGuardianAddress")
+            .value
+            .trim(),
+
+        second_guardian_name:
+          $("secondGuardianName")
+            .value
+            .trim(),
+
+        second_guardian_relationship:
+          $("secondGuardianRelationship")
+            .value
+            .trim(),
+
+        second_guardian_phone:
+          $("secondGuardianPhone")
+            .value
+            .trim(),
+
+        second_guardian_email:
+          $("secondGuardianEmail")
+            .value
+            .trim(),
+
+        emergency_contact_name:
+          $("emergencyContactName")
+            .value
+            .trim(),
+
+        emergency_contact_phone:
+          $("emergencyContactPhone")
+            .value
+            .trim(),
+
+        emergency_contact_relationship:
+          $("emergencyContactRelationship")
+            .value
+            .trim(),
+
+        blood_group:
+          $("bloodGroup")
+            .value,
+
+        genotype:
+          $("genotype")
+            .value,
+
+        medical_notes:
+          $("medicalNotes")
+            .value
+            .trim(),
+
+        passport_photo_url:
+          $("passportPhotoUrl")
+            .value
+            .trim(),
+
+        notes:
+          $("notes")
+            .value
+            .trim()
+
+      };
+
+
+      if (
+        !payload.first_name
+      ) {
+
+        toast(
+          "First name required",
+          "Enter the student's first name.",
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      if (
+        !payload.last_name
+      ) {
+
+        toast(
+          "Last name required",
+          "Enter the student's surname.",
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      const button =
+        $("saveStudentButton");
+
+
+      button.disabled =
+        true;
+
+
+      button.textContent =
+        editingStudentId
+          ? "Updating..."
+          : "Creating...";
+
+
+      let result;
+
+
+      if (
+        editingStudentId
+      ) {
+
+        result =
+          await callUpdateStudent(
+            editingStudentId,
+            payload
+          );
+
+      } else {
+
+        result =
+          await callCreateStudent(
+            payload
+          );
+
+      }
+
+
+      button.disabled =
+        false;
+
+
+      button.textContent =
+        editingStudentId
+          ? "Update Student"
+          : "Create Student";
+
+
+      if (result.error) {
+
+        toast(
+          editingStudentId
+            ? "Update failed"
+            : "Creation failed",
+
+          result.error.message,
+
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      closeModal(
+        "studentFormModal"
+      );
+
+
+      toast(
+        editingStudentId
+          ? "Student updated"
+          : "Student created",
+
+        editingStudentId
+          ? "The student profile was updated successfully."
+          : "The student was added successfully.",
+
+        "success"
+      );
+
+
+      resetStudentForm();
+
+      await loadStudents();
+
+    }
+  );
+
+
+/* ============================================================
+   CREATE RPC
+============================================================ */
+
+async function callCreateStudent(data) {
+
+  return await supabaseClient
+    .rpc(
+      RPC.create,
+      {
+
+        new_first_name:
+          data.first_name,
+
+        new_middle_name:
+          data.middle_name || null,
+
+        new_last_name:
+          data.last_name,
+
+        new_date_of_birth:
+          data.date_of_birth,
+
+        new_gender:
+          data.gender || null,
+
+        new_nationality:
+          data.nationality || "Nigerian",
+
+        new_state_of_origin:
+          data.state_of_origin || null,
+
+        new_lga:
+          data.lga || null,
+
+        new_religion:
+          data.religion || null,
+
+        new_phone:
+          data.phone || null,
+
+        new_email:
+          data.email || null,
+
+        new_address:
+          data.address || null,
+
+        new_class_id:
+          data.class_id,
+
+        new_admission_date:
+          data.admission_date,
+
+        new_student_status:
+          data.student_status,
+
+        new_student_type:
+          data.student_type,
+
+        new_previous_school:
+          data.previous_school || null,
+
+        new_parent_guardian_name:
+          data.parent_guardian_name || null,
+
+        new_parent_guardian_relationship:
+          data.parent_guardian_relationship || null,
+
+        new_parent_guardian_phone:
+          data.parent_guardian_phone || null,
+
+        new_parent_guardian_email:
+          data.parent_guardian_email || null,
+
+        new_parent_guardian_address:
+          data.parent_guardian_address || null,
+
+        new_second_guardian_name:
+          data.second_guardian_name || null,
+
+        new_second_guardian_relationship:
+          data.second_guardian_relationship || null,
+
+        new_second_guardian_phone:
+          data.second_guardian_phone || null,
+
+        new_second_guardian_email:
+          data.second_guardian_email || null,
+
+        new_emergency_contact_name:
+          data.emergency_contact_name || null,
+
+        new_emergency_contact_phone:
+          data.emergency_contact_phone || null,
+
+        new_emergency_contact_relationship:
+          data.emergency_contact_relationship || null,
+
+        new_blood_group:
+          data.blood_group || null,
+
+        new_genotype:
+          data.genotype || null,
+
+        new_medical_notes:
+          data.medical_notes || null,
+
+        new_passport_photo_url:
+          data.passport_photo_url || null,
+
+        new_notes:
+          data.notes || null
+
+      }
+    );
+
+}
+
+
+/* ============================================================
+   UPDATE RPC
+============================================================ */
+
+async function callUpdateStudent(
+  id,
+  data
+) {
+
+  return await supabaseClient
+    .rpc(
+      RPC.update,
+      {
+
+        target_student_id:
+          id,
+
+        new_first_name:
+          data.first_name,
+
+        new_middle_name:
+          data.middle_name || null,
+
+        new_last_name:
+          data.last_name,
+
+        new_date_of_birth:
+          data.date_of_birth,
+
+        new_gender:
+          data.gender || null,
+
+        new_nationality:
+          data.nationality || "Nigerian",
+
+        new_state_of_origin:
+          data.state_of_origin || null,
+
+        new_lga:
+          data.lga || null,
+
+        new_religion:
+          data.religion || null,
+
+        new_phone:
+          data.phone || null,
+
+        new_email:
+          data.email || null,
+
+        new_address:
+          data.address || null,
+
+        new_class_id:
+          data.class_id,
+
+        new_admission_date:
+          data.admission_date,
+
+        new_student_status:
+          data.student_status,
+
+        new_student_type:
+          data.student_type,
+
+        new_previous_school:
+          data.previous_school || null,
+
+        new_parent_guardian_name:
+          data.parent_guardian_name || null,
+
+        new_parent_guardian_relationship:
+          data.parent_guardian_relationship || null,
+
+        new_parent_guardian_phone:
+          data.parent_guardian_phone || null,
+
+        new_parent_guardian_email:
+          data.parent_guardian_email || null,
+
+        new_parent_guardian_address:
+          data.parent_guardian_address || null,
+
+        new_second_guardian_name:
+          data.second_guardian_name || null,
+
+        new_second_guardian_relationship:
+          data.second_guardian_relationship || null,
+
+        new_second_guardian_phone:
+          data.second_guardian_phone || null,
+
+        new_second_guardian_email:
+          data.second_guardian_email || null,
+
+        new_emergency_contact_name:
+          data.emergency_contact_name || null,
+
+        new_emergency_contact_phone:
+          data.emergency_contact_phone || null,
+
+        new_emergency_contact_relationship:
+          data.emergency_contact_relationship || null,
+
+        new_blood_group:
+          data.blood_group || null,
+
+        new_genotype:
+          data.genotype || null,
+
+        new_medical_notes:
+          data.medical_notes || null,
+
+        new_passport_photo_url:
+          data.passport_photo_url || null,
+
+        new_notes:
+          data.notes || null
+
+      }
+    );
+
+}
+
+
+/* ============================================================
+   VIEW STUDENT
+============================================================ */
+
+async function viewStudent(id) {
+
+  let student =
+    students.find(
+      s => s.id === id
+    );
+
+
+  if (!student) {
+
+    toast(
+      "Student not found",
+      "The selected student record could not be found.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  selectedStudent =
+    student;
+
+
+  renderProfile(
+    student
+  );
+
+
+  openModal(
+    "profileModal"
+  );
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .rpc(
+        RPC.get,
+        {
+          target_student_id:
+            id
+        }
+      );
+
+
+  if (
+    !error &&
+    data &&
+    data.length
+  ) {
+
+    selectedStudent =
+      data[0];
+
+
+    renderProfile(
+      selectedStudent
+    );
+
+  }
+
+}
+
+
+/* ============================================================
+   PROFILE
+============================================================ */
+
+function renderProfile(student) {
+
+  const name =
+    fullName(student);
+
+
+  const photo =
+    student.passport_photo_url
+      ? `
+        <img
+          src="${escapeHTML(
+            student.passport_photo_url
+          )}"
+          alt="${escapeHTML(name)}"
+        >
+      `
+      : escapeHTML(
+          initials(name)
+        );
+
+
+  $("profileBody").innerHTML = `
+
+    <div class="profile-head">
+
+
+      <div class="profile-photo">
+
+        ${photo}
+
+      </div>
+
+
+      <div>
+
+        <div class="profile-name">
+
+          ${escapeHTML(name)}
+
+        </div>
+
+
+        <div class="profile-admission">
+
+          ${escapeHTML(
+            student.admission_number ||
+            "No admission number"
+          )}
+
+        </div>
+
+      </div>
+
+
+      <div
+        style="
+          margin-left:auto;
+        "
+      >
+
+        ${statusBadge(
+          student.student_status
+        )}
+
+      </div>
+
+
+    </div>
+
+
+    <div class="profile-grid">
+
+
+      ${detail(
+        "First Name",
+        student.first_name
+      )}
+
+
+      ${detail(
+        "Middle Name",
+        student.middle_name
+      )}
+
+
+      ${detail(
+        "Last Name",
+        student.last_name
+      )}
+
+
+      ${detail(
+        "Date of Birth",
+        dateText(
+          student.date_of_birth
+        )
+      )}
+
+
+      ${detail(
+        "Gender",
+        label(student.gender)
+      )}
+
+
+      ${detail(
+        "Nationality",
+        student.nationality
+      )}
+
+
+      ${detail(
+        "State of Origin",
+        student.state_of_origin
+      )}
+
+
+      ${detail(
+        "LGA",
+        student.lga
+      )}
+
+
+      ${detail(
+        "Religion",
+        student.religion
+      )}
+
+
+      ${detail(
+        "Class",
+        student.class_name
+      )}
+
+
+      ${detail(
+        "Section",
+        student.section
+      )}
+
+
+      ${detail(
+        "Admission Date",
+        dateText(
+          student.admission_date
+        )
+      )}
+
+
+      ${detail(
+        "Student Type",
+        label(student.student_type)
+      )}
+
+
+      ${detail(
+        "Previous School",
+        student.previous_school,
+        true
+      )}
+
+
+      ${detail(
+        "Student Phone",
+        student.phone
+      )}
+
+
+      ${detail(
+        "Student Email",
+        student.email
+      )}
+
+
+      ${detail(
+        "Address",
+        student.address,
+        true
+      )}
+
+
+      ${detail(
+        "Parent / Guardian",
+        student.parent_guardian_name
+      )}
+
+
+      ${detail(
+        "Relationship",
+        student.parent_guardian_relationship
+      )}
+
+
+      ${detail(
+        "Parent Phone",
+        student.parent_guardian_phone
+      )}
+
+
+      ${detail(
+        "Parent Email",
+        student.parent_guardian_email
+      )}
+
+
+      ${detail(
+        "Parent Address",
+        student.parent_guardian_address,
+        true
+      )}
+
+
+      ${detail(
+        "Second Guardian",
+        student.second_guardian_name
+      )}
+
+
+      ${detail(
+        "Second Guardian Relationship",
+        student.second_guardian_relationship
+      )}
+
+
+      ${detail(
+        "Second Guardian Phone",
+        student.second_guardian_phone
+      )}
+
+
+      ${detail(
+        "Second Guardian Email",
+        student.second_guardian_email
+      )}
+
+
+      ${detail(
+        "Emergency Contact",
+        student.emergency_contact_name
+      )}
+
+
+      ${detail(
+        "Emergency Relationship",
+        student.emergency_contact_relationship
+      )}
+
+
+      ${detail(
+        "Emergency Phone",
+        student.emergency_contact_phone
+      )}
+
+
+      ${detail(
+        "Blood Group",
+        student.blood_group
+      )}
+
+
+      ${detail(
+        "Genotype",
+        student.genotype
+      )}
+
+
+      ${detail(
+        "Medical Notes",
+        student.medical_notes,
+        true
+      )}
+
+
+      ${detail(
+        "Administrative Notes",
+        student.notes,
+        true
+      )}
+
+
+      ${detail(
+        "Created",
+        dateText(student.created_at)
+      )}
+
+
+      ${detail(
+        "Last Updated",
+        dateText(student.updated_at)
+      )}
+
+    </div>
+
+  `;
+
+}
+
+
+function detail(
+  title,
+  value,
+  full = false
+) {
+
+  return `
+
+    <div
+      class="
+        detail
+        ${full ? "full" : ""}
+      "
+    >
+
+      <div class="detail-label">
+
+        ${escapeHTML(title)}
+
+      </div>
+
+
+      <div class="detail-value">
+
+        ${escapeHTML(
+          value ||
+          "Not provided"
+        )}
+
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+
+/* ============================================================
+   EDIT STUDENT
+============================================================ */
+
+async function editStudent(id) {
+
+  let student =
+    students.find(
+      s => s.id === id
+    );
+
+
+  if (!student) {
+
+    toast(
+      "Student not found",
+      "The selected student could not be found.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  editingStudentId =
+    id;
+
+
+  fillStudentForm(
+    student
+  );
+
+
+  $("formTitle")
+    .textContent =
+    "Edit Student";
+
+
+  $("formSubtitle")
+    .textContent =
+    "Update the student's complete profile.";
+
+
+  $("saveStudentButton")
+    .textContent =
+    "Update Student";
+
+
+  openModal(
+    "studentFormModal"
+  );
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .rpc(
+        RPC.get,
+        {
+          target_student_id:
+            id
+        }
+      );
+
+
+  if (
+    !error &&
+    data &&
+    data.length
+  ) {
+
+    fillStudentForm(
+      data[0]
+    );
+
+  }
+
+}
+
+
+/* ============================================================
+   ARCHIVE
+============================================================ */
+
+function archiveStudent(id) {
+
+  const student =
+    students.find(
+      s => s.id === id
+    );
+
+
+  if (!student)
+    return;
+
+
+  confirmAction(
+
+    "Archive Student",
+
+    `Archive ${fullName(student)}? The student record will remain stored but will no longer have active status.`,
+
+    "Archive Student",
+
+    async () => {
+
+      const {
+        error
+      } =
+        await supabaseClient
+          .rpc(
+            RPC.archive,
+            {
+              target_student_id:
+                id
+            }
+          );
+
+
+      if (error) {
+
+        toast(
+          "Archive failed",
+          error.message,
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      toast(
+        "Student archived",
+        `${fullName(student)} has been archived.`,
+        "success"
+      );
+
+
+      await loadStudents();
+
+    }
+
+  );
+
+}
+
+
+/* ============================================================
+   RESTORE
+============================================================ */
+
+function restoreStudent(id) {
+
+  const student =
+    students.find(
+      s => s.id === id
+    );
+
+
+  if (!student)
+    return;
+
+
+  confirmAction(
+
+    "Restore Student",
+
+    `Restore ${fullName(student)} as an active student?`,
+
+    "Restore Student",
+
+    async () => {
+
+      const {
+        error
+      } =
+        await supabaseClient
+          .rpc(
+            RPC.restore,
+            {
+              target_student_id:
+                id
+            }
+          );
+
+
+      if (error) {
+
+        toast(
+          "Restore failed",
+          error.message,
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      toast(
+        "Student restored",
+        `${fullName(student)} has been restored.`,
+        "success"
+      );
+
+
+      await loadStudents();
+
+    }
+
+  );
+
+}
+
+
+/* ============================================================
+   DELETE
+============================================================ */
+
+function deleteStudent(id) {
+
+  const student =
+    students.find(
+      s => s.id === id
+    );
+
+
+  if (!student)
+    return;
+
+
+  confirmAction(
+
+    "Delete Student",
+
+    `Permanently delete ${fullName(student)} and their student record? This action cannot be undone.`,
+
+    "Delete Permanently",
+
+    async () => {
+
+      const {
+        error
+      } =
+        await supabaseClient
+          .rpc(
+            RPC.delete,
+            {
+              target_student_id:
+                id
+            }
+          );
+
+
+      if (error) {
+
+        toast(
+          "Delete failed",
+          error.message,
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      toast(
+        "Student deleted",
+        `${fullName(student)} has been permanently deleted.`,
+        "success"
+      );
+
+
+      await loadStudents();
+
+    }
+
+  );
+
+}
+
+
+/* ============================================================
+   CONFIRMATION
+============================================================ */
+
+function confirmAction(
+  title,
+  message,
+  buttonText,
+  callback
+) {
+
+  $("confirmTitle")
+    .textContent =
+    title;
+
+
+  $("confirmMessage")
+    .textContent =
+    message;
+
+
+  $("confirmButton")
+    .textContent =
+    buttonText;
+
+
+  confirmationAction =
+    callback;
+
+
+  openModal(
+    "confirmModal"
+  );
+
+}
+
+
+$("confirmButton")
+  .addEventListener(
+    "click",
+    async () => {
+
+      const action =
+        confirmationAction;
+
+
+      confirmationAction =
+        null;
+
+
+      closeModal(
+        "confirmModal"
+      );
+
+
+      if (action)
+        await action();
+
+    }
+  );
+
+
+/* ============================================================
+   PRINT / PDF
+============================================================ */
+
+$("printProfileButton")
+  .addEventListener(
+    "click",
+    () => {
+
+      if (!selectedStudent) {
+
+        toast(
+          "No student selected",
+          "Open a student profile first.",
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      buildPrintProfile(
+        selectedStudent
+      );
+
+
+      window.print();
+
+    }
+  );
+
+
+function buildPrintProfile(student) {
+
+  const name =
+    fullName(student);
+
+
+  const photo =
+    student.passport_photo_url
+
+      ?
+
+      `
+        <img
+          src="${escapeHTML(
+            student.passport_photo_url
+          )}"
+          alt="${escapeHTML(name)}"
+        >
+      `
+
+      :
+
+      `
+        <div class="print-photo-placeholder">
+          STUDENT PHOTO
+        </div>
+      `;
+
+
+  $("printArea").innerHTML = `
+
+    <div class="print-header">
+
+
+      <div class="print-brand">
+
+        <img
+          src="assets/images/Almafaaz-logo.png"
+          class="print-logo"
+          alt="ALMAFAAZ ACADEMY"
+        >
+
+
+        <div>
+
+          <div class="print-school">
+            ALMAFAAZ ACADEMY
+          </div>
+
+          <div class="print-subtitle">
+            Official Student Profile Record
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div
+        style="
+          text-align:right;
+          font-size:8px;
+          color:#718094;
+        "
+      >
+        Student Management<br>
+        Copyright © 2026
+      </div>
+
+
+    </div>
+
+
+    <div class="print-title">
+      Student Profile
+    </div>
+
+
+    <div class="print-student-head">
+
+
+      <div class="print-photo">
+
+        ${photo}
+
+      </div>
+
+
+      <div>
+
+        <div class="print-student-name">
+          ${escapeHTML(name)}
+        </div>
+
+
+        <div class="print-admission">
+          Admission Number:
+          ${escapeHTML(
+            student.admission_number
+          )}
+        </div>
+
+
+        <div class="print-admission">
+          Class:
+          ${escapeHTML(
+            student.class_name ||
+            "Not assigned"
+          )}
+        </div>
+
+
+        <div class="print-status">
+          Status:
+          ${escapeHTML(
+            label(
+              student.student_status
+            )
+          )}
+        </div>
+
+      </div>
+
+
+    </div>
+
+
+    ${printSection(
+      "Personal Information",
+      [
+
+        ["First Name", student.first_name],
+
+        ["Middle Name", student.middle_name],
+
+        ["Last Name", student.last_name],
+
+        ["Date of Birth",
+          dateText(
+            student.date_of_birth
+          )
+        ],
+
+        ["Gender",
+          label(student.gender)
+        ],
+
+        ["Nationality", student.nationality],
+
+        ["State of Origin",
+          student.state_of_origin
+        ],
+
+        ["LGA", student.lga],
+
+        ["Religion", student.religion]
+
+      ]
+    )}
+
+
+    ${printSection(
+      "Academic Information",
+      [
+
+        ["Class",
+          student.class_name
+        ],
+
+        ["Section",
+          student.section
+        ],
+
+        ["Admission Date",
+          dateText(
+            student.admission_date
+          )
+        ],
+
+        ["Student Type",
+          label(
+            student.student_type
+          )
+        ],
+
+        ["Student Status",
+          label(
+            student.student_status
+          )
+        ],
+
+        ["Previous School",
+          student.previous_school
+        ]
+
+      ]
+    )}
+
+
+    ${printSection(
+      "Contact Information",
+      [
+
+        ["Student Phone",
+          student.phone
+        ],
+
+        ["Student Email",
+          student.email
+        ],
+
+        ["Address",
+          student.address
+        ]
+
+      ]
+    )}
+
+
+    ${printSection(
+      "Parent / Guardian",
+      [
+
+        ["Name",
+          student.parent_guardian_name
+        ],
+
+        ["Relationship",
+          student.parent_guardian_relationship
+        ],
+
+        ["Phone",
+          student.parent_guardian_phone
+        ],
+
+        ["Email",
+          student.parent_guardian_email
+        ],
+
+        ["Address",
+          student.parent_guardian_address
+        ]
+
+      ]
+    )}
+
+
+    ${printSection(
+      "Second Guardian",
+      [
+
+        ["Name",
+          student.second_guardian_name
+        ],
+
+        ["Relationship",
+          student.second_guardian_relationship
+        ],
+
+        ["Phone",
+          student.second_guardian_phone
+        ],
+
+        ["Email",
+          student.second_guardian_email
+        ]
+
+      ]
+    )}
+
+
+    ${printSection(
+      "Emergency Contact",
+      [
+
+        ["Name",
+          student.emergency_contact_name
+        ],
+
+        ["Relationship",
+          student.emergency_contact_relationship
+        ],
+
+        ["Phone",
+          student.emergency_contact_phone
+        ]
+
+      ]
+    )}
+
+
+    ${printSection(
+      "Additional Information",
+      [
+
+        ["Blood Group",
+          student.blood_group
+        ],
+
+        ["Genotype",
+          student.genotype
+        ],
+
+        ["Medical Notes",
+          student.medical_notes
+        ],
+
+        ["Administrative Notes",
+          student.notes
+        ]
+
+      ]
+    )}
+
+
+    <div class="print-footer">
+
+      <div>
+        ALMAFAAZ ACADEMY
+      </div>
+
+      <div>
+        Powered by Yalerima Technologies Limited
+      </div>
+
+      <div>
+        Generated:
+        ${escapeHTML(
+          new Date().toLocaleString(
+            "en-NG"
+          )
+        )}
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+
+function printSection(
+  title,
+  fields
+) {
+
+  return `
+
+    <div class="print-section">
+      ${escapeHTML(title)}
+    </div>
+
+
+    <div class="print-grid">
+
+      ${fields
+        .map(
+          ([labelText,value]) => `
+
+            <div class="print-field">
+
+              <div class="print-label">
+                ${escapeHTML(
+                  labelText
+                )}
+              </div>
+
+              <div class="print-value">
+                ${escapeHTML(
+                  value ||
+                  "Not provided"
+                )}
+              </div>
+
+            </div>
+
+          `
+        )
+        .join("")}
+
+    </div>
+
+  `;
+
+}
+
+
+/* ============================================================
+   FILTER EVENTS
+============================================================ */
+
+$("search")
+  .addEventListener(
+    "input",
+    applyFilters
+  );
+
+
+$("classFilter")
+  .addEventListener(
+    "change",
+    applyFilters
+  );
+
+
+$("statusFilter")
+  .addEventListener(
+    "change",
+    applyFilters
+  );
+
+
+$("genderFilter")
+  .addEventListener(
+    "change",
+    applyFilters
+  );
+
+
+$("refreshButton")
+  .addEventListener(
+    "click",
+    async () => {
+
+      await loadClasses();
+
+      await loadStudents();
+
+    }
+  );
+
+
+/* ============================================================
+   LOGOUT
+============================================================ */
+
+$("logoutButton")
+  .addEventListener(
+    "click",
+    async () => {
+
+      $("logoutButton")
+        .disabled =
+        true;
+
+
+      const {
+        error
+      } =
+        await supabaseClient
+          .auth
+          .signOut();
+
+
+      if (error) {
+
+        $("logoutButton")
+          .disabled =
+          false;
+
+
+        toast(
+          "Logout failed",
+          error.message,
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      window.location.href =
+        "./super-admin-login.html";
+
+    }
+  );
+
+
+/* ============================================================
+   ESCAPE KEY
+============================================================ */
+
+document.addEventListener(
+  "keydown",
+  event => {
+
+    if (
+      event.key !== "Escape"
+    )
+      return;
+
+
+    document
+      .querySelectorAll(
+        ".modal-bg:not(.hidden)"
+      )
+      .forEach(
+        modal =>
+          closeModal(
+            modal.id
+          )
+      );
+
+  }
+);
+
+
+/* ============================================================
+   BOOT
+============================================================ */
+
+async function boot() {
+
+  try {
+
+    const authorized =
+      await verifySuperAdmin();
+
+
+    if (!authorized)
+      return;
+
+
+    $("app")
+      .classList
+      .remove("hidden");
+
+
+    $("bootScreen")
+      .classList
+      .add("hidden");
+
+
+    await loadClasses();
+
+    await loadStudents();
+
+  }
+
+  catch (error) {
+
+    console.error(error);
+
+
+    $("bootScreen")
+      .classList
+      .add("hidden");
+
+
+    $("app")
+      .classList
+      .remove("hidden");
+
+
+    toast(
+      "Application error",
+      error.message ||
+      "Unable to initialise Student Management.",
+      "error"
+    );
+
+  }
+
+}
+
+
+boot();
+
+</script>
+
+</body>
+
+</html>

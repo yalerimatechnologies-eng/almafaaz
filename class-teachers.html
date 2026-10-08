@@ -1,0 +1,3891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
+  />
+
+  <title>Teachers Management | ALMAFAAZ ACADEMY</title>
+
+  <meta
+    name="description"
+    content="ALMAFAAZ ACADEMY Teacher Management System powered by Yalerima Technologies Limited."
+  />
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --blue-950: #071525;
+      --blue-900: #0a1f38;
+      --blue-850: #0d2948;
+      --blue-800: #10365c;
+      --blue-700: #164b7d;
+      --orange: #ff7a00;
+      --orange-dark: #d85f00;
+      --white: #ffffff;
+      --text: #152235;
+      --muted: #68788d;
+      --border: #e4e9ef;
+      --bg: #f4f7fa;
+      --success: #14804a;
+      --danger: #c73535;
+      --warning: #a66a00;
+      --shadow: 0 18px 45px rgba(8, 29, 52, 0.10);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family:
+        Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top right, rgba(255, 122, 0, 0.07), transparent 30%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* =========================================================
+       BOOT SCREEN
+       ========================================================= */
+
+    #bootScreen {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      background:
+        radial-gradient(circle at top right, rgba(255, 122, 0, 0.16), transparent 35%),
+        linear-gradient(145deg, #061321, #0b2744);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .boot-card {
+      width: min(460px, 100%);
+      text-align: center;
+      color: white;
+      padding: 42px 28px;
+      border: 1px solid rgba(255,255,255,.13);
+      background: rgba(255,255,255,.065);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-radius: 26px;
+      box-shadow: 0 30px 80px rgba(0,0,0,.35);
+    }
+
+    .boot-logo {
+      width: 78px;
+      height: 78px;
+      object-fit: contain;
+      background: white;
+      border-radius: 18px;
+      padding: 8px;
+      margin-bottom: 20px;
+    }
+
+    .boot-title {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .boot-subtitle {
+      color: rgba(255,255,255,.68);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .loader {
+      width: 42px;
+      height: 42px;
+      border: 3px solid rgba(255,255,255,.15);
+      border-top-color: var(--orange);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+      margin: 25px auto 0;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* =========================================================
+       APPLICATION
+       ========================================================= */
+
+    #app {
+      display: none;
+      min-height: 100vh;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      height: 76px;
+      background: rgba(255,255,255,.94);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(12, 40, 68, .09);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 30px;
+    }
+
+    .brand-area {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      min-width: 0;
+    }
+
+    .brand-logo {
+      width: 45px;
+      height: 45px;
+      object-fit: contain;
+      border-radius: 10px;
+      background: white;
+    }
+
+    .brand-text {
+      min-width: 0;
+    }
+
+    .brand-name {
+      font-size: 16px;
+      font-weight: 850;
+      color: var(--blue-950);
+      white-space: nowrap;
+    }
+
+    .brand-caption {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+      white-space: nowrap;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-btn {
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--blue-900);
+      min-height: 42px;
+      padding: 0 15px;
+      border-radius: 11px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      transition: .2s ease;
+    }
+
+    .nav-btn:hover {
+      border-color: var(--orange);
+      color: var(--orange-dark);
+      transform: translateY(-1px);
+    }
+
+    .logout-btn {
+      background: var(--blue-900);
+      border-color: var(--blue-900);
+      color: white;
+    }
+
+    .logout-btn:hover {
+      background: var(--blue-800);
+      color: white;
+    }
+
+    /* =========================================================
+       MAIN
+       ========================================================= */
+
+    main {
+      width: min(1450px, calc(100% - 44px));
+      margin: 0 auto;
+      padding: 34px 0 50px;
+    }
+
+    .page-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    .heading-left {
+      min-width: 0;
+    }
+
+    .eyebrow {
+      color: var(--orange-dark);
+      font-size: 11px;
+      font-weight: 850;
+      text-transform: uppercase;
+      letter-spacing: .13em;
+      margin-bottom: 7px;
+    }
+
+    h1 {
+      color: var(--blue-950);
+      font-size: clamp(27px, 4vw, 38px);
+      line-height: 1.1;
+      letter-spacing: -.025em;
+      margin-bottom: 9px;
+    }
+
+    .page-description {
+      color: var(--muted);
+      max-width: 700px;
+      line-height: 1.65;
+      font-size: 14px;
+    }
+
+    .primary-btn {
+      min-height: 46px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--orange), #ff922e);
+      color: white;
+      padding: 0 19px;
+      font-weight: 800;
+      box-shadow: 0 10px 24px rgba(255,122,0,.22);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: .2s ease;
+      white-space: nowrap;
+    }
+
+    .primary-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px rgba(255,122,0,.28);
+    }
+
+    /* =========================================================
+       STATS
+       ========================================================= */
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      margin-bottom: 22px;
+    }
+
+    .stat-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: 0 7px 25px rgba(8,29,52,.045);
+      min-width: 0;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 9px;
+    }
+
+    .stat-value {
+      color: var(--blue-950);
+      font-size: 28px;
+      font-weight: 850;
+    }
+
+    .stat-note {
+      color: var(--muted);
+      font-size: 11px;
+      margin-top: 5px;
+    }
+
+    /* =========================================================
+       TOOLBAR
+       ========================================================= */
+
+    .panel {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .toolbar {
+      padding: 17px;
+      display: grid;
+      grid-template-columns: minmax(230px, 1fr) 190px auto;
+      gap: 11px;
+      align-items: center;
+      margin-bottom: 17px;
+    }
+
+    .field {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      background: #fbfcfd;
+      color: var(--text);
+      padding: 0 13px;
+      outline: none;
+      transition: .2s ease;
+    }
+
+    .field:focus {
+      border-color: var(--orange);
+      box-shadow: 0 0 0 3px rgba(255,122,0,.10);
+      background: white;
+    }
+
+    .refresh-btn {
+      min-height: 44px;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      background: white;
+      padding: 0 15px;
+      font-weight: 750;
+      color: var(--blue-900);
+    }
+
+    .refresh-btn:hover {
+      border-color: var(--blue-700);
+    }
+
+    /* =========================================================
+       TABLE
+       ========================================================= */
+
+    .table-panel {
+      overflow: hidden;
+    }
+
+    .table-head {
+      padding: 20px 22px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .table-title {
+      font-size: 16px;
+      font-weight: 850;
+      color: var(--blue-950);
+    }
+
+    .record-count {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 950px;
+    }
+
+    th {
+      text-align: left;
+      padding: 13px 18px;
+      background: #f7f9fb;
+      color: #607086;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .09em;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 16px 18px;
+      border-top: 1px solid #edf0f3;
+      font-size: 13px;
+      vertical-align: middle;
+    }
+
+    tbody tr:hover {
+      background: #fcfdff;
+    }
+
+    .teacher-cell {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+
+    .avatar {
+      width: 38px;
+      height: 38px;
+      flex: 0 0 38px;
+      border-radius: 11px;
+      display: grid;
+      place-items: center;
+      background: #eaf1f8;
+      color: var(--blue-800);
+      font-weight: 850;
+      font-size: 13px;
+    }
+
+    .teacher-name {
+      font-weight: 800;
+      color: var(--blue-950);
+    }
+
+    .teacher-id {
+      color: var(--muted);
+      font-size: 10px;
+      margin-top: 3px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      min-height: 27px;
+      padding: 0 9px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 850;
+      text-transform: capitalize;
+    }
+
+    .status.active {
+      color: var(--success);
+      background: #e8f7ef;
+    }
+
+    .status.inactive {
+      color: #68788d;
+      background: #edf0f3;
+    }
+
+    .status.suspended {
+      color: var(--danger);
+      background: #fdeaea;
+    }
+
+    .status.pending {
+      color: var(--warning);
+      background: #fff4dc;
+    }
+
+    .classes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      max-width: 260px;
+    }
+
+    .class-chip {
+      padding: 5px 8px;
+      border-radius: 7px;
+      background: #eef4fa;
+      color: var(--blue-800);
+      font-size: 10px;
+      font-weight: 750;
+    }
+
+    .class-teacher-chip {
+      background: #fff0e4;
+      color: var(--orange-dark);
+    }
+
+    .actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .action-btn {
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--blue-900);
+      border-radius: 8px;
+      min-height: 33px;
+      padding: 0 9px;
+      font-size: 10px;
+      font-weight: 750;
+    }
+
+    .action-btn:hover {
+      border-color: var(--orange);
+      color: var(--orange-dark);
+    }
+
+    .action-btn.danger:hover {
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 65px 25px;
+      color: var(--muted);
+    }
+
+    .empty-state strong {
+      display: block;
+      color: var(--blue-950);
+      margin-bottom: 6px;
+    }
+
+    /* =========================================================
+       MODAL
+       ========================================================= */
+
+    .modal-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 5000;
+      background: rgba(3, 13, 24, .58);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-layer.open {
+      display: flex;
+    }
+
+    .modal {
+      width: min(620px, 100%);
+      max-height: calc(100vh - 40px);
+      overflow-y: auto;
+      background: white;
+      border-radius: 22px;
+      box-shadow: 0 35px 90px rgba(0,0,0,.30);
+    }
+
+    .modal.large {
+      width: min(800px, 100%);
+    }
+
+    .modal-header {
+      padding: 21px 23px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 850;
+      color: var(--blue-950);
+    }
+
+    .modal-subtitle {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 4px;
+      line-height: 1.5;
+    }
+
+    .close-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--muted);
+      font-size: 18px;
+    }
+
+    .close-btn:hover {
+      color: var(--danger);
+      border-color: var(--danger);
+    }
+
+    .modal-body {
+      padding: 23px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--blue-900);
+    }
+
+    .modal-footer {
+      padding: 17px 23px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 9px;
+    }
+
+    .secondary-btn {
+      min-height: 43px;
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--blue-900);
+      border-radius: 10px;
+      padding: 0 15px;
+      font-weight: 750;
+    }
+
+    /* =========================================================
+       DETAILS
+       ========================================================= */
+
+    .profile-hero {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      padding: 17px;
+      background: #f7f9fb;
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      margin-bottom: 18px;
+    }
+
+    .profile-avatar {
+      width: 58px;
+      height: 58px;
+      border-radius: 15px;
+      background: var(--blue-900);
+      color: white;
+      display: grid;
+      place-items: center;
+      font-size: 19px;
+      font-weight: 850;
+      flex: 0 0 58px;
+    }
+
+    .profile-name {
+      font-size: 18px;
+      font-weight: 850;
+      color: var(--blue-950);
+    }
+
+    .profile-role {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 11px;
+    }
+
+    .detail-box {
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: white;
+    }
+
+    .detail-label {
+      color: var(--muted);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-weight: 750;
+      margin-bottom: 6px;
+    }
+
+    .detail-value {
+      color: var(--blue-950);
+      font-size: 13px;
+      font-weight: 750;
+      word-break: break-word;
+    }
+
+    .activity-list {
+      display: grid;
+      gap: 9px;
+    }
+
+    .activity-item {
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      padding: 12px;
+      background: #fbfcfd;
+    }
+
+    .activity-item strong {
+      font-size: 12px;
+      color: var(--blue-950);
+    }
+
+    .activity-item div {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* =========================================================
+       TOAST
+       ========================================================= */
+
+    #toastContainer {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 10000;
+      width: min(390px, calc(100% - 40px));
+      display: grid;
+      gap: 9px;
+    }
+
+    .toast {
+      background: var(--blue-950);
+      color: white;
+      border-left: 4px solid var(--orange);
+      padding: 14px 15px;
+      border-radius: 12px;
+      box-shadow: 0 18px 40px rgba(0,0,0,.20);
+      font-size: 12px;
+      line-height: 1.5;
+      animation: toastIn .22s ease;
+    }
+
+    .toast.error {
+      border-left-color: var(--danger);
+    }
+
+    .toast.success {
+      border-left-color: #37b978;
+    }
+
+    @keyframes toastIn {
+      from {
+        transform: translateY(10px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    /* =========================================================
+       FOOTER
+       ========================================================= */
+
+    footer {
+      background: var(--blue-950);
+      color: white;
+      margin-top: 30px;
+      padding: 32px 22px;
+    }
+
+    .footer-inner {
+      width: min(1450px, 100%);
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .footer-title {
+      font-weight: 850;
+      font-size: 14px;
+    }
+
+    .footer-copy {
+      color: rgba(255,255,255,.58);
+      font-size: 11px;
+      margin-top: 6px;
+    }
+
+    .footer-powered {
+      color: rgba(255,255,255,.75);
+      font-size: 11px;
+    }
+
+    .footer-powered strong {
+      color: var(--orange);
+    }
+
+    /* =========================================================
+       RESPONSIVE
+       ========================================================= */
+
+    @media (max-width: 1050px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .toolbar {
+        grid-template-columns: 1fr 180px;
+      }
+
+      .toolbar .refresh-btn {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .topbar {
+        height: auto;
+        min-height: 70px;
+        padding: 12px 15px;
+        gap: 12px;
+      }
+
+      .brand-caption {
+        display: none;
+      }
+
+      .top-actions {
+        gap: 6px;
+      }
+
+      .nav-btn {
+        padding: 0 10px;
+        font-size: 11px;
+      }
+
+      .logout-btn {
+        font-size: 0;
+        width: 42px;
+        padding: 0;
+        justify-content: center;
+      }
+
+      main {
+        width: min(100% - 26px, 1450px);
+        padding-top: 25px;
+      }
+
+      .page-heading {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .primary-btn {
+        width: 100%;
+      }
+
+      .stats-grid {
+        gap: 10px;
+      }
+
+      .stat-card {
+        padding: 16px;
+      }
+
+      .stat-value {
+        font-size: 23px;
+      }
+
+      .toolbar {
+        grid-template-columns: 1fr;
+      }
+
+      .toolbar .refresh-btn {
+        grid-column: auto;
+      }
+
+      .table-head {
+        padding: 17px;
+      }
+
+      .form-grid,
+      .detail-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-group.full {
+        grid-column: auto;
+      }
+
+      .footer-inner {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .brand-name {
+        font-size: 13px;
+      }
+
+      .brand-logo {
+        width: 39px;
+        height: 39px;
+      }
+
+      .topbar {
+        padding: 10px 12px;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .stat-card {
+        padding: 13px;
+      }
+
+      .stat-label {
+        font-size: 10px;
+      }
+
+      .stat-value {
+        font-size: 21px;
+      }
+
+      .modal-layer {
+        padding: 10px;
+      }
+
+      .modal {
+        max-height: calc(100vh - 20px);
+        border-radius: 17px;
+      }
+
+      .modal-body,
+      .modal-header,
+      .modal-footer {
+        padding: 17px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- =======================================================
+       BOOT SCREEN
+       ======================================================= -->
+
+  <div id="bootScreen">
+    <div class="boot-card">
+      <img
+        class="boot-logo"
+        src="assets/images/Almafaaz-logo.png"
+        alt="ALMAFAAZ ACADEMY"
+        onerror="this.style.display='none'"
+      />
+
+      <div class="boot-title">ALMAFAAZ ACADEMY</div>
+
+      <div class="boot-subtitle" id="bootMessage">
+        Verifying your secure session...
+      </div>
+
+      <div class="loader"></div>
+    </div>
+  </div>
+
+  <!-- =======================================================
+       APPLICATION
+       ======================================================= -->
+
+  <div id="app">
+
+    <header class="topbar">
+
+      <div class="brand-area">
+
+        <img
+          class="brand-logo"
+          src="assets/images/Almafaaz-logo.png"
+          alt="ALMAFAAZ ACADEMY"
+          onerror="this.style.display='none'"
+        />
+
+        <div class="brand-text">
+          <div class="brand-name">ALMAFAAZ ACADEMY</div>
+          <div class="brand-caption">Teacher Management</div>
+        </div>
+
+      </div>
+
+      <div class="top-actions">
+
+        <a
+          href="./super-admin-dashboard.html"
+          class="nav-btn"
+        >
+          Dashboard
+        </a>
+
+        <button
+          type="button"
+          class="nav-btn logout-btn"
+          id="logoutBtn"
+        >
+          Logout
+        </button>
+
+      </div>
+
+    </header>
+
+    <main>
+
+      <!-- PAGE HEADER -->
+
+      <section class="page-heading">
+
+        <div class="heading-left">
+
+          <div class="eyebrow">
+            Academic Administration
+          </div>
+
+          <h1>Teachers</h1>
+
+          <p class="page-description">
+            Manage teacher accounts, assignments, class-teacher responsibilities,
+            account status and teacher activities from one secure administration
+            interface.
+          </p>
+
+        </div>
+
+        <button
+          type="button"
+          class="primary-btn"
+          id="createTeacherBtn"
+        >
+          Add Teacher
+        </button>
+
+      </section>
+
+      <!-- STATS -->
+
+      <section class="stats-grid">
+
+        <div class="stat-card">
+          <div class="stat-label">Total Teachers</div>
+          <div class="stat-value" id="totalTeachers">0</div>
+          <div class="stat-note">Teacher profiles</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Active</div>
+          <div class="stat-value" id="activeTeachers">0</div>
+          <div class="stat-note">Currently active</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Assigned</div>
+          <div class="stat-value" id="assignedTeachers">0</div>
+          <div class="stat-note">With class assignments</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Class Teachers</div>
+          <div class="stat-value" id="classTeachers">0</div>
+          <div class="stat-note">Class-teacher roles</div>
+        </div>
+
+      </section>
+
+      <!-- SEARCH -->
+
+      <section class="panel toolbar">
+
+        <input
+          id="searchInput"
+          class="field"
+          type="search"
+          placeholder="Search teacher by name or ID..."
+          autocomplete="off"
+        />
+
+        <select
+          id="statusFilter"
+          class="field"
+        >
+          <option value="all">All statuses</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+          <option value="suspended">Suspended</option>
+          <option value="pending">Pending</option>
+        </select>
+
+        <button
+          type="button"
+          class="refresh-btn"
+          id="refreshBtn"
+        >
+          Refresh Teachers
+        </button>
+
+      </section>
+
+      <!-- TABLE -->
+
+      <section class="panel table-panel">
+
+        <div class="table-head">
+
+          <div>
+            <div class="table-title">
+              Teacher Directory
+            </div>
+
+            <div class="record-count" id="recordCount">
+              Loading teachers...
+            </div>
+          </div>
+
+        </div>
+
+        <div class="table-wrap">
+
+          <table>
+
+            <thead>
+              <tr>
+                <th>Teacher</th>
+                <th>Status</th>
+                <th>Assigned Classes</th>
+                <th>Class Teacher</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+
+            <tbody id="teacherTableBody"></tbody>
+
+          </table>
+
+          <div
+            id="emptyState"
+            class="empty-state"
+            style="display:none"
+          >
+            <strong>No teachers found</strong>
+            <span>
+              There are no teachers matching the current search or filter.
+            </span>
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- =====================================================
+         CREATE TEACHER MODAL
+         ===================================================== -->
+
+    <div
+      id="createModal"
+      class="modal-layer"
+      role="dialog"
+      aria-modal="true"
+    >
+
+      <div class="modal">
+
+        <div class="modal-header">
+
+          <div>
+            <div class="modal-title">
+              Create Teacher
+            </div>
+
+            <div class="modal-subtitle">
+              A new teacher account will be created through the secure
+              teacher-create-user Edge Function.
+            </div>
+          </div>
+
+          <button
+            type="button"
+            class="close-btn"
+            data-close="createModal"
+          >
+            ×
+          </button>
+
+        </div>
+
+        <form id="createTeacherForm">
+
+          <div class="modal-body">
+
+            <div class="form-grid">
+
+              <div class="form-group full">
+                <label for="teacherFullName">
+                  Full Name
+                </label>
+
+                <input
+                  id="teacherFullName"
+                  class="field"
+                  type="text"
+                  required
+                  placeholder="Enter teacher's full name"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="teacherEmail">
+                  Email Address
+                </label>
+
+                <input
+                  id="teacherEmail"
+                  class="field"
+                  type="email"
+                  required
+                  placeholder="teacher@example.com"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="teacherPassword">
+                  Temporary Password
+                </label>
+
+                <input
+                  id="teacherPassword"
+                  class="field"
+                  type="text"
+                  minlength="8"
+                  required
+                  placeholder="Minimum 8 characters"
+                />
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="modal-footer">
+
+            <button
+              type="button"
+              class="secondary-btn"
+              data-close="createModal"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="submit"
+              class="primary-btn"
+              id="saveTeacherBtn"
+            >
+              Create Teacher
+            </button>
+
+          </div>
+
+        </form>
+
+      </div>
+
+    </div>
+
+    <!-- =====================================================
+         PROFILE MODAL
+         ===================================================== -->
+
+    <div
+      id="profileModal"
+      class="modal-layer"
+      role="dialog"
+      aria-modal="true"
+    >
+
+      <div class="modal large">
+
+        <div class="modal-header">
+
+          <div>
+            <div class="modal-title">
+              Teacher Profile
+            </div>
+
+            <div class="modal-subtitle">
+              Teacher account and academic assignment details.
+            </div>
+          </div>
+
+          <button
+            type="button"
+            class="close-btn"
+            data-close="profileModal"
+          >
+            ×
+          </button>
+
+        </div>
+
+        <div class="modal-body" id="profileContent"></div>
+
+      </div>
+
+    </div>
+
+    <!-- =====================================================
+         EDIT MODAL
+         ===================================================== -->
+
+    <div
+      id="editModal"
+      class="modal-layer"
+      role="dialog"
+      aria-modal="true"
+    >
+
+      <div class="modal">
+
+        <div class="modal-header">
+
+          <div>
+            <div class="modal-title">
+              Edit Teacher
+            </div>
+
+            <div class="modal-subtitle">
+              Update the teacher profile name or account status.
+            </div>
+          </div>
+
+          <button
+            type="button"
+            class="close-btn"
+            data-close="editModal"
+          >
+            ×
+          </button>
+
+        </div>
+
+        <form id="editTeacherForm">
+
+          <div class="modal-body">
+
+            <input
+              type="hidden"
+              id="editTeacherId"
+            />
+
+            <div class="form-grid">
+
+              <div class="form-group full">
+
+                <label for="editTeacherName">
+                  Full Name
+                </label>
+
+                <input
+                  id="editTeacherName"
+                  class="field"
+                  type="text"
+                  required
+                />
+
+              </div>
+
+              <div class="form-group full">
+
+                <label for="editTeacherStatus">
+                  Account Status
+                </label>
+
+                <select
+                  id="editTeacherStatus"
+                  class="field"
+                  required
+                >
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                  <option value="suspended">Suspended</option>
+                  <option value="pending">Pending</option>
+                </select>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="modal-footer">
+
+            <button
+              type="button"
+              class="secondary-btn"
+              data-close="editModal"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="submit"
+              class="primary-btn"
+              id="updateTeacherBtn"
+            >
+              Save Changes
+            </button>
+
+          </div>
+
+        </form>
+
+      </div>
+
+    </div>
+
+    <!-- =====================================================
+         ASSIGN CLASS MODAL
+         ===================================================== -->
+
+    <div
+      id="assignModal"
+      class="modal-layer"
+      role="dialog"
+      aria-modal="true"
+    >
+
+      <div class="modal">
+
+        <div class="modal-header">
+
+          <div>
+            <div class="modal-title">
+              Assign Teacher to Class
+            </div>
+
+            <div class="modal-subtitle" id="assignSubtitle">
+              Select an academic class.
+            </div>
+          </div>
+
+          <button
+            type="button"
+            class="close-btn"
+            data-close="assignModal"
+          >
+            ×
+          </button>
+
+        </div>
+
+        <form id="assignTeacherForm">
+
+          <div class="modal-body">
+
+            <input
+              type="hidden"
+              id="assignTeacherId"
+            />
+
+            <div class="form-group">
+
+              <label for="classSelect">
+                Academic Class
+              </label>
+
+              <select
+                id="classSelect"
+                class="field"
+                required
+              >
+                <option value="">
+                  Loading classes...
+                </option>
+              </select>
+
+            </div>
+
+            <div style="height:15px"></div>
+
+            <div class="form-group">
+
+              <label>
+                Class Teacher
+              </label>
+
+              <select
+                id="makeClassTeacher"
+                class="field"
+              >
+                <option value="false">
+                  Assign as normal subject/class teacher
+                </option>
+
+                <option value="true">
+                  Assign as Class Teacher
+                </option>
+              </select>
+
+            </div>
+
+          </div>
+
+          <div class="modal-footer">
+
+            <button
+              type="button"
+              class="secondary-btn"
+              data-close="assignModal"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="submit"
+              class="primary-btn"
+              id="assignBtn"
+            >
+              Assign Teacher
+            </button>
+
+          </div>
+
+        </form>
+
+      </div>
+
+    </div>
+
+    <!-- =====================================================
+         TOAST
+         ===================================================== -->
+
+    <div id="toastContainer"></div>
+
+    <!-- =====================================================
+         FOOTER
+         ===================================================== -->
+
+    <footer>
+
+      <div class="footer-inner">
+
+        <div>
+          <div class="footer-title">
+            ALMAFAAZ ACADEMY
+          </div>
+
+          <div class="footer-copy">
+            Copyright © 2026 ALMAFAAZ ACADEMY. All rights reserved.
+          </div>
+        </div>
+
+        <div class="footer-powered">
+          Powered by
+          <strong>Yalerima Technologies Limited</strong>
+        </div>
+
+      </div>
+
+    </footer>
+
+  </div>
+
+
+  <script>
+    /* =========================================================
+       SUPABASE CONFIGURATION
+       ========================================================= */
+
+    const SUPABASE_URL =
+      "https://orkokipqrwsqnslbwpbt.supabase.co";
+
+    const SUPABASE_KEY =
+      "sb_publishable_sjcK3_WrRNCnz04ePDsuHg_GfsHjr0l";
+
+    const SUPER_ADMIN_LOGIN =
+      "./super-admin-login.html";
+
+    const DASHBOARD =
+      "./super-admin-dashboard.html";
+
+    const supabaseClient =
+      window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY,
+        {
+          auth: {
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: true
+          }
+        }
+      );
+
+
+    /* =========================================================
+       GLOBAL STATE
+       ========================================================= */
+
+    let teachers = [];
+    let classes = [];
+    let currentTeacher = null;
+
+    const SUPER_ADMIN_ID =
+      "35ec4ffa-0b6a-4fb4-a79f-3d4c4289370d";
+
+
+    /* =========================================================
+       DOM HELPERS
+       ========================================================= */
+
+    const $ = (selector) =>
+      document.querySelector(selector);
+
+    const $$ = (selector) =>
+      document.querySelectorAll(selector);
+
+
+    function setBootMessage(message) {
+      const el = $("#bootMessage");
+
+      if (el) {
+        el.textContent = message;
+      }
+    }
+
+
+    function showApp() {
+      $("#bootScreen").style.display = "none";
+      $("#app").style.display = "block";
+    }
+
+
+    function redirectToLogin() {
+      window.location.replace(SUPER_ADMIN_LOGIN);
+    }
+
+
+    function showToast(message, type = "normal") {
+
+      const container =
+        $("#toastContainer");
+
+      const toast =
+        document.createElement("div");
+
+      toast.className =
+        "toast " + type;
+
+      toast.textContent =
+        message;
+
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.remove();
+      }, 5000);
+    }
+
+
+    function escapeHTML(value) {
+
+      if (value === null || value === undefined) {
+        return "";
+      }
+
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+
+    function getInitials(name) {
+
+      if (!name) {
+        return "T";
+      }
+
+      const parts =
+        String(name)
+          .trim()
+          .split(/\s+/)
+          .filter(Boolean);
+
+      if (parts.length === 1) {
+        return parts[0].substring(0, 2).toUpperCase();
+      }
+
+      return (
+        parts[0][0] +
+        parts[parts.length - 1][0]
+      ).toUpperCase();
+    }
+
+
+    function formatStatus(status) {
+
+      return String(status || "unknown")
+        .replace(/_/g, " ");
+    }
+
+
+    function formatClassName(classRow) {
+
+      if (!classRow) {
+        return "Unknown Class";
+      }
+
+      return (
+        classRow.class_name ||
+        classRow.class_code ||
+        "Unknown Class"
+      );
+    }
+
+
+    /* =========================================================
+       MODALS
+       ========================================================= */
+
+    function openModal(id) {
+      const modal = document.getElementById(id);
+
+      if (modal) {
+        modal.classList.add("open");
+      }
+    }
+
+
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+
+      if (modal) {
+        modal.classList.remove("open");
+      }
+    }
+
+
+    $$("[data-close]").forEach(button => {
+
+      button.addEventListener("click", () => {
+        closeModal(button.dataset.close);
+      });
+
+    });
+
+
+    $$(".modal-layer").forEach(layer => {
+
+      layer.addEventListener("click", event => {
+
+        if (event.target === layer) {
+          layer.classList.remove("open");
+        }
+
+      });
+
+    });
+
+
+    /* =========================================================
+       AUTHENTICATION
+       ========================================================= */
+
+    async function verifySuperAdminSession() {
+
+      setBootMessage(
+        "Checking your authenticated session..."
+      );
+
+      let sessionResult;
+
+      try {
+
+        sessionResult =
+          await supabaseClient.auth.getSession();
+
+      } catch (error) {
+
+        console.error(
+          "Session error:",
+          error
+        );
+
+        throw new Error(
+          "Unable to contact Supabase authentication."
+        );
+      }
+
+      const session =
+        sessionResult?.data?.session;
+
+      if (!session || !session.user) {
+
+        setBootMessage(
+          "No active Super Admin session. Redirecting..."
+        );
+
+        setTimeout(
+          redirectToLogin,
+          700
+        );
+
+        return false;
+      }
+
+
+      setBootMessage(
+        "Verifying Super Admin permissions..."
+      );
+
+
+      const userId =
+        session.user.id;
+
+
+      /*
+       * This query deliberately checks the authenticated
+       * user's profile. It does NOT trust localStorage.
+       */
+
+      const profileResult =
+        await supabaseClient
+          .from("profiles")
+          .select(
+            "id, full_name, role, account_status"
+          )
+          .eq("id", userId)
+          .maybeSingle();
+
+
+      if (profileResult.error) {
+
+        console.error(
+          "Profile verification error:",
+          profileResult.error
+        );
+
+        throw new Error(
+          profileResult.error.message
+        );
+      }
+
+
+      const profile =
+        profileResult.data;
+
+
+      if (!profile) {
+
+        setBootMessage(
+          "Your account profile could not be verified. Redirecting..."
+        );
+
+        await supabaseClient.auth.signOut();
+
+        setTimeout(
+          redirectToLogin,
+          700
+        );
+
+        return false;
+      }
+
+
+      if (
+        profile.role !== "super_admin" ||
+        profile.account_status !== "active"
+      ) {
+
+        setBootMessage(
+          "This account does not have active Super Admin access."
+        );
+
+        await supabaseClient.auth.signOut();
+
+        setTimeout(
+          redirectToLogin,
+          900
+        );
+
+        return false;
+      }
+
+
+      /*
+       * Confirm the expected account identity.
+       * This is an additional sanity check, not a replacement
+       * for the database role/status verification.
+       */
+
+      if (profile.id !== SUPER_ADMIN_ID) {
+
+        console.warn(
+          "Authenticated Super Admin UUID differs from configured UUID."
+        );
+
+      }
+
+
+      window.currentSession =
+        session;
+
+      window.currentProfile =
+        profile;
+
+
+      return true;
+    }
+
+
+    /* =========================================================
+       LOAD ACADEMIC CLASSES
+       ========================================================= */
+
+    async function loadClasses() {
+
+      const result =
+        await supabaseClient
+          .from("academic_classes")
+          .select(`
+            id,
+            class_code,
+            class_name,
+            section,
+            level_order,
+            is_active
+          `)
+          .eq("is_active", true)
+          .order(
+            "level_order",
+            {
+              ascending: true
+            }
+          );
+
+
+      if (result.error) {
+
+        console.error(
+          "Class loading error:",
+          result.error
+        );
+
+        throw new Error(
+          "Unable to load academic classes: " +
+          result.error.message
+        );
+      }
+
+
+      classes =
+        result.data || [];
+
+
+      renderClassOptions();
+    }
+
+
+    function renderClassOptions() {
+
+      const select =
+        $("#classSelect");
+
+      if (!select) {
+        return;
+      }
+
+
+      select.innerHTML =
+        `<option value="">Select a class</option>`;
+
+
+      classes.forEach(classRow => {
+
+        const option =
+          document.createElement("option");
+
+        option.value =
+          classRow.id;
+
+        option.textContent =
+          `${formatClassName(classRow)}${
+            classRow.section
+              ? " — " + classRow.section
+              : ""
+          }`;
+
+        select.appendChild(option);
+
+      });
+
+    }
+
+
+    /* =========================================================
+       LOAD TEACHERS
+       ========================================================= */
+
+    async function loadTeachers() {
+
+      $("#recordCount").textContent =
+        "Loading teachers...";
+
+
+      const result =
+        await supabaseClient
+          .rpc("list_teachers");
+
+
+      if (result.error) {
+
+        console.error(
+          "Teacher RPC error:",
+          result.error
+        );
+
+        throw new Error(
+          "Unable to load teachers: " +
+          result.error.message
+        );
+      }
+
+
+      teachers =
+        Array.isArray(result.data)
+          ? result.data
+          : [];
+
+
+      /*
+       * The backend function is the source of teacher records.
+       * We separately obtain assignments for each teacher using
+       * the existing list_teacher_assignments(uuid) function.
+       */
+
+      await enrichTeachersWithAssignments();
+
+
+      renderTeachers();
+      updateStats();
+    }
+
+
+    async function enrichTeachersWithAssignments() {
+
+      for (const teacher of teachers) {
+
+        try {
+
+          const teacherId =
+            teacher.id ||
+            teacher.teacher_id ||
+            teacher.user_id;
+
+
+          if (!teacherId) {
+            teacher.assignments = [];
+            continue;
+          }
+
+
+          const result =
+            await supabaseClient
+              .rpc(
+                "list_teacher_assignments",
+                {
+                  target_teacher_id:
+                    teacherId
+                }
+              );
+
+
+          if (result.error) {
+
+            console.warn(
+              "Assignment loading failed for",
+              teacherId,
+              result.error
+            );
+
+            teacher.assignments = [];
+
+          } else {
+
+            teacher.assignments =
+              Array.isArray(result.data)
+                ? result.data
+                : [];
+
+          }
+
+        } catch (error) {
+
+          console.warn(
+            "Assignment enrichment error:",
+            error
+          );
+
+          teacher.assignments = [];
+        }
+
+      }
+
+    }
+
+
+    /* =========================================================
+       TEACHER DATA NORMALIZATION
+       ========================================================= */
+
+    function teacherId(teacher) {
+
+      return (
+        teacher.id ||
+        teacher.teacher_id ||
+        teacher.user_id ||
+        ""
+      );
+    }
+
+
+    function teacherName(teacher) {
+
+      return (
+        teacher.full_name ||
+        teacher.name ||
+        teacher.teacher_name ||
+        "Unnamed Teacher"
+      );
+    }
+
+
+    function teacherStatus(teacher) {
+
+      return (
+        teacher.account_status ||
+        teacher.status ||
+        "unknown"
+      );
+    }
+
+
+    function assignmentClassName(assignment) {
+
+      /*
+       * The backend may return either class_name directly
+       * or a class_id. We support both.
+       */
+
+      if (assignment.class_name) {
+        return assignment.class_name;
+      }
+
+      if (assignment.name) {
+        return assignment.name;
+      }
+
+      const classId =
+        assignment.class_id;
+
+      const found =
+        classes.find(
+          c => c.id === classId
+        );
+
+      return found
+        ? formatClassName(found)
+        : "Assigned Class";
+    }
+
+
+    function isClassTeacherAssignment(assignment) {
+
+      return (
+        assignment.is_class_teacher === true ||
+        assignment.is_class_teacher === "true"
+      );
+    }
+
+
+    /* =========================================================
+       RENDER TEACHERS
+       ========================================================= */
+
+    function getFilteredTeachers() {
+
+      const search =
+        $("#searchInput")
+          .value
+          .trim()
+          .toLowerCase();
+
+      const status =
+        $("#statusFilter")
+          .value;
+
+
+      return teachers.filter(teacher => {
+
+        const name =
+          teacherName(teacher)
+            .toLowerCase();
+
+        const id =
+          String(teacherId(teacher))
+            .toLowerCase();
+
+        const teacherCurrentStatus =
+          String(
+            teacherStatus(teacher)
+          ).toLowerCase();
+
+
+        const matchesSearch =
+          !search ||
+          name.includes(search) ||
+          id.includes(search);
+
+
+        const matchesStatus =
+          status === "all" ||
+          teacherCurrentStatus === status;
+
+
+        return (
+          matchesSearch &&
+          matchesStatus
+        );
+
+      });
+
+    }
+
+
+    function renderTeachers() {
+
+      const body =
+        $("#teacherTableBody");
+
+      const empty =
+        $("#emptyState");
+
+      const filtered =
+        getFilteredTeachers();
+
+
+      body.innerHTML = "";
+
+
+      $("#recordCount").textContent =
+        `${filtered.length} teacher${
+          filtered.length === 1 ? "" : "s"
+        } shown`;
+
+
+      if (!filtered.length) {
+
+        empty.style.display =
+          "block";
+
+        return;
+      }
+
+
+      empty.style.display =
+        "none";
+
+
+      filtered.forEach(teacher => {
+
+        const id =
+          teacherId(teacher);
+
+        const name =
+          teacherName(teacher);
+
+        const status =
+          teacherStatus(teacher);
+
+        const assignments =
+          Array.isArray(
+            teacher.assignments
+          )
+            ? teacher.assignments
+            : [];
+
+
+        const classTeacherAssignments =
+          assignments.filter(
+            isClassTeacherAssignment
+          );
+
+
+        const row =
+          document.createElement("tr");
+
+
+        row.innerHTML = `
+
+          <td>
+
+            <div class="teacher-cell">
+
+              <div class="avatar">
+                ${escapeHTML(
+                  getInitials(name)
+                )}
+              </div>
+
+              <div>
+
+                <div class="teacher-name">
+                  ${escapeHTML(name)}
+                </div>
+
+                <div class="teacher-id">
+                  ${escapeHTML(id)}
+                </div>
+
+              </div>
+
+            </div>
+
+          </td>
+
+
+          <td>
+
+            <span class="status ${escapeHTML(
+              status
+            )}">
+              ${escapeHTML(
+                formatStatus(status)
+              )}
+            </span>
+
+          </td>
+
+
+          <td>
+
+            <div class="classes">
+
+              ${
+                assignments.length
+                  ? assignments.map(
+                      assignment => `
+                        <span class="class-chip ${
+                          isClassTeacherAssignment(
+                            assignment
+                          )
+                            ? "class-teacher-chip"
+                            : ""
+                        }">
+                          ${escapeHTML(
+                            assignmentClassName(
+                              assignment
+                            )
+                          )}
+                        </span>
+                      `
+                    ).join("")
+                  : `<span style="color:#8a98aa;font-size:11px">
+                       No class assigned
+                     </span>`
+              }
+
+            </div>
+
+          </td>
+
+
+          <td>
+
+            ${
+              classTeacherAssignments.length
+                ? `
+                  <div class="classes">
+                    ${classTeacherAssignments.map(
+                      assignment => `
+                        <span class="class-chip class-teacher-chip">
+                          ${escapeHTML(
+                            assignmentClassName(
+                              assignment
+                            )
+                          )}
+                        </span>
+                      `
+                    ).join("")}
+                  </div>
+                `
+                : `
+                  <span style="color:#8a98aa;font-size:11px">
+                    Not assigned
+                  </span>
+                `
+            }
+
+          </td>
+
+
+          <td>
+
+            <div class="actions">
+
+              <button
+                class="action-btn"
+                data-action="view"
+                data-id="${escapeHTML(id)}"
+              >
+                View
+              </button>
+
+              <button
+                class="action-btn"
+                data-action="edit"
+                data-id="${escapeHTML(id)}"
+              >
+                Edit
+              </button>
+
+              <button
+                class="action-btn"
+                data-action="assign"
+                data-id="${escapeHTML(id)}"
+              >
+                Assign
+              </button>
+
+              <button
+                class="action-btn danger"
+                data-action="archive"
+                data-id="${escapeHTML(id)}"
+              >
+                ${
+                  status === "inactive"
+                    ? "Restore"
+                    : "Archive"
+                }
+              </button>
+
+            </div>
+
+          </td>
+
+        `;
+
+
+        body.appendChild(row);
+
+      });
+
+
+      body
+        .querySelectorAll(
+          "[data-action]"
+        )
+        .forEach(button => {
+
+          button.addEventListener(
+            "click",
+            handleTeacherAction
+          );
+
+        });
+
+    }
+
+
+    /* =========================================================
+       STATS
+       ========================================================= */
+
+    function updateStats() {
+
+      const total =
+        teachers.length;
+
+
+      const active =
+        teachers.filter(
+          teacher =>
+            teacherStatus(
+              teacher
+            ) === "active"
+        ).length;
+
+
+      const assigned =
+        teachers.filter(
+          teacher =>
+            Array.isArray(
+              teacher.assignments
+            ) &&
+            teacher.assignments.length
+        ).length;
+
+
+      const classTeachers =
+        teachers.filter(
+          teacher =>
+            Array.isArray(
+              teacher.assignments
+            ) &&
+            teacher.assignments.some(
+              isClassTeacherAssignment
+            )
+        ).length;
+
+
+      $("#totalTeachers")
+        .textContent = total;
+
+      $("#activeTeachers")
+        .textContent = active;
+
+      $("#assignedTeachers")
+        .textContent = assigned;
+
+      $("#classTeachers")
+        .textContent = classTeachers;
+
+    }
+
+
+    /* =========================================================
+       FIND TEACHER
+       ========================================================= */
+
+    function findTeacher(id) {
+
+      return teachers.find(
+        teacher =>
+          teacherId(teacher) === id
+      );
+
+    }
+
+
+    /* =========================================================
+       VIEW PROFILE
+       ========================================================= */
+
+    async function viewTeacher(id) {
+
+      const teacher =
+        findTeacher(id);
+
+
+      if (!teacher) {
+
+        showToast(
+          "Teacher record could not be found.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      currentTeacher =
+        teacher;
+
+
+      const name =
+        teacherName(teacher);
+
+      const assignments =
+        teacher.assignments || [];
+
+
+      const profile =
+        $("#profileContent");
+
+
+      profile.innerHTML = `
+
+        <div class="profile-hero">
+
+          <div class="profile-avatar">
+            ${escapeHTML(
+              getInitials(name)
+            )}
+          </div>
+
+          <div>
+
+            <div class="profile-name">
+              ${escapeHTML(name)}
+            </div>
+
+            <div class="profile-role">
+              Teacher
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="detail-grid">
+
+          <div class="detail-box">
+
+            <div class="detail-label">
+              Teacher ID
+            </div>
+
+            <div class="detail-value">
+              ${escapeHTML(
+                teacherId(teacher)
+              )}
+            </div>
+
+          </div>
+
+
+          <div class="detail-box">
+
+            <div class="detail-label">
+              Account Status
+            </div>
+
+            <div class="detail-value">
+              ${escapeHTML(
+                formatStatus(
+                  teacherStatus(teacher)
+                )
+              )}
+            </div>
+
+          </div>
+
+
+          <div class="detail-box">
+
+            <div class="detail-label">
+              Role
+            </div>
+
+            <div class="detail-value">
+              ${escapeHTML(
+                teacher.role ||
+                "teacher"
+              )}
+            </div>
+
+          </div>
+
+
+          <div class="detail-box">
+
+            <div class="detail-label">
+              Assigned Classes
+            </div>
+
+            <div class="detail-value">
+              ${assignments.length}
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div style="height:20px"></div>
+
+        <div class="detail-label">
+          Academic Assignments
+        </div>
+
+        <div style="height:9px"></div>
+
+        ${
+          assignments.length
+            ? `
+              <div class="activity-list">
+
+                ${assignments.map(
+                  assignment => `
+                    <div class="activity-item">
+
+                      <strong>
+                        ${escapeHTML(
+                          assignmentClassName(
+                            assignment
+                          )
+                        )}
+                      </strong>
+
+                      <div>
+                        ${
+                          isClassTeacherAssignment(
+                            assignment
+                          )
+                            ? "Class Teacher"
+                            : "Teacher Assignment"
+                        }
+                      </div>
+
+                    </div>
+                  `
+                ).join("")}
+
+              </div>
+            `
+            : `
+              <div class="empty-state" style="padding:30px 10px">
+                No class assignments found.
+              </div>
+            `
+        }
+
+      `;
+
+
+      openModal("profileModal");
+
+    }
+
+
+    /* =========================================================
+       EDIT TEACHER
+       ========================================================= */
+
+    function editTeacher(id) {
+
+      const teacher =
+        findTeacher(id);
+
+
+      if (!teacher) {
+
+        showToast(
+          "Teacher record could not be found.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      $("#editTeacherId")
+        .value = teacherId(teacher);
+
+      $("#editTeacherName")
+        .value = teacherName(teacher);
+
+      $("#editTeacherStatus")
+        .value = teacherStatus(teacher);
+
+
+      openModal("editModal");
+
+    }
+
+
+    /* =========================================================
+       ASSIGN TEACHER
+       ========================================================= */
+
+    function openAssignModal(id) {
+
+      const teacher =
+        findTeacher(id);
+
+
+      if (!teacher) {
+
+        showToast(
+          "Teacher record could not be found.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      $("#assignTeacherId")
+        .value = id;
+
+
+      $("#assignSubtitle")
+        .textContent =
+          `Assign ${teacherName(
+            teacher
+          )} to an academic class.`;
+
+
+      $("#classSelect")
+        .value = "";
+
+
+      $("#makeClassTeacher")
+        .value = "false";
+
+
+      openModal("assignModal");
+
+    }
+
+
+    /* =========================================================
+       TEACHER ACTIONS
+       ========================================================= */
+
+    async function handleTeacherAction(event) {
+
+      const button =
+        event.currentTarget;
+
+      const action =
+        button.dataset.action;
+
+      const id =
+        button.dataset.id;
+
+
+      if (action === "view") {
+        await viewTeacher(id);
+        return;
+      }
+
+
+      if (action === "edit") {
+        editTeacher(id);
+        return;
+      }
+
+
+      if (action === "assign") {
+        openAssignModal(id);
+        return;
+      }
+
+
+      if (action === "archive") {
+        await toggleArchive(id);
+      }
+
+    }
+
+
+    /* =========================================================
+       CREATE TEACHER
+       ========================================================= */
+
+    async function createTeacher(event) {
+
+      event.preventDefault();
+
+
+      const fullName =
+        $("#teacherFullName")
+          .value
+          .trim();
+
+      const email =
+        $("#teacherEmail")
+          .value
+          .trim();
+
+      const temporaryPassword =
+        $("#teacherPassword")
+          .value;
+
+
+      if (!fullName || !email) {
+
+        showToast(
+          "Full name and email are required.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      if (temporaryPassword.length < 8) {
+
+        showToast(
+          "Temporary password must contain at least 8 characters.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      const button =
+        $("#saveTeacherBtn");
+
+      button.disabled = true;
+      button.textContent =
+        "Creating...";
+
+
+      try {
+
+        const {
+          data: {
+            session
+          }
+        } =
+          await supabaseClient
+            .auth
+            .getSession();
+
+
+        if (!session) {
+
+          redirectToLogin();
+          return;
+        }
+
+
+        /*
+         * IMPORTANT:
+         * teacher-create-user must be deployed as a Supabase
+         * Edge Function. The service-role key never appears
+         * inside this browser page.
+         */
+
+        const response =
+          await fetch(
+            `${SUPABASE_URL}/functions/v1/teacher-create-user`,
+            {
+              method: "POST",
+
+              headers: {
+                "Content-Type":
+                  "application/json",
+
+                "Authorization":
+                  `Bearer ${session.access_token}`
+              },
+
+              body: JSON.stringify({
+                full_name: fullName,
+                email: email,
+                temporary_password:
+                  temporaryPassword
+              })
+            }
+          );
+
+
+        const responseText =
+          await response.text();
+
+
+        let responseData = {};
+
+        try {
+          responseData =
+            responseText
+              ? JSON.parse(
+                  responseText
+                )
+              : {};
+        } catch {
+          responseData = {
+            message:
+              responseText
+          };
+        }
+
+
+        if (!response.ok) {
+
+          throw new Error(
+            responseData.message ||
+            responseData.error ||
+            `Teacher creation failed (${response.status})`
+          );
+        }
+
+
+        closeModal(
+          "createModal"
+        );
+
+
+        $("#createTeacherForm")
+          .reset();
+
+
+        showToast(
+          "Teacher account created successfully.",
+          "success"
+        );
+
+
+        await loadTeachers();
+
+
+      } catch (error) {
+
+        console.error(
+          "Create teacher error:",
+          error
+        );
+
+        showToast(
+          error.message ||
+          "Unable to create teacher.",
+          "error"
+        );
+
+      } finally {
+
+        button.disabled = false;
+        button.textContent =
+          "Create Teacher";
+
+      }
+
+    }
+
+
+    /* =========================================================
+       UPDATE TEACHER
+       ========================================================= */
+
+    async function updateTeacher(event) {
+
+      event.preventDefault();
+
+
+      const id =
+        $("#editTeacherId")
+          .value;
+
+      const name =
+        $("#editTeacherName")
+          .value
+          .trim();
+
+      const status =
+        $("#editTeacherStatus")
+          .value;
+
+
+      if (!id || !name) {
+
+        showToast(
+          "Teacher ID and name are required.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      const button =
+        $("#updateTeacherBtn");
+
+      button.disabled = true;
+      button.textContent =
+        "Saving...";
+
+
+      try {
+
+        const result =
+          await supabaseClient
+            .rpc(
+              "update_teacher_profile",
+              {
+                target_teacher_id:
+                  id,
+
+                new_full_name:
+                  name,
+
+                new_account_status:
+                  status
+              }
+            );
+
+
+        if (result.error) {
+          throw new Error(
+            result.error.message
+          );
+        }
+
+
+        closeModal(
+          "editModal"
+        );
+
+
+        showToast(
+          "Teacher profile updated successfully.",
+          "success"
+        );
+
+
+        await loadTeachers();
+
+
+      } catch (error) {
+
+        console.error(
+          "Update teacher error:",
+          error
+        );
+
+        showToast(
+          "Unable to update teacher: " +
+          error.message,
+          "error"
+        );
+
+      } finally {
+
+        button.disabled = false;
+        button.textContent =
+          "Save Changes";
+
+      }
+
+    }
+
+
+    /* =========================================================
+       ASSIGN CLASS
+       ========================================================= */
+
+    async function assignTeacher(event) {
+
+      event.preventDefault();
+
+
+      const teacherIdValue =
+        $("#assignTeacherId")
+          .value;
+
+      const classId =
+        $("#classSelect")
+          .value;
+
+      const makeClassTeacher =
+        $("#makeClassTeacher")
+          .value === "true";
+
+
+      if (!teacherIdValue || !classId) {
+
+        showToast(
+          "Select a teacher and academic class.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      const button =
+        $("#assignBtn");
+
+      button.disabled = true;
+      button.textContent =
+        "Assigning...";
+
+
+      try {
+
+        const result =
+          await supabaseClient
+            .rpc(
+              "assign_teacher_to_class",
+              {
+                target_teacher_id:
+                  teacherIdValue,
+
+                target_class_id:
+                  classId,
+
+                make_class_teacher:
+                  makeClassTeacher
+              }
+            );
+
+
+        if (result.error) {
+          throw new Error(
+            result.error.message
+          );
+        }
+
+
+        closeModal(
+          "assignModal"
+        );
+
+
+        showToast(
+          makeClassTeacher
+            ? "Teacher assigned as Class Teacher successfully."
+            : "Teacher assigned to class successfully.",
+          "success"
+        );
+
+
+        await loadTeachers();
+
+
+      } catch (error) {
+
+        console.error(
+          "Assign teacher error:",
+          error
+        );
+
+        showToast(
+          "Unable to assign teacher: " +
+          error.message,
+          "error"
+        );
+
+      } finally {
+
+        button.disabled = false;
+        button.textContent =
+          "Assign Teacher";
+
+      }
+
+    }
+
+
+    /* =========================================================
+       ARCHIVE / RESTORE
+       ========================================================= */
+
+    async function toggleArchive(id) {
+
+      const teacher =
+        findTeacher(id);
+
+
+      if (!teacher) {
+        return;
+      }
+
+
+      const status =
+        teacherStatus(teacher);
+
+
+      const currentlyInactive =
+        status === "inactive";
+
+
+      const actionName =
+        currentlyInactive
+          ? "restore"
+          : "archive";
+
+
+      const confirmed =
+        window.confirm(
+          currentlyInactive
+            ? `Restore ${teacherName(
+                teacher
+              )}?`
+            : `Archive ${teacherName(
+                teacher
+              )}?`
+        );
+
+
+      if (!confirmed) {
+        return;
+      }
+
+
+      try {
+
+        const functionName =
+          currentlyInactive
+            ? "restore_teacher"
+            : "archive_teacher";
+
+
+        const result =
+          await supabaseClient
+            .rpc(
+              functionName,
+              {
+                target_teacher_id:
+                  id
+              }
+            );
+
+
+        if (result.error) {
+          throw new Error(
+            result.error.message
+          );
+        }
+
+
+        showToast(
+          currentlyInactive
+            ? "Teacher restored successfully."
+            : "Teacher archived successfully.",
+          "success"
+        );
+
+
+        await loadTeachers();
+
+
+      } catch (error) {
+
+        console.error(
+          "Archive/restore error:",
+          error
+        );
+
+        showToast(
+          `Unable to ${actionName} teacher: ` +
+          error.message,
+          "error"
+        );
+
+      }
+
+    }
+
+
+    /* =========================================================
+       DELETE TEACHER PROFILE
+       ========================================================= */
+
+    async function deleteTeacherProfile(id) {
+
+      const teacher =
+        findTeacher(id);
+
+
+      if (!teacher) {
+        return;
+      }
+
+
+      const confirmed =
+        window.confirm(
+          `Delete the profile for ${teacherName(
+            teacher
+          )}?\n\nThis is a destructive profile operation.`
+        );
+
+
+      if (!confirmed) {
+        return;
+      }
+
+
+      try {
+
+        const result =
+          await supabaseClient
+            .rpc(
+              "delete_teacher_profile",
+              {
+                target_teacher_id:
+                  id
+              }
+            );
+
+
+        if (result.error) {
+          throw new Error(
+            result.error.message
+          );
+        }
+
+
+        showToast(
+          "Teacher profile deleted successfully.",
+          "success"
+        );
+
+
+        await loadTeachers();
+
+
+      } catch (error) {
+
+        console.error(
+          "Delete teacher error:",
+          error
+        );
+
+        showToast(
+          "Unable to delete teacher: " +
+          error.message,
+          "error"
+        );
+
+      }
+
+    }
+
+
+    /* =========================================================
+       TEACHER ACTIVITY
+       ========================================================= */
+
+    async function viewTeacherActivity(id) {
+
+      try {
+
+        const result =
+          await supabaseClient
+            .rpc(
+              "list_teacher_activities",
+              {
+                target_teacher_id:
+                  id
+              }
+            );
+
+
+        if (result.error) {
+          throw new Error(
+            result.error.message
+          );
+        }
+
+
+        const activities =
+          Array.isArray(result.data)
+            ? result.data
+            : [];
+
+
+        const teacher =
+          findTeacher(id);
+
+
+        const name =
+          teacher
+            ? teacherName(teacher)
+            : "Teacher";
+
+
+        $("#profileContent")
+          .innerHTML = `
+
+            <div class="profile-hero">
+
+              <div class="profile-avatar">
+                ${escapeHTML(
+                  getInitials(name)
+                )}
+              </div>
+
+              <div>
+
+                <div class="profile-name">
+                  ${escapeHTML(name)}
+                </div>
+
+                <div class="profile-role">
+                  Recent Teacher Activity
+                </div>
+
+              </div>
+
+            </div>
+
+
+            ${
+              activities.length
+                ? `
+                  <div class="activity-list">
+
+                    ${activities.map(
+                      activity => `
+
+                        <div class="activity-item">
+
+                          <strong>
+                            ${escapeHTML(
+                              activity.action ||
+                              activity.activity ||
+                              activity.event ||
+                              "Activity"
+                            )}
+                          </strong>
+
+                          <div>
+                            ${escapeHTML(
+                              activity.description ||
+                              activity.created_at ||
+                              activity.timestamp ||
+                              ""
+                            )}
+                          </div>
+
+                        </div>
+
+                      `
+                    ).join("")}
+
+                  </div>
+                `
+                : `
+                  <div class="empty-state" style="padding:40px 10px">
+                    <strong>No activity found</strong>
+                    <span>
+                      No teacher activity records were returned.
+                    </span>
+                  </div>
+                `
+            }
+
+          `;
+
+
+        openModal(
+          "profileModal"
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "Activity error:",
+          error
+        );
+
+        showToast(
+          "Unable to load teacher activity: " +
+          error.message,
+          "error"
+        );
+
+      }
+
+    }
+
+
+    /* =========================================================
+       SEARCH EVENTS
+       ========================================================= */
+
+    $("#searchInput")
+      .addEventListener(
+        "input",
+        renderTeachers
+      );
+
+
+    $("#statusFilter")
+      .addEventListener(
+        "change",
+        renderTeachers
+      );
+
+
+    /* =========================================================
+       BUTTON EVENTS
+       ========================================================= */
+
+    $("#createTeacherBtn")
+      .addEventListener(
+        "click",
+        () => {
+          openModal(
+            "createModal"
+          );
+        }
+      );
+
+
+    $("#refreshBtn")
+      .addEventListener(
+        "click",
+        async () => {
+
+          try {
+
+            await loadTeachers();
+
+            showToast(
+              "Teacher directory refreshed.",
+              "success"
+            );
+
+          } catch (error) {
+
+            showToast(
+              error.message,
+              "error"
+            );
+
+          }
+
+        }
+      );
+
+
+    $("#createTeacherForm")
+      .addEventListener(
+        "submit",
+        createTeacher
+      );
+
+
+    $("#editTeacherForm")
+      .addEventListener(
+        "submit",
+        updateTeacher
+      );
+
+
+    $("#assignTeacherForm")
+      .addEventListener(
+        "submit",
+        assignTeacher
+      );
+
+
+    $("#logoutBtn")
+      .addEventListener(
+        "click",
+        async () => {
+
+          try {
+
+            await supabaseClient
+              .auth
+              .signOut();
+
+          } finally {
+
+            window.location.replace(
+              SUPER_ADMIN_LOGIN
+            );
+
+          }
+
+        }
+      );
+
+
+    /* =========================================================
+       SESSION CHANGE LISTENER
+       ========================================================= */
+
+    supabaseClient.auth.onAuthStateChange(
+      (event, session) => {
+
+        /*
+         * Do not immediately redirect during INITIAL_SESSION.
+         * verifySuperAdminSession() already handles initial boot.
+         */
+
+        if (
+          event === "SIGNED_OUT" &&
+          !window.isLoggingOut
+        ) {
+
+          window.location.replace(
+            SUPER_ADMIN_LOGIN
+          );
+
+        }
+
+      }
+    );
+
+
+    /* =========================================================
+       APPLICATION BOOT
+       ========================================================= */
+
+    async function bootApplication() {
+
+      try {
+
+        /*
+         * STEP 1
+         * Verify authenticated Super Admin.
+         */
+
+        const authorized =
+          await verifySuperAdminSession();
+
+
+        if (!authorized) {
+          return;
+        }
+
+
+        /*
+         * STEP 2
+         * Make the application visible BEFORE loading
+         * secondary data.
+         *
+         * This prevents the page from appearing to be
+         * "not opening" while classes/teachers load.
+         */
+
+        showApp();
+
+
+        setBootMessage(
+          "Loading academic data..."
+        );
+
+
+        /*
+         * STEP 3
+         * Load classes and teachers.
+         */
+
+        await loadClasses();
+
+        await loadTeachers();
+
+
+        /*
+         * STEP 4
+         * Application is now fully ready.
+         */
+
+      } catch (error) {
+
+        console.error(
+          "APPLICATION BOOT ERROR:",
+          error
+        );
+
+
+        /*
+         * IMPORTANT:
+         * We do NOT sign the user out for ordinary database
+         * or RPC errors.
+         */
+
+        showApp();
+
+
+        showToast(
+          error.message ||
+          "The Teacher Management page could not load completely.",
+          "error"
+        );
+
+
+        $("#recordCount")
+          .textContent =
+          "Unable to load teacher records.";
+
+
+        $("#emptyState")
+          .style.display =
+          "block";
+
+
+        $("#emptyState")
+          .innerHTML = `
+            <strong>
+              Teacher data could not be loaded
+            </strong>
+
+            <span>
+              ${escapeHTML(
+                error.message ||
+                "Please refresh the page and try again."
+              )}
+            </span>
+          `;
+
+      }
+
+    }
+
+
+    /*
+     * Start the application after the browser has loaded
+     * the complete HTML and Supabase library.
+     */
+
+    window.addEventListener(
+      "load",
+      bootApplication
+    );
+
+  </script>
+
+</body>
+</html>

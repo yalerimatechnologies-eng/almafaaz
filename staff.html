@@ -1,0 +1,4468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
+
+<title>Staff Management | ALMAFAAZ ACADEMY</title>
+
+<meta
+  name="description"
+  content="ALMAFAAZ ACADEMY Staff Management System powered by Yalerima Technologies Limited."
+>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+:root {
+  --blue-950:#061526;
+  --blue-900:#0a1f38;
+  --blue-850:#0c2948;
+  --blue-800:#10385f;
+  --blue-700:#174e7f;
+
+  --orange:#ff7a00;
+  --orange-dark:#d96100;
+
+  --white:#fff;
+  --bg:#f4f7fa;
+  --text:#172438;
+  --muted:#6d7c90;
+  --border:#e2e8ef;
+
+  --success:#16804c;
+  --danger:#c63737;
+  --warning:#a76a00;
+
+  --shadow:0 18px 45px rgba(7,29,52,.09);
+  --radius:18px;
+}
+
+* {
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+body {
+  min-height:100vh;
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(255,122,0,.08),
+      transparent 30%
+    ),
+    var(--bg);
+
+  color:var(--text);
+
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+button,
+input,
+select,
+textarea {
+  font:inherit;
+}
+
+button {
+  cursor:pointer;
+}
+
+a {
+  text-decoration:none;
+  color:inherit;
+}
+
+
+/* =========================================================
+   BOOT
+   ========================================================= */
+
+#bootScreen {
+  position:fixed;
+  inset:0;
+  z-index:99999;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:20px;
+
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(255,122,0,.16),
+      transparent 35%
+    ),
+    linear-gradient(
+      145deg,
+      #061321,
+      #0b2948
+    );
+}
+
+.boot-card {
+  width:min(450px,100%);
+
+  padding:42px 28px;
+
+  text-align:center;
+
+  color:white;
+
+  border:1px solid rgba(255,255,255,.13);
+
+  border-radius:25px;
+
+  background:rgba(255,255,255,.06);
+
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+
+  box-shadow:
+    0 30px 80px rgba(0,0,0,.35);
+}
+
+.boot-logo {
+  width:76px;
+  height:76px;
+
+  object-fit:contain;
+
+  padding:8px;
+
+  background:white;
+
+  border-radius:17px;
+
+  margin-bottom:20px;
+}
+
+.boot-title {
+  font-size:24px;
+  font-weight:850;
+  margin-bottom:8px;
+}
+
+.boot-message {
+  color:rgba(255,255,255,.68);
+  font-size:14px;
+  line-height:1.6;
+}
+
+.loader {
+  width:42px;
+  height:42px;
+
+  margin:25px auto 0;
+
+  border:3px solid rgba(255,255,255,.15);
+
+  border-top-color:var(--orange);
+
+  border-radius:50%;
+
+  animation:spin .8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform:rotate(360deg);
+  }
+}
+
+
+/* =========================================================
+   APP
+   ========================================================= */
+
+#app {
+  display:none;
+  min-height:100vh;
+}
+
+
+/* =========================================================
+   TOP BAR
+   ========================================================= */
+
+.topbar {
+  position:sticky;
+  top:0;
+  z-index:1000;
+
+  min-height:76px;
+
+  padding:0 30px;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  gap:20px;
+
+  background:rgba(255,255,255,.94);
+
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+
+  border-bottom:1px solid rgba(10,31,56,.08);
+}
+
+.brand {
+  display:flex;
+  align-items:center;
+  gap:13px;
+  min-width:0;
+}
+
+.brand-logo {
+  width:45px;
+  height:45px;
+
+  object-fit:contain;
+
+  border-radius:10px;
+
+  background:white;
+}
+
+.brand-name {
+  color:var(--blue-950);
+  font-size:16px;
+  font-weight:850;
+  white-space:nowrap;
+}
+
+.brand-caption {
+  color:var(--muted);
+  font-size:11px;
+  margin-top:3px;
+}
+
+.top-actions {
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.nav-btn {
+  min-height:42px;
+
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:0 14px;
+
+  border:1px solid var(--border);
+
+  border-radius:10px;
+
+  background:white;
+
+  color:var(--blue-900);
+
+  font-size:12px;
+  font-weight:750;
+
+  transition:.2s;
+}
+
+.nav-btn:hover {
+  border-color:var(--orange);
+  color:var(--orange-dark);
+}
+
+.logout-btn {
+  color:white;
+  background:var(--blue-900);
+  border-color:var(--blue-900);
+}
+
+
+/* =========================================================
+   MAIN
+   ========================================================= */
+
+main {
+  width:min(1450px,calc(100% - 44px));
+
+  margin:auto;
+
+  padding:34px 0 50px;
+}
+
+.page-heading {
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+
+  gap:25px;
+
+  margin-bottom:28px;
+}
+
+.eyebrow {
+  color:var(--orange-dark);
+
+  font-size:11px;
+  font-weight:850;
+
+  text-transform:uppercase;
+
+  letter-spacing:.14em;
+
+  margin-bottom:7px;
+}
+
+h1 {
+  color:var(--blue-950);
+
+  font-size:clamp(28px,4vw,39px);
+
+  line-height:1.1;
+
+  margin-bottom:9px;
+
+  letter-spacing:-.03em;
+}
+
+.description {
+  max-width:720px;
+
+  color:var(--muted);
+
+  font-size:14px;
+
+  line-height:1.65;
+}
+
+.primary-btn {
+  min-height:46px;
+
+  padding:0 19px;
+
+  border:none;
+
+  border-radius:12px;
+
+  color:white;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--orange),
+      #ff922e
+    );
+
+  font-weight:800;
+
+  box-shadow:
+    0 10px 24px rgba(255,122,0,.22);
+
+  transition:.2s;
+}
+
+.primary-btn:hover {
+  transform:translateY(-2px);
+
+  box-shadow:
+    0 14px 30px rgba(255,122,0,.28);
+}
+
+
+/* =========================================================
+   STATS
+   ========================================================= */
+
+.stats {
+  display:grid;
+
+  grid-template-columns:
+    repeat(4,1fr);
+
+  gap:15px;
+
+  margin-bottom:20px;
+}
+
+.stat {
+  padding:20px;
+
+  background:white;
+
+  border:1px solid var(--border);
+
+  border-radius:var(--radius);
+
+  box-shadow:
+    0 7px 25px rgba(8,29,52,.045);
+}
+
+.stat-label {
+  color:var(--muted);
+
+  font-size:11px;
+
+  font-weight:750;
+
+  margin-bottom:9px;
+}
+
+.stat-value {
+  color:var(--blue-950);
+
+  font-size:28px;
+
+  font-weight:850;
+}
+
+.stat-note {
+  color:var(--muted);
+
+  font-size:10px;
+
+  margin-top:5px;
+}
+
+
+/* =========================================================
+   PANEL
+   ========================================================= */
+
+.panel {
+  background:white;
+
+  border:1px solid var(--border);
+
+  border-radius:20px;
+
+  box-shadow:var(--shadow);
+}
+
+
+/* =========================================================
+   TOOLBAR
+   ========================================================= */
+
+.toolbar {
+  padding:16px;
+
+  display:grid;
+
+  grid-template-columns:
+    minmax(220px,1fr)
+    190px
+    190px
+    auto;
+
+  gap:10px;
+
+  margin-bottom:17px;
+}
+
+.field {
+  width:100%;
+
+  min-height:44px;
+
+  padding:0 12px;
+
+  border:1px solid var(--border);
+
+  border-radius:10px;
+
+  outline:none;
+
+  color:var(--text);
+
+  background:#fbfcfd;
+
+  transition:.2s;
+}
+
+textarea.field {
+  min-height:100px;
+
+  padding:12px;
+
+  resize:vertical;
+}
+
+.field:focus {
+  border-color:var(--orange);
+
+  background:white;
+
+  box-shadow:
+    0 0 0 3px rgba(255,122,0,.10);
+}
+
+.refresh-btn {
+  min-height:44px;
+
+  padding:0 14px;
+
+  border:1px solid var(--border);
+
+  border-radius:10px;
+
+  background:white;
+
+  color:var(--blue-900);
+
+  font-weight:750;
+}
+
+.refresh-btn:hover {
+  border-color:var(--blue-700);
+}
+
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.table-head {
+  padding:19px 21px;
+
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:center;
+
+  gap:15px;
+
+  border-bottom:1px solid var(--border);
+}
+
+.table-title {
+  color:var(--blue-950);
+
+  font-size:16px;
+
+  font-weight:850;
+}
+
+.record-count {
+  color:var(--muted);
+
+  font-size:11px;
+
+  margin-top:4px;
+}
+
+.table-wrap {
+  overflow-x:auto;
+}
+
+table {
+  width:100%;
+
+  min-width:1050px;
+
+  border-collapse:collapse;
+}
+
+th {
+  padding:13px 17px;
+
+  background:#f7f9fb;
+
+  color:#627287;
+
+  font-size:10px;
+
+  font-weight:800;
+
+  text-align:left;
+
+  text-transform:uppercase;
+
+  letter-spacing:.08em;
+
+  white-space:nowrap;
+}
+
+td {
+  padding:15px 17px;
+
+  border-top:1px solid #edf0f3;
+
+  font-size:12px;
+
+  vertical-align:middle;
+}
+
+tbody tr:hover {
+  background:#fcfdff;
+}
+
+.staff-cell {
+  display:flex;
+  align-items:center;
+
+  gap:11px;
+}
+
+.avatar {
+  width:39px;
+  height:39px;
+
+  flex:0 0 39px;
+
+  display:grid;
+  place-items:center;
+
+  border-radius:11px;
+
+  background:#eaf1f8;
+
+  color:var(--blue-800);
+
+  font-size:12px;
+  font-weight:850;
+}
+
+.staff-name {
+  color:var(--blue-950);
+
+  font-weight:800;
+}
+
+.staff-code {
+  color:var(--muted);
+
+  font-size:9px;
+
+  margin-top:3px;
+
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+}
+
+.department {
+  color:var(--blue-900);
+
+  font-weight:700;
+}
+
+.job {
+  color:var(--muted);
+
+  margin-top:3px;
+
+  font-size:10px;
+}
+
+.status {
+  display:inline-flex;
+
+  align-items:center;
+
+  min-height:26px;
+
+  padding:0 9px;
+
+  border-radius:999px;
+
+  font-size:9px;
+
+  font-weight:850;
+
+  text-transform:capitalize;
+}
+
+.status.active {
+  color:var(--success);
+  background:#e8f7ef;
+}
+
+.status.inactive {
+  color:#68788d;
+  background:#edf0f3;
+}
+
+.status.suspended {
+  color:var(--danger);
+  background:#fdeaea;
+}
+
+.status.on_leave {
+  color:var(--warning);
+  background:#fff4dc;
+}
+
+.status.terminated {
+  color:var(--danger);
+  background:#fbe1e1;
+}
+
+.status.pending {
+  color:var(--warning);
+  background:#fff4dc;
+}
+
+.actions {
+  display:flex;
+
+  flex-wrap:wrap;
+
+  gap:5px;
+}
+
+.action {
+  min-height:32px;
+
+  padding:0 8px;
+
+  border:1px solid var(--border);
+
+  border-radius:8px;
+
+  background:white;
+
+  color:var(--blue-900);
+
+  font-size:9px;
+
+  font-weight:750;
+}
+
+.action:hover {
+  color:var(--orange-dark);
+  border-color:var(--orange);
+}
+
+.action.danger:hover {
+  color:var(--danger);
+  border-color:var(--danger);
+}
+
+.empty {
+  padding:65px 20px;
+
+  text-align:center;
+
+  color:var(--muted);
+}
+
+.empty strong {
+  display:block;
+
+  color:var(--blue-950);
+
+  margin-bottom:6px;
+}
+
+
+/* =========================================================
+   MODAL
+   ========================================================= */
+
+.modal-layer {
+  position:fixed;
+
+  inset:0;
+
+  z-index:5000;
+
+  display:none;
+
+  align-items:center;
+
+  justify-content:center;
+
+  padding:20px;
+
+  background:rgba(3,13,24,.58);
+
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+}
+
+.modal-layer.open {
+  display:flex;
+}
+
+.modal {
+  width:min(850px,100%);
+
+  max-height:
+    calc(100vh - 40px);
+
+  overflow-y:auto;
+
+  background:white;
+
+  border-radius:22px;
+
+  box-shadow:
+    0 35px 90px rgba(0,0,0,.30);
+}
+
+.modal.small {
+  width:min(600px,100%);
+}
+
+.modal-header {
+  padding:21px 23px;
+
+  display:flex;
+
+  align-items:flex-start;
+
+  justify-content:space-between;
+
+  gap:15px;
+
+  border-bottom:1px solid var(--border);
+}
+
+.modal-title {
+  color:var(--blue-950);
+
+  font-size:18px;
+
+  font-weight:850;
+}
+
+.modal-subtitle {
+  color:var(--muted);
+
+  font-size:11px;
+
+  line-height:1.5;
+
+  margin-top:4px;
+}
+
+.close {
+  width:34px;
+  height:34px;
+
+  border:1px solid var(--border);
+
+  border-radius:9px;
+
+  background:white;
+
+  color:var(--muted);
+
+  font-size:18px;
+}
+
+.close:hover {
+  color:var(--danger);
+
+  border-color:var(--danger);
+}
+
+.modal-body {
+  padding:23px;
+}
+
+.form-grid {
+  display:grid;
+
+  grid-template-columns:
+    repeat(2,1fr);
+
+  gap:15px;
+}
+
+.form-group {
+  display:flex;
+
+  flex-direction:column;
+
+  gap:7px;
+}
+
+.form-group.full {
+  grid-column:1 / -1;
+}
+
+label {
+  color:var(--blue-900);
+
+  font-size:10px;
+
+  font-weight:800;
+}
+
+.modal-footer {
+  padding:17px 23px;
+
+  display:flex;
+
+  justify-content:flex-end;
+
+  gap:9px;
+
+  border-top:1px solid var(--border);
+}
+
+.secondary-btn {
+  min-height:43px;
+
+  padding:0 15px;
+
+  border:1px solid var(--border);
+
+  border-radius:10px;
+
+  background:white;
+
+  color:var(--blue-900);
+
+  font-weight:750;
+}
+
+
+/* =========================================================
+   PROFILE
+   ========================================================= */
+
+.profile-hero {
+  display:flex;
+
+  align-items:center;
+
+  gap:15px;
+
+  padding:17px;
+
+  margin-bottom:18px;
+
+  border:1px solid var(--border);
+
+  border-radius:15px;
+
+  background:#f7f9fb;
+}
+
+.profile-avatar {
+  width:58px;
+  height:58px;
+
+  flex:0 0 58px;
+
+  display:grid;
+
+  place-items:center;
+
+  border-radius:15px;
+
+  background:var(--blue-900);
+
+  color:white;
+
+  font-size:18px;
+
+  font-weight:850;
+}
+
+.profile-name {
+  color:var(--blue-950);
+
+  font-size:19px;
+
+  font-weight:850;
+}
+
+.profile-code {
+  color:var(--muted);
+
+  font-size:11px;
+
+  margin-top:4px;
+}
+
+.detail-grid {
+  display:grid;
+
+  grid-template-columns:
+    repeat(3,1fr);
+
+  gap:10px;
+}
+
+.detail {
+  padding:14px;
+
+  border:1px solid var(--border);
+
+  border-radius:12px;
+
+  background:white;
+}
+
+.detail-label {
+  color:var(--muted);
+
+  font-size:9px;
+
+  font-weight:800;
+
+  text-transform:uppercase;
+
+  letter-spacing:.08em;
+
+  margin-bottom:6px;
+}
+
+.detail-value {
+  color:var(--blue-950);
+
+  font-size:12px;
+
+  font-weight:750;
+
+  word-break:break-word;
+}
+
+.section-title {
+  color:var(--blue-950);
+
+  font-size:13px;
+
+  font-weight:850;
+
+  margin-bottom:10px;
+}
+
+
+/* =========================================================
+   TOAST
+   ========================================================= */
+
+#toastContainer {
+  position:fixed;
+
+  right:20px;
+  bottom:20px;
+
+  z-index:10000;
+
+  width:min(390px,calc(100% - 40px));
+
+  display:grid;
+
+  gap:9px;
+}
+
+.toast {
+  padding:14px 15px;
+
+  color:white;
+
+  background:var(--blue-950);
+
+  border-left:4px solid var(--orange);
+
+  border-radius:12px;
+
+  box-shadow:
+    0 18px 40px rgba(0,0,0,.20);
+
+  font-size:11px;
+
+  line-height:1.5;
+}
+
+.toast.success {
+  border-left-color:#37b978;
+}
+
+.toast.error {
+  border-left-color:var(--danger);
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+footer {
+  padding:32px 22px;
+
+  margin-top:30px;
+
+  background:var(--blue-950);
+
+  color:white;
+}
+
+.footer-inner {
+  width:min(1450px,100%);
+
+  margin:auto;
+
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:center;
+
+  gap:20px;
+}
+
+.footer-title {
+  font-size:14px;
+
+  font-weight:850;
+}
+
+.footer-copy {
+  color:rgba(255,255,255,.55);
+
+  font-size:10px;
+
+  margin-top:6px;
+}
+
+.powered {
+  color:rgba(255,255,255,.72);
+
+  font-size:10px;
+}
+
+.powered strong {
+  color:var(--orange);
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media(max-width:1100px) {
+
+  .stats {
+    grid-template-columns:
+      repeat(2,1fr);
+  }
+
+  .toolbar {
+    grid-template-columns:
+      1fr 180px;
+  }
+
+  .refresh-btn {
+    grid-column:1 / -1;
+  }
+
+  .detail-grid {
+    grid-template-columns:
+      repeat(2,1fr);
+  }
+}
+
+
+@media(max-width:760px) {
+
+  .topbar {
+    min-height:70px;
+
+    padding:11px 14px;
+  }
+
+  .brand-caption {
+    display:none;
+  }
+
+  .brand-name {
+    font-size:13px;
+  }
+
+  .brand-logo {
+    width:40px;
+    height:40px;
+  }
+
+  .nav-btn {
+    min-height:40px;
+
+    padding:0 10px;
+
+    font-size:10px;
+  }
+
+  .logout-btn {
+    width:40px;
+
+    padding:0;
+
+    font-size:0;
+  }
+
+  main {
+    width:calc(100% - 26px);
+
+    padding-top:25px;
+  }
+
+  .page-heading {
+    flex-direction:column;
+
+    align-items:stretch;
+  }
+
+  .primary-btn {
+    width:100%;
+  }
+
+  .toolbar {
+    grid-template-columns:1fr;
+  }
+
+  .refresh-btn {
+    grid-column:auto;
+  }
+
+  .form-grid {
+    grid-template-columns:1fr;
+  }
+
+  .form-group.full {
+    grid-column:auto;
+  }
+
+  .detail-grid {
+    grid-template-columns:1fr;
+  }
+
+  .footer-inner {
+    flex-direction:column;
+
+    text-align:center;
+  }
+}
+
+
+@media(max-width:480px) {
+
+  .stats {
+    grid-template-columns:
+      repeat(2,1fr);
+
+    gap:9px;
+  }
+
+  .stat {
+    padding:14px;
+  }
+
+  .stat-value {
+    font-size:22px;
+  }
+
+  .stat-label {
+    font-size:9px;
+  }
+
+  .modal-layer {
+    padding:10px;
+  }
+
+  .modal {
+    max-height:
+      calc(100vh - 20px);
+
+    border-radius:17px;
+  }
+
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding:17px;
+  }
+}
+
+</style>
+</head>
+
+
+<body>
+
+
+<!-- =========================================================
+     BOOT SCREEN
+     ========================================================= -->
+
+<div id="bootScreen">
+
+  <div class="boot-card">
+
+    <img
+      class="boot-logo"
+      src="assets/images/Almafaaz-logo.png"
+      alt="ALMAFAAZ ACADEMY"
+      onerror="this.style.display='none'"
+    >
+
+    <div class="boot-title">
+      ALMAFAAZ ACADEMY
+    </div>
+
+    <div
+      class="boot-message"
+      id="bootMessage"
+    >
+      Verifying your secure session...
+    </div>
+
+    <div class="loader"></div>
+
+  </div>
+
+</div>
+
+
+<!-- =========================================================
+     APPLICATION
+     ========================================================= -->
+
+<div id="app">
+
+
+<header class="topbar">
+
+  <div class="brand">
+
+    <img
+      class="brand-logo"
+      src="assets/images/Almafaaz-logo.png"
+      alt="ALMAFAAZ ACADEMY"
+      onerror="this.style.display='none'"
+    >
+
+    <div>
+
+      <div class="brand-name">
+        ALMAFAAZ ACADEMY
+      </div>
+
+      <div class="brand-caption">
+        Staff Management
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="top-actions">
+
+    <a
+      href="./super-admin-dashboard.html"
+      class="nav-btn"
+    >
+      Dashboard
+    </a>
+
+    <button
+      class="nav-btn logout-btn"
+      id="logoutBtn"
+      type="button"
+    >
+      Logout
+    </button>
+
+  </div>
+
+</header>
+
+
+<main>
+
+
+<!-- =========================================================
+     HEADING
+     ========================================================= -->
+
+<section class="page-heading">
+
+  <div>
+
+    <div class="eyebrow">
+      Administration
+    </div>
+
+    <h1>
+      Staff
+    </h1>
+
+    <p class="description">
+      Manage non-teaching staff, departments, positions,
+      employment information, account status and staff
+      records from one centralized administration interface.
+    </p>
+
+  </div>
+
+
+  <button
+    class="primary-btn"
+    id="addStaffBtn"
+    type="button"
+  >
+    Add Staff
+  </button>
+
+</section>
+
+
+<!-- =========================================================
+     STATS
+     ========================================================= -->
+
+<section class="stats">
+
+  <div class="stat">
+
+    <div class="stat-label">
+      Total Staff
+    </div>
+
+    <div
+      class="stat-value"
+      id="totalStaff"
+    >
+      0
+    </div>
+
+    <div class="stat-note">
+      Staff records
+    </div>
+
+  </div>
+
+
+  <div class="stat">
+
+    <div class="stat-label">
+      Active
+    </div>
+
+    <div
+      class="stat-value"
+      id="activeStaff"
+    >
+      0
+    </div>
+
+    <div class="stat-note">
+      Currently active
+    </div>
+
+  </div>
+
+
+  <div class="stat">
+
+    <div class="stat-label">
+      Departments
+    </div>
+
+    <div
+      class="stat-value"
+      id="departmentCount"
+    >
+      0
+    </div>
+
+    <div class="stat-note">
+      Staff departments
+    </div>
+
+  </div>
+
+
+  <div class="stat">
+
+    <div class="stat-label">
+      On Leave
+    </div>
+
+    <div
+      class="stat-value"
+      id="leaveCount"
+    >
+      0
+    </div>
+
+    <div class="stat-note">
+      Current staff leave
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- =========================================================
+     SEARCH / FILTER
+     ========================================================= -->
+
+<section class="panel toolbar">
+
+  <input
+    id="searchInput"
+    class="field"
+    type="search"
+    placeholder="Search staff name, employee code, phone..."
+    autocomplete="off"
+  >
+
+
+  <select
+    id="statusFilter"
+    class="field"
+  >
+
+    <option value="all">
+      All employment statuses
+    </option>
+
+    <option value="active">
+      Active
+    </option>
+
+    <option value="inactive">
+      Inactive
+    </option>
+
+    <option value="suspended">
+      Suspended
+    </option>
+
+    <option value="on_leave">
+      On Leave
+    </option>
+
+    <option value="terminated">
+      Terminated
+    </option>
+
+    <option value="pending">
+      Pending
+    </option>
+
+  </select>
+
+
+  <select
+    id="departmentFilter"
+    class="field"
+  >
+
+    <option value="all">
+      All departments
+    </option>
+
+  </select>
+
+
+  <button
+    id="refreshBtn"
+    class="refresh-btn"
+    type="button"
+  >
+    Refresh Staff
+  </button>
+
+</section>
+
+
+<!-- =========================================================
+     STAFF TABLE
+     ========================================================= -->
+
+<section class="panel">
+
+  <div class="table-head">
+
+    <div>
+
+      <div class="table-title">
+        Staff Directory
+      </div>
+
+      <div
+        class="record-count"
+        id="recordCount"
+      >
+        Loading staff...
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="table-wrap">
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>
+            Staff
+          </th>
+
+          <th>
+            Department
+          </th>
+
+          <th>
+            Employment
+          </th>
+
+          <th>
+            Status
+          </th>
+
+          <th>
+            Contact
+          </th>
+
+          <th>
+            Actions
+          </th>
+
+        </tr>
+
+      </thead>
+
+
+      <tbody id="staffBody"></tbody>
+
+    </table>
+
+
+    <div
+      class="empty"
+      id="emptyState"
+      style="display:none"
+    >
+
+      <strong>
+        No staff found
+      </strong>
+
+      <span>
+        No staff records match the current search or filter.
+      </span>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+</main>
+
+
+<!-- =========================================================
+     CREATE MODAL
+     ========================================================= -->
+
+<div
+  class="modal-layer"
+  id="createModal"
+>
+
+<div class="modal">
+
+  <div class="modal-header">
+
+    <div>
+
+      <div class="modal-title">
+        Add Staff Member
+      </div>
+
+      <div class="modal-subtitle">
+        Create a complete staff personnel record.
+      </div>
+
+    </div>
+
+    <button
+      class="close"
+      data-close="createModal"
+      type="button"
+    >
+      ×
+    </button>
+
+  </div>
+
+
+  <form id="createForm">
+
+  <div class="modal-body">
+
+    <div class="form-grid">
+
+
+      <div class="form-group full">
+
+        <label>
+          Full Name
+        </label>
+
+        <input
+          id="createName"
+          class="field"
+          required
+          placeholder="Enter full name"
+        >
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Email
+        </label>
+
+        <input
+          id="createEmail"
+          class="field"
+          type="email"
+          placeholder="staff@example.com"
+        >
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Phone
+        </label>
+
+        <input
+          id="createPhone"
+          class="field"
+          type="tel"
+          placeholder="080..."
+        >
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Gender
+        </label>
+
+        <select
+          id="createGender"
+          class="field"
+        >
+
+          <option value="">
+            Select gender
+          </option>
+
+          <option value="male">
+            Male
+          </option>
+
+          <option value="female">
+            Female
+          </option>
+
+          <option value="other">
+            Other
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Department
+        </label>
+
+        <input
+          id="createDepartment"
+          class="field"
+          placeholder="Administration"
+        >
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Job Title
+        </label>
+
+        <input
+          id="createJobTitle"
+          class="field"
+          placeholder="Administrative Officer"
+        >
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Employment Type
+        </label>
+
+        <select
+          id="createEmploymentType"
+          class="field"
+        >
+
+          <option value="full_time">
+            Full Time
+          </option>
+
+          <option value="part_time">
+            Part Time
+          </option>
+
+          <option value="contract">
+            Contract
+          </option>
+
+          <option value="temporary">
+            Temporary
+          </option>
+
+          <option value="intern">
+            Intern
+          </option>
+
+          <option value="volunteer">
+            Volunteer
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Employment Status
+        </label>
+
+        <select
+          id="createEmploymentStatus"
+          class="field"
+        >
+
+          <option value="active">
+            Active
+          </option>
+
+          <option value="inactive">
+            Inactive
+          </option>
+
+          <option value="pending">
+            Pending
+          </option>
+
+          <option value="on_leave">
+            On Leave
+          </option>
+
+          <option value="suspended">
+            Suspended
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Hire Date
+        </label>
+
+        <input
+          id="createHireDate"
+          class="field"
+          type="date"
+        >
+
+      </div>
+
+
+      <div class="form-group full">
+
+        <label>
+          Qualification
+        </label>
+
+        <input
+          id="createQualification"
+          class="field"
+          placeholder="Qualification / certification"
+        >
+
+      </div>
+
+
+      <div class="form-group full">
+
+        <label>
+          Address
+        </label>
+
+        <textarea
+          id="createAddress"
+          class="field"
+          placeholder="Staff address"
+        ></textarea>
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Emergency Contact Name
+        </label>
+
+        <input
+          id="createEmergencyName"
+          class="field"
+        >
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Emergency Contact Phone
+        </label>
+
+        <input
+          id="createEmergencyPhone"
+          class="field"
+        >
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Relationship
+        </label>
+
+        <input
+          id="createEmergencyRelationship"
+          class="field"
+          placeholder="Parent, spouse, sibling..."
+        >
+
+      </div>
+
+
+      <div class="form-group full">
+
+        <label>
+          Notes
+        </label>
+
+        <textarea
+          id="createNotes"
+          class="field"
+          placeholder="Additional staff information"
+        ></textarea>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="modal-footer">
+
+    <button
+      class="secondary-btn"
+      data-close="createModal"
+      type="button"
+    >
+      Cancel
+    </button>
+
+    <button
+      class="primary-btn"
+      id="createSubmit"
+      type="submit"
+    >
+      Create Staff
+    </button>
+
+  </div>
+
+  </form>
+
+</div>
+
+</div>
+
+
+<!-- =========================================================
+     EDIT MODAL
+     ========================================================= -->
+
+<div
+  class="modal-layer"
+  id="editModal"
+>
+
+<div class="modal">
+
+  <div class="modal-header">
+
+    <div>
+
+      <div class="modal-title">
+        Edit Staff
+      </div>
+
+      <div class="modal-subtitle">
+        Update the staff personnel record.
+      </div>
+
+    </div>
+
+    <button
+      class="close"
+      data-close="editModal"
+      type="button"
+    >
+      ×
+    </button>
+
+  </div>
+
+
+  <form id="editForm">
+
+  <div class="modal-body">
+
+    <input
+      type="hidden"
+      id="editId"
+    >
+
+
+    <div class="form-grid">
+
+
+      <div class="form-group full">
+
+        <label>
+          Full Name
+        </label>
+
+        <input
+          id="editName"
+          class="field"
+          required
+        >
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Email
+        </label>
+
+        <input
+          id="editEmail"
+          class="field"
+          type="email"
+        >
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Phone
+        </label>
+
+        <input
+          id="editPhone"
+          class="field"
+          type="tel"
+        >
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Gender
+        </label>
+
+        <select
+          id="editGender"
+          class="field"
+        >
+
+          <option value="">
+            Not specified
+          </option>
+
+          <option value="male">
+            Male
+          </option>
+
+          <option value="female">
+            Female
+          </option>
+
+          <option value="other">
+            Other
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Department
+        </label>
+
+        <input
+          id="editDepartment"
+          class="field"
+        >
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Job Title
+        </label>
+
+        <input
+          id="editJobTitle"
+          class="field"
+        >
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Employment Type
+        </label>
+
+        <select
+          id="editEmploymentType"
+          class="field"
+        >
+
+          <option value="full_time">
+            Full Time
+          </option>
+
+          <option value="part_time">
+            Part Time
+          </option>
+
+          <option value="contract">
+            Contract
+          </option>
+
+          <option value="temporary">
+            Temporary
+          </option>
+
+          <option value="intern">
+            Intern
+          </option>
+
+          <option value="volunteer">
+            Volunteer
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Employment Status
+        </label>
+
+        <select
+          id="editEmploymentStatus"
+          class="field"
+        >
+
+          <option value="active">
+            Active
+          </option>
+
+          <option value="inactive">
+            Inactive
+          </option>
+
+          <option value="suspended">
+            Suspended
+          </option>
+
+          <option value="on_leave">
+            On Leave
+          </option>
+
+          <option value="terminated">
+            Terminated
+          </option>
+
+          <option value="pending">
+            Pending
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Hire Date
+        </label>
+
+        <input
+          id="editHireDate"
+          class="field"
+          type="date"
+        >
+
+      </div>
+
+
+      <div class="form-group full">
+
+        <label>
+          Qualification
+        </label>
+
+        <input
+          id="editQualification"
+          class="field"
+        >
+
+      </div>
+
+
+      <div class="form-group full">
+
+        <label>
+          Address
+        </label>
+
+        <textarea
+          id="editAddress"
+          class="field"
+        ></textarea>
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Emergency Contact Name
+        </label>
+
+        <input
+          id="editEmergencyName"
+          class="field"
+        >
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Emergency Contact Phone
+        </label>
+
+        <input
+          id="editEmergencyPhone"
+          class="field"
+        >
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Relationship
+        </label>
+
+        <input
+          id="editEmergencyRelationship"
+          class="field"
+        >
+
+      </div>
+
+
+      <div class="form-group full">
+
+        <label>
+          Notes
+        </label>
+
+        <textarea
+          id="editNotes"
+          class="field"
+        ></textarea>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="modal-footer">
+
+    <button
+      class="secondary-btn"
+      data-close="editModal"
+      type="button"
+    >
+      Cancel
+    </button>
+
+    <button
+      class="primary-btn"
+      id="editSubmit"
+      type="submit"
+    >
+      Save Changes
+    </button>
+
+  </div>
+
+  </form>
+
+</div>
+
+</div>
+
+
+<!-- =========================================================
+     VIEW MODAL
+     ========================================================= -->
+
+<div
+  class="modal-layer"
+  id="viewModal"
+>
+
+<div class="modal">
+
+  <div class="modal-header">
+
+    <div>
+
+      <div class="modal-title">
+        Staff Profile
+      </div>
+
+      <div class="modal-subtitle">
+        Complete staff personnel information.
+      </div>
+
+    </div>
+
+    <button
+      class="close"
+      data-close="viewModal"
+      type="button"
+    >
+      ×
+    </button>
+
+  </div>
+
+
+  <div
+    class="modal-body"
+    id="viewContent"
+  ></div>
+
+</div>
+
+</div>
+
+
+<!-- =========================================================
+     TOAST
+     ========================================================= -->
+
+<div id="toastContainer"></div>
+
+
+<!-- =========================================================
+     FOOTER
+     ========================================================= -->
+
+<footer>
+
+<div class="footer-inner">
+
+  <div>
+
+    <div class="footer-title">
+      ALMAFAAZ ACADEMY
+    </div>
+
+    <div class="footer-copy">
+      Copyright © 2026 ALMAFAAZ ACADEMY.
+      All rights reserved.
+    </div>
+
+  </div>
+
+
+  <div class="powered">
+    Powered by
+    <strong>
+      Yalerima Technologies Limited
+    </strong>
+  </div>
+
+</div>
+
+</footer>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   SUPABASE
+   ========================================================= */
+
+const SUPABASE_URL =
+  "https://orkokipqrwsqnslbwpbt.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_sjcK3_WrRNCnz04ePDsuHg_GfsHjr0l";
+
+const LOGIN_PAGE =
+  "./super-admin-login.html";
+
+const DASHBOARD =
+  "./super-admin-dashboard.html";
+
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY,
+    {
+      auth:{
+        persistSession:true,
+        autoRefreshToken:true,
+        detectSessionInUrl:true
+      }
+    }
+  );
+
+
+/* =========================================================
+   STATE
+   ========================================================= */
+
+let staff = [];
+
+let currentStaff = null;
+
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+
+function $(selector) {
+  return document.querySelector(selector);
+}
+
+
+function escapeHTML(value) {
+
+  if (
+    value === null ||
+    value === undefined
+  ) {
+    return "";
+  }
+
+  return String(value)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+
+function initials(name) {
+
+  if (!name) {
+    return "S";
+  }
+
+  const parts =
+    String(name)
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean);
+
+  if (parts.length === 1) {
+
+    return parts[0]
+      .substring(0,2)
+      .toUpperCase();
+
+  }
+
+  return (
+    parts[0][0] +
+    parts[parts.length - 1][0]
+  ).toUpperCase();
+}
+
+
+function statusText(value) {
+
+  return String(value || "")
+    .replace(/_/g," ");
+}
+
+
+function showToast(
+  message,
+  type="normal"
+) {
+
+  const container =
+    $("#toastContainer");
+
+  const toast =
+    document.createElement("div");
+
+  toast.className =
+    "toast " + type;
+
+  toast.textContent =
+    message;
+
+  container.appendChild(toast);
+
+  setTimeout(
+    () => toast.remove(),
+    5000
+  );
+}
+
+
+function openModal(id) {
+
+  const element =
+    document.getElementById(id);
+
+  if (element) {
+    element.classList.add("open");
+  }
+
+}
+
+
+function closeModal(id) {
+
+  const element =
+    document.getElementById(id);
+
+  if (element) {
+    element.classList.remove("open");
+  }
+
+}
+
+
+/* =========================================================
+   CLOSE BUTTONS
+   ========================================================= */
+
+document
+  .querySelectorAll("[data-close]")
+  .forEach(button => {
+
+    button.addEventListener(
+      "click",
+      () => {
+        closeModal(
+          button.dataset.close
+        );
+      }
+    );
+
+  });
+
+
+document
+  .querySelectorAll(".modal-layer")
+  .forEach(layer => {
+
+    layer.addEventListener(
+      "click",
+      event => {
+
+        if (
+          event.target === layer
+        ) {
+
+          layer.classList.remove(
+            "open"
+          );
+
+        }
+
+      }
+    );
+
+  });
+
+
+/* =========================================================
+   SESSION VERIFICATION
+   ========================================================= */
+
+async function verifySession() {
+
+  $("#bootMessage").textContent =
+    "Checking your authenticated session...";
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .auth
+      .getSession();
+
+
+  if (error) {
+    throw error;
+  }
+
+
+  const session =
+    data?.session;
+
+
+  if (
+    !session ||
+    !session.user
+  ) {
+
+    $("#bootMessage").textContent =
+      "No active Super Admin session. Redirecting...";
+
+
+    setTimeout(
+      () => {
+        window.location.replace(
+          LOGIN_PAGE
+        );
+      },
+      700
+    );
+
+
+    return false;
+  }
+
+
+  $("#bootMessage").textContent =
+    "Verifying Super Admin permissions...";
+
+
+  const profileResult =
+    await supabaseClient
+      .from("profiles")
+      .select(
+        "id,full_name,role,account_status"
+      )
+      .eq(
+        "id",
+        session.user.id
+      )
+      .maybeSingle();
+
+
+  if (
+    profileResult.error
+  ) {
+
+    throw profileResult.error;
+
+  }
+
+
+  const profile =
+    profileResult.data;
+
+
+  if (!profile) {
+
+    await supabaseClient
+      .auth
+      .signOut();
+
+
+    window.location.replace(
+      LOGIN_PAGE
+    );
+
+
+    return false;
+  }
+
+
+  if (
+    profile.role !== "super_admin" ||
+    profile.account_status !== "active"
+  ) {
+
+    await supabaseClient
+      .auth
+      .signOut();
+
+
+    window.location.replace(
+      LOGIN_PAGE
+    );
+
+
+    return false;
+  }
+
+
+  return true;
+
+}
+
+
+/* =========================================================
+   LOAD STAFF
+   ========================================================= */
+
+async function loadStaff() {
+
+  $("#recordCount").textContent =
+    "Loading staff...";
+
+
+  const result =
+    await supabaseClient
+      .rpc(
+        "list_staff_members"
+      );
+
+
+  if (result.error) {
+
+    throw new Error(
+      result.error.message
+    );
+
+  }
+
+
+  staff =
+    Array.isArray(result.data)
+      ? result.data
+      : [];
+
+
+  renderDepartments();
+
+  renderStaff();
+
+  updateStats();
+
+}
+
+
+/* =========================================================
+   DEPARTMENTS
+   ========================================================= */
+
+function renderDepartments() {
+
+  const select =
+    $("#departmentFilter");
+
+  const existing =
+    select.value;
+
+
+  const departments =
+    [
+      ...new Set(
+        staff
+          .map(
+            item =>
+              item.department
+          )
+          .filter(Boolean)
+      )
+    ]
+    .sort(
+      (a,b) =>
+        a.localeCompare(b)
+    );
+
+
+  select.innerHTML =
+    `
+      <option value="all">
+        All departments
+      </option>
+    `;
+
+
+  departments.forEach(
+    department => {
+
+      const option =
+        document.createElement(
+          "option"
+        );
+
+      option.value =
+        department;
+
+      option.textContent =
+        department;
+
+      select.appendChild(
+        option
+      );
+
+    }
+  );
+
+
+  if (
+    departments.includes(
+      existing
+    )
+  ) {
+
+    select.value =
+      existing;
+
+  }
+
+}
+
+
+/* =========================================================
+   FILTER
+   ========================================================= */
+
+function filteredStaff() {
+
+  const search =
+    $("#searchInput")
+      .value
+      .trim()
+      .toLowerCase();
+
+
+  const status =
+    $("#statusFilter")
+      .value;
+
+
+  const department =
+    $("#departmentFilter")
+      .value;
+
+
+  return staff.filter(
+    item => {
+
+      const searchable =
+        [
+          item.full_name,
+          item.employee_code,
+          item.email,
+          item.phone,
+          item.department,
+          item.job_title
+        ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+
+      const searchMatch =
+        !search ||
+        searchable.includes(
+          search
+        );
+
+
+      const statusMatch =
+        status === "all" ||
+        item.employment_status ===
+          status;
+
+
+      const departmentMatch =
+        department === "all" ||
+        item.department ===
+          department;
+
+
+      return (
+        searchMatch &&
+        statusMatch &&
+        departmentMatch
+      );
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   RENDER TABLE
+   ========================================================= */
+
+function renderStaff() {
+
+  const body =
+    $("#staffBody");
+
+  const empty =
+    $("#emptyState");
+
+
+  const rows =
+    filteredStaff();
+
+
+  body.innerHTML = "";
+
+
+  $("#recordCount")
+    .textContent =
+      `${rows.length} staff record${
+        rows.length === 1
+          ? ""
+          : "s"
+      } shown`;
+
+
+  if (!rows.length) {
+
+    empty.style.display =
+      "block";
+
+    return;
+
+  }
+
+
+  empty.style.display =
+    "none";
+
+
+  rows.forEach(
+    item => {
+
+      const tr =
+        document.createElement(
+          "tr"
+        );
+
+
+      tr.innerHTML = `
+
+        <td>
+
+          <div class="staff-cell">
+
+            <div class="avatar">
+              ${escapeHTML(
+                initials(
+                  item.full_name
+                )
+              )}
+            </div>
+
+            <div>
+
+              <div class="staff-name">
+                ${escapeHTML(
+                  item.full_name
+                )}
+              </div>
+
+              <div class="staff-code">
+                ${escapeHTML(
+                  item.employee_code
+                )}
+              </div>
+
+            </div>
+
+          </div>
+
+        </td>
+
+
+        <td>
+
+          <div class="department">
+            ${escapeHTML(
+              item.department ||
+              "Not assigned"
+            )}
+          </div>
+
+          <div class="job">
+            ${escapeHTML(
+              item.job_title ||
+              "No position"
+            )}
+          </div>
+
+        </td>
+
+
+        <td>
+
+          ${escapeHTML(
+            statusText(
+              item.employment_type
+            )
+          )}
+
+        </td>
+
+
+        <td>
+
+          <span
+            class="status ${escapeHTML(
+              item.employment_status
+            )}"
+          >
+            ${escapeHTML(
+              statusText(
+                item.employment_status
+              )
+            )}
+          </span>
+
+        </td>
+
+
+        <td>
+
+          <div>
+            ${escapeHTML(
+              item.phone ||
+              "No phone"
+            )}
+          </div>
+
+          <div class="job">
+            ${escapeHTML(
+              item.email ||
+              "No email"
+            )}
+          </div>
+
+        </td>
+
+
+        <td>
+
+          <div class="actions">
+
+            <button
+              class="action"
+              data-action="view"
+              data-id="${escapeHTML(
+                item.id
+              )}"
+            >
+              View
+            </button>
+
+            <button
+              class="action"
+              data-action="edit"
+              data-id="${escapeHTML(
+                item.id
+              )}"
+            >
+              Edit
+            </button>
+
+            <button
+              class="action danger"
+              data-action="archive"
+              data-id="${escapeHTML(
+                item.id
+              )}"
+            >
+              ${
+                item.employment_status ===
+                "inactive"
+                  ? "Restore"
+                  : "Archive"
+              }
+            </button>
+
+            <button
+              class="action danger"
+              data-action="delete"
+              data-id="${escapeHTML(
+                item.id
+              )}"
+            >
+              Delete
+            </button>
+
+          </div>
+
+        </td>
+
+      `;
+
+
+      body.appendChild(tr);
+
+    }
+  );
+
+
+  body
+    .querySelectorAll(
+      "[data-action]"
+    )
+    .forEach(button => {
+
+      button.addEventListener(
+        "click",
+        handleAction
+      );
+
+    });
+
+}
+
+
+/* =========================================================
+   STATS
+   ========================================================= */
+
+function updateStats() {
+
+  const active =
+    staff.filter(
+      item =>
+        item.employment_status ===
+        "active"
+    ).length;
+
+
+  const leave =
+    staff.filter(
+      item =>
+        item.employment_status ===
+        "on_leave"
+    ).length;
+
+
+  const departments =
+    new Set(
+      staff
+        .map(
+          item =>
+            item.department
+        )
+        .filter(Boolean)
+    );
+
+
+  $("#totalStaff")
+    .textContent =
+      staff.length;
+
+  $("#activeStaff")
+    .textContent =
+      active;
+
+  $("#departmentCount")
+    .textContent =
+      departments.size;
+
+  $("#leaveCount")
+    .textContent =
+      leave;
+
+}
+
+
+/* =========================================================
+   FIND
+   ========================================================= */
+
+function findStaff(id) {
+
+  return staff.find(
+    item =>
+      item.id === id
+  );
+
+}
+
+
+/* =========================================================
+   VIEW
+   ========================================================= */
+
+function viewStaff(id) {
+
+  const item =
+    findStaff(id);
+
+
+  if (!item) {
+
+    showToast(
+      "Staff record not found.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  currentStaff =
+    item;
+
+
+  $("#viewContent")
+    .innerHTML = `
+
+      <div class="profile-hero">
+
+        <div class="profile-avatar">
+          ${escapeHTML(
+            initials(
+              item.full_name
+            )
+          )}
+        </div>
+
+        <div>
+
+          <div class="profile-name">
+            ${escapeHTML(
+              item.full_name
+            )}
+          </div>
+
+          <div class="profile-code">
+            Employee Code:
+            ${escapeHTML(
+              item.employee_code
+            )}
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="detail-grid">
+
+        <div class="detail">
+
+          <div class="detail-label">
+            Department
+          </div>
+
+          <div class="detail-value">
+            ${escapeHTML(
+              item.department ||
+              "Not specified"
+            )}
+          </div>
+
+        </div>
+
+
+        <div class="detail">
+
+          <div class="detail-label">
+            Job Title
+          </div>
+
+          <div class="detail-value">
+            ${escapeHTML(
+              item.job_title ||
+              "Not specified"
+            )}
+          </div>
+
+        </div>
+
+
+        <div class="detail">
+
+          <div class="detail-label">
+            Employment Type
+          </div>
+
+          <div class="detail-value">
+            ${escapeHTML(
+              statusText(
+                item.employment_type
+              )
+            )}
+          </div>
+
+        </div>
+
+
+        <div class="detail">
+
+          <div class="detail-label">
+            Employment Status
+          </div>
+
+          <div class="detail-value">
+            ${escapeHTML(
+              statusText(
+                item.employment_status
+              )
+            )}
+          </div>
+
+        </div>
+
+
+        <div class="detail">
+
+          <div class="detail-label">
+            Gender
+          </div>
+
+          <div class="detail-value">
+            ${escapeHTML(
+              item.gender ||
+              "Not specified"
+            )}
+          </div>
+
+        </div>
+
+
+        <div class="detail">
+
+          <div class="detail-label">
+            Hire Date
+          </div>
+
+          <div class="detail-value">
+            ${escapeHTML(
+              item.hire_date ||
+              "Not specified"
+            )}
+          </div>
+
+        </div>
+
+
+        <div class="detail">
+
+          <div class="detail-label">
+            Email
+          </div>
+
+          <div class="detail-value">
+            ${escapeHTML(
+              item.email ||
+              "Not specified"
+            )}
+          </div>
+
+        </div>
+
+
+        <div class="detail">
+
+          <div class="detail-label">
+            Phone
+          </div>
+
+          <div class="detail-value">
+            ${escapeHTML(
+              item.phone ||
+              "Not specified"
+            )}
+          </div>
+
+        </div>
+
+
+        <div class="detail">
+
+          <div class="detail-label">
+            Qualification
+          </div>
+
+          <div class="detail-value">
+            ${escapeHTML(
+              item.qualification ||
+              "Not specified"
+            )}
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div style="height:20px"></div>
+
+
+      <div class="section-title">
+        Address
+      </div>
+
+      <div class="detail">
+        <div class="detail-value">
+          ${escapeHTML(
+            item.address ||
+            "No address recorded."
+          )}
+        </div>
+      </div>
+
+
+      <div style="height:18px"></div>
+
+
+      <div class="section-title">
+        Emergency Contact
+      </div>
+
+
+      <div class="detail-grid">
+
+        <div class="detail">
+
+          <div class="detail-label">
+            Name
+          </div>
+
+          <div class="detail-value">
+            ${escapeHTML(
+              item.emergency_contact_name ||
+              "Not specified"
+            )}
+          </div>
+
+        </div>
+
+
+        <div class="detail">
+
+          <div class="detail-label">
+            Phone
+          </div>
+
+          <div class="detail-value">
+            ${escapeHTML(
+              item.emergency_contact_phone ||
+              "Not specified"
+            )}
+          </div>
+
+        </div>
+
+
+        <div class="detail">
+
+          <div class="detail-label">
+            Relationship
+          </div>
+
+          <div class="detail-value">
+            ${escapeHTML(
+              item.emergency_contact_relationship ||
+              "Not specified"
+            )}
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div style="height:18px"></div>
+
+
+      <div class="section-title">
+        Notes
+      </div>
+
+      <div class="detail">
+
+        <div class="detail-value">
+          ${escapeHTML(
+            item.notes ||
+            "No additional notes."
+          )}
+        </div>
+
+      </div>
+
+    `;
+
+
+  openModal(
+    "viewModal"
+  );
+
+}
+
+
+/* =========================================================
+   EDIT
+   ========================================================= */
+
+function editStaff(id) {
+
+  const item =
+    findStaff(id);
+
+
+  if (!item) {
+    return;
+  }
+
+
+  $("#editId").value =
+    item.id;
+
+  $("#editName").value =
+    item.full_name || "";
+
+  $("#editEmail").value =
+    item.email || "";
+
+  $("#editPhone").value =
+    item.phone || "";
+
+  $("#editGender").value =
+    item.gender || "";
+
+  $("#editDepartment").value =
+    item.department || "";
+
+  $("#editJobTitle").value =
+    item.job_title || "";
+
+  $("#editEmploymentType").value =
+    item.employment_type ||
+    "full_time";
+
+  $("#editEmploymentStatus").value =
+    item.employment_status ||
+    "active";
+
+  $("#editHireDate").value =
+    item.hire_date || "";
+
+  $("#editQualification").value =
+    item.qualification || "";
+
+  $("#editAddress").value =
+    item.address || "";
+
+  $("#editEmergencyName").value =
+    item.emergency_contact_name ||
+    "";
+
+  $("#editEmergencyPhone").value =
+    item.emergency_contact_phone ||
+    "";
+
+  $("#editEmergencyRelationship").value =
+    item.emergency_contact_relationship ||
+    "";
+
+  $("#editNotes").value =
+    item.notes || "";
+
+
+  openModal(
+    "editModal"
+  );
+
+}
+
+
+/* =========================================================
+   CREATE
+   ========================================================= */
+
+$("#createForm")
+  .addEventListener(
+    "submit",
+    async event => {
+
+      event.preventDefault();
+
+
+      const button =
+        $("#createSubmit");
+
+
+      button.disabled = true;
+
+      button.textContent =
+        "Creating...";
+
+
+      try {
+
+        const result =
+          await supabaseClient
+            .rpc(
+              "create_staff_member",
+              {
+                new_full_name:
+                  $("#createName")
+                    .value
+                    .trim(),
+
+                new_email:
+                  $("#createEmail")
+                    .value
+                    .trim() ||
+                  null,
+
+                new_phone:
+                  $("#createPhone")
+                    .value
+                    .trim() ||
+                  null,
+
+                new_gender:
+                  $("#createGender")
+                    .value ||
+                  null,
+
+                new_department:
+                  $("#createDepartment")
+                    .value
+                    .trim() ||
+                  null,
+
+                new_job_title:
+                  $("#createJobTitle")
+                    .value
+                    .trim() ||
+                  null,
+
+                new_employment_type:
+                  $("#createEmploymentType")
+                    .value,
+
+                new_employment_status:
+                  $("#createEmploymentStatus")
+                    .value,
+
+                new_hire_date:
+                  $("#createHireDate")
+                    .value ||
+                  null,
+
+                new_qualification:
+                  $("#createQualification")
+                    .value
+                    .trim() ||
+                  null,
+
+                new_address:
+                  $("#createAddress")
+                    .value
+                    .trim() ||
+                  null,
+
+                new_emergency_contact_name:
+                  $("#createEmergencyName")
+                    .value
+                    .trim() ||
+                  null,
+
+                new_emergency_contact_phone:
+                  $("#createEmergencyPhone")
+                    .value
+                    .trim() ||
+                  null,
+
+                new_emergency_contact_relationship:
+                  $("#createEmergencyRelationship")
+                    .value
+                    .trim() ||
+                  null,
+
+                new_notes:
+                  $("#createNotes")
+                    .value
+                    .trim() ||
+                  null
+              }
+            );
+
+
+        if (result.error) {
+          throw result.error;
+        }
+
+
+        $("#createForm")
+          .reset();
+
+
+        closeModal(
+          "createModal"
+        );
+
+
+        showToast(
+          "Staff member created successfully.",
+          "success"
+        );
+
+
+        await loadStaff();
+
+
+      } catch (error) {
+
+        console.error(
+          error
+        );
+
+
+        showToast(
+          error.message ||
+          "Unable to create staff member.",
+          "error"
+        );
+
+      } finally {
+
+        button.disabled = false;
+
+        button.textContent =
+          "Create Staff";
+
+      }
+
+    }
+  );
+
+
+/* =========================================================
+   UPDATE
+   ========================================================= */
+
+$("#editForm")
+  .addEventListener(
+    "submit",
+    async event => {
+
+      event.preventDefault();
+
+
+      const button =
+        $("#editSubmit");
+
+
+      button.disabled = true;
+
+      button.textContent =
+        "Saving...";
+
+
+      try {
+
+        const result =
+          await supabaseClient
+            .rpc(
+              "update_staff_member",
+              {
+                target_staff_id:
+                  $("#editId").value,
+
+                new_full_name:
+                  $("#editName")
+                    .value
+                    .trim(),
+
+                new_email:
+                  $("#editEmail")
+                    .value
+                    .trim() ||
+                  null,
+
+                new_phone:
+                  $("#editPhone")
+                    .value
+                    .trim() ||
+                  null,
+
+                new_gender:
+                  $("#editGender")
+                    .value ||
+                  null,
+
+                new_department:
+                  $("#editDepartment")
+                    .value
+                    .trim() ||
+                  null,
+
+                new_job_title:
+                  $("#editJobTitle")
+                    .value
+                    .trim() ||
+                  null,
+
+                new_employment_type:
+                  $("#editEmploymentType")
+                    .value,
+
+                new_employment_status:
+                  $("#editEmploymentStatus")
+                    .value,
+
+                new_hire_date:
+                  $("#editHireDate")
+                    .value ||
+                  null,
+
+                new_qualification:
+                  $("#editQualification")
+                    .value
+                    .trim() ||
+                  null,
+
+                new_address:
+                  $("#editAddress")
+                    .value
+                    .trim() ||
+                  null,
+
+                new_emergency_contact_name:
+                  $("#editEmergencyName")
+                    .value
+                    .trim() ||
+                  null,
+
+                new_emergency_contact_phone:
+                  $("#editEmergencyPhone")
+                    .value
+                    .trim() ||
+                  null,
+
+                new_emergency_contact_relationship:
+                  $("#editEmergencyRelationship")
+                    .value
+                    .trim() ||
+                  null,
+
+                new_notes:
+                  $("#editNotes")
+                    .value
+                    .trim() ||
+                  null
+              }
+            );
+
+
+        if (result.error) {
+          throw result.error;
+        }
+
+
+        closeModal(
+          "editModal"
+        );
+
+
+        showToast(
+          "Staff record updated successfully.",
+          "success"
+        );
+
+
+        await loadStaff();
+
+
+      } catch (error) {
+
+        console.error(
+          error
+        );
+
+
+        showToast(
+          error.message ||
+          "Unable to update staff.",
+          "error"
+        );
+
+      } finally {
+
+        button.disabled = false;
+
+        button.textContent =
+          "Save Changes";
+
+      }
+
+    }
+  );
+
+
+/* =========================================================
+   ARCHIVE / RESTORE
+   ========================================================= */
+
+async function archiveOrRestore(id) {
+
+  const item =
+    findStaff(id);
+
+
+  if (!item) {
+    return;
+  }
+
+
+  const restoring =
+    item.employment_status ===
+    "inactive";
+
+
+  const confirmed =
+    window.confirm(
+      restoring
+        ? `Restore ${item.full_name}?`
+        : `Archive ${item.full_name}?`
+    );
+
+
+  if (!confirmed) {
+    return;
+  }
+
+
+  try {
+
+    const rpcName =
+      restoring
+        ? "restore_staff_member"
+        : "archive_staff_member";
+
+
+    const result =
+      await supabaseClient
+        .rpc(
+          rpcName,
+          {
+            target_staff_id:
+              id
+          }
+        );
+
+
+    if (result.error) {
+      throw result.error;
+    }
+
+
+    showToast(
+      restoring
+        ? "Staff member restored successfully."
+        : "Staff member archived successfully.",
+      "success"
+    );
+
+
+    await loadStaff();
+
+
+  } catch (error) {
+
+    showToast(
+      error.message ||
+      "Unable to change staff status.",
+      "error"
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   DELETE
+   ========================================================= */
+
+async function deleteStaff(id) {
+
+  const item =
+    findStaff(id);
+
+
+  if (!item) {
+    return;
+  }
+
+
+  const confirmed =
+    window.confirm(
+      `Delete ${item.full_name} (${item.employee_code})?\n\n` +
+      `This permanently removes the staff personnel record.`
+    );
+
+
+  if (!confirmed) {
+    return;
+  }
+
+
+  try {
+
+    const result =
+      await supabaseClient
+        .rpc(
+          "delete_staff_member",
+          {
+            target_staff_id:
+              id
+          }
+        );
+
+
+    if (result.error) {
+      throw result.error;
+    }
+
+
+    showToast(
+      "Staff record deleted successfully.",
+      "success"
+    );
+
+
+    await loadStaff();
+
+
+  } catch (error) {
+
+    showToast(
+      error.message ||
+      "Unable to delete staff record.",
+      "error"
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   ACTION ROUTER
+   ========================================================= */
+
+function handleAction(event) {
+
+  const action =
+    event.currentTarget
+      .dataset
+      .action;
+
+
+  const id =
+    event.currentTarget
+      .dataset
+      .id;
+
+
+  if (
+    action === "view"
+  ) {
+
+    viewStaff(id);
+
+    return;
+  }
+
+
+  if (
+    action === "edit"
+  ) {
+
+    editStaff(id);
+
+    return;
+  }
+
+
+  if (
+    action === "archive"
+  ) {
+
+    archiveOrRestore(id);
+
+    return;
+  }
+
+
+  if (
+    action === "delete"
+  ) {
+
+    deleteStaff(id);
+
+    return;
+  }
+
+}
+
+
+/* =========================================================
+   ADD STAFF
+   ========================================================= */
+
+$("#addStaffBtn")
+  .addEventListener(
+    "click",
+    () => {
+
+      $("#createForm")
+        .reset();
+
+      openModal(
+        "createModal"
+      );
+
+    }
+  );
+
+
+/* =========================================================
+   SEARCH / FILTER
+   ========================================================= */
+
+$("#searchInput")
+  .addEventListener(
+    "input",
+    renderStaff
+  );
+
+
+$("#statusFilter")
+  .addEventListener(
+    "change",
+    renderStaff
+  );
+
+
+$("#departmentFilter")
+  .addEventListener(
+    "change",
+    renderStaff
+  );
+
+
+/* =========================================================
+   REFRESH
+   ========================================================= */
+
+$("#refreshBtn")
+  .addEventListener(
+    "click",
+    async () => {
+
+      try {
+
+        await loadStaff();
+
+        showToast(
+          "Staff directory refreshed.",
+          "success"
+        );
+
+      } catch (error) {
+
+        showToast(
+          error.message ||
+          "Unable to refresh staff.",
+          "error"
+        );
+
+      }
+
+    }
+  );
+
+
+/* =========================================================
+   LOGOUT
+   ========================================================= */
+
+$("#logoutBtn")
+  .addEventListener(
+    "click",
+    async () => {
+
+      try {
+
+        await supabaseClient
+          .auth
+          .signOut();
+
+      } finally {
+
+        window.location.replace(
+          LOGIN_PAGE
+        );
+
+      }
+
+    }
+  );
+
+
+/* =========================================================
+   AUTH STATE
+   ========================================================= */
+
+supabaseClient
+  .auth
+  .onAuthStateChange(
+    event => {
+
+      if (
+        event === "SIGNED_OUT"
+      ) {
+
+        window.location.replace(
+          LOGIN_PAGE
+        );
+
+      }
+
+    }
+  );
+
+
+/* =========================================================
+   BOOT APPLICATION
+   ========================================================= */
+
+async function bootApplication() {
+
+  try {
+
+    const authorized =
+      await verifySession();
+
+
+    if (!authorized) {
+      return;
+    }
+
+
+    /*
+     * Show application BEFORE secondary data loading.
+     * This prevents blank-page behaviour.
+     */
+
+    $("#bootScreen")
+      .style
+      .display = "none";
+
+
+    $("#app")
+      .style
+      .display = "block";
+
+
+    await loadStaff();
+
+
+  } catch (error) {
+
+    console.error(
+      "STAFF APPLICATION ERROR:",
+      error
+    );
+
+
+    /*
+     * Do not automatically sign the Super Admin out
+     * because a database/RPC operation failed.
+     */
+
+    $("#bootScreen")
+      .style
+      .display = "none";
+
+
+    $("#app")
+      .style
+      .display = "block";
+
+
+    $("#recordCount")
+      .textContent =
+      "Unable to load staff records";
+
+
+    $("#emptyState")
+      .style
+      .display = "block";
+
+
+    $("#emptyState")
+      .innerHTML = `
+
+        <strong>
+          Staff data could not be loaded
+        </strong>
+
+        <span>
+          ${escapeHTML(
+            error.message ||
+            "Please refresh the page and try again."
+          )}
+        </span>
+
+      `;
+
+
+    showToast(
+      error.message ||
+      "Staff management could not load completely.",
+      "error"
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   START
+   ========================================================= */
+
+window.addEventListener(
+  "load",
+  bootApplication
+);
+
+</script>
+
+</body>
+</html>
