@@ -1,0 +1,4285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Administrators | ALMAFAAZ ACADEMY</title>
+
+<meta name="description"
+      content="ALMAFAAZ ACADEMY Super Administrator management console.">
+
+<link rel="icon"
+      href="assets/images/Almafaaz-logo.png"
+      type="image/png">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root{
+    --blue:#071b3a;
+    --blue-2:#0b2b59;
+    --blue-3:#123e76;
+    --orange:#ff7a00;
+    --orange-dark:#d95f00;
+
+    --white:#ffffff;
+    --bg:#f4f7fb;
+    --surface:#ffffff;
+    --surface-soft:#f8fafc;
+    --border:#e4e9f0;
+
+    --text:#142033;
+    --muted:#68758a;
+
+    --success:#14804a;
+    --success-bg:#e8f7ef;
+
+    --danger:#c62828;
+    --danger-bg:#fdecec;
+
+    --warning:#a96800;
+    --warning-bg:#fff5df;
+
+    --shadow:0 20px 55px rgba(7,27,58,.10);
+    --shadow-small:0 8px 25px rgba(7,27,58,.08);
+
+    --radius:20px;
+    --radius-small:12px;
+}
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    min-height:100vh;
+    font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+    color:var(--text);
+    background:
+        radial-gradient(
+            circle at top right,
+            rgba(255,122,0,.08),
+            transparent 28%
+        ),
+        var(--bg);
+}
+
+/* =========================================================
+   BOOT SCREEN
+========================================================= */
+
+.boot-screen{
+    position:fixed;
+    inset:0;
+    z-index:9999;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:
+        radial-gradient(
+            circle at 50% 25%,
+            rgba(255,122,0,.12),
+            transparent 35%
+        ),
+        linear-gradient(
+            145deg,
+            #041229,
+            #071b3a 55%,
+            #0b2b59
+        );
+    transition:
+        opacity .35s ease,
+        visibility .35s ease;
+}
+
+.boot-screen.hidden{
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+}
+
+.boot-card{
+    width:min(430px,92%);
+    padding:38px 30px;
+    text-align:center;
+    border:1px solid rgba(255,255,255,.13);
+    border-radius:28px;
+    background:rgba(255,255,255,.065);
+    backdrop-filter:blur(22px);
+    box-shadow:0 30px 80px rgba(0,0,0,.3);
+}
+
+.boot-logo{
+    width:92px;
+    height:92px;
+    object-fit:contain;
+    border-radius:22px;
+    background:#fff;
+    padding:8px;
+    box-shadow:
+        0 0 0 5px rgba(255,122,0,.15),
+        0 15px 35px rgba(0,0,0,.25);
+}
+
+.boot-card h1{
+    margin-top:22px;
+    color:#fff;
+    font-size:22px;
+    font-weight:800;
+}
+
+.boot-card p{
+    margin-top:8px;
+    color:rgba(255,255,255,.68);
+    font-size:14px;
+}
+
+.loader{
+    width:42px;
+    height:42px;
+    margin:24px auto 0;
+    border:4px solid rgba(255,255,255,.16);
+    border-top-color:var(--orange);
+    border-radius:50%;
+    animation:spin .8s linear infinite;
+}
+
+@keyframes spin{
+    to{
+        transform:rotate(360deg);
+    }
+}
+
+.boot-error{
+    display:none;
+    margin-top:18px;
+    padding:13px;
+    color:#ffd4d4;
+    border:1px solid rgba(255,120,120,.25);
+    border-radius:12px;
+    background:rgba(180,20,20,.14);
+    font-size:13px;
+    line-height:1.5;
+}
+
+.boot-error.show{
+    display:block;
+}
+
+/* =========================================================
+   APPLICATION
+========================================================= */
+
+.app{
+    min-height:100vh;
+    display:flex;
+}
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+.sidebar{
+    position:fixed;
+    left:0;
+    top:0;
+    bottom:0;
+    z-index:100;
+    width:260px;
+    padding:20px 14px;
+    display:flex;
+    flex-direction:column;
+    background:
+        linear-gradient(
+            180deg,
+            #061832,
+            #081f42 60%,
+            #092b57
+        );
+    color:#fff;
+    border-right:1px solid rgba(255,255,255,.06);
+    transition:transform .3s ease;
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:8px 10px 22px;
+    border-bottom:1px solid rgba(255,255,255,.09);
+}
+
+.brand img{
+    width:48px;
+    height:48px;
+    object-fit:contain;
+    padding:4px;
+    border-radius:13px;
+    background:#fff;
+}
+
+.brand-text strong{
+    display:block;
+    font-size:14px;
+    line-height:1.2;
+}
+
+.brand-text span{
+    display:block;
+    margin-top:3px;
+    color:rgba(255,255,255,.56);
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:.9px;
+}
+
+.nav{
+    margin-top:20px;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+}
+
+.nav-title{
+    padding:9px 11px;
+    color:rgba(255,255,255,.38);
+    font-size:10px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:1.4px;
+}
+
+.nav a,
+.nav button{
+    width:100%;
+    display:flex;
+    align-items:center;
+    gap:11px;
+    padding:12px 12px;
+    border:0;
+    border-radius:12px;
+    background:transparent;
+    color:rgba(255,255,255,.72);
+    text-decoration:none;
+    font:inherit;
+    font-size:13px;
+    cursor:pointer;
+    transition:.2s ease;
+}
+
+.nav a:hover,
+.nav button:hover{
+    background:rgba(255,255,255,.08);
+    color:#fff;
+}
+
+.nav a.active{
+    color:#fff;
+    background:
+        linear-gradient(
+            90deg,
+            rgba(255,122,0,.25),
+            rgba(255,122,0,.08)
+        );
+    border:1px solid rgba(255,122,0,.20);
+}
+
+.nav svg{
+    width:18px;
+    height:18px;
+    flex:none;
+}
+
+.sidebar-bottom{
+    margin-top:auto;
+    padding-top:15px;
+    border-top:1px solid rgba(255,255,255,.09);
+}
+
+.sidebar-user{
+    padding:12px;
+    border-radius:14px;
+    background:rgba(255,255,255,.055);
+}
+
+.sidebar-user small{
+    display:block;
+    color:rgba(255,255,255,.43);
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:.8px;
+}
+
+.sidebar-user strong{
+    display:block;
+    margin-top:4px;
+    color:#fff;
+    font-size:12px;
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+}
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+.main{
+    width:calc(100% - 260px);
+    margin-left:260px;
+    min-width:0;
+}
+
+.topbar{
+    position:sticky;
+    top:0;
+    z-index:50;
+    height:76px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+    padding:0 30px;
+    background:rgba(255,255,255,.90);
+    backdrop-filter:blur(18px);
+    border-bottom:1px solid var(--border);
+}
+
+.topbar-left{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.mobile-menu{
+    display:none;
+    width:40px;
+    height:40px;
+    align-items:center;
+    justify-content:center;
+    border:1px solid var(--border);
+    border-radius:11px;
+    background:#fff;
+    cursor:pointer;
+}
+
+.mobile-menu svg{
+    width:20px;
+    height:20px;
+}
+
+.page-title h1{
+    font-size:20px;
+    font-weight:850;
+    letter-spacing:-.4px;
+}
+
+.page-title p{
+    margin-top:3px;
+    color:var(--muted);
+    font-size:12px;
+}
+
+.top-actions{
+    display:flex;
+    align-items:center;
+    gap:9px;
+}
+
+.content{
+    padding:28px 30px 40px;
+    max-width:1600px;
+    margin:auto;
+}
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+.btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    min-height:42px;
+    padding:0 15px;
+    border:1px solid transparent;
+    border-radius:11px;
+    font:inherit;
+    font-size:12px;
+    font-weight:750;
+    cursor:pointer;
+    transition:
+        transform .15s ease,
+        box-shadow .15s ease,
+        background .15s ease;
+}
+
+.btn:hover{
+    transform:translateY(-1px);
+}
+
+.btn:disabled{
+    opacity:.55;
+    cursor:not-allowed;
+    transform:none;
+}
+
+.btn svg{
+    width:17px;
+    height:17px;
+}
+
+.btn-primary{
+    color:#fff;
+    background:var(--orange);
+    box-shadow:0 7px 18px rgba(255,122,0,.22);
+}
+
+.btn-primary:hover{
+    background:var(--orange-dark);
+}
+
+.btn-dark{
+    color:#fff;
+    background:var(--blue);
+}
+
+.btn-light{
+    color:var(--text);
+    background:#fff;
+    border-color:var(--border);
+}
+
+.btn-danger{
+    color:#fff;
+    background:var(--danger);
+}
+
+.btn-success{
+    color:#fff;
+    background:var(--success);
+}
+
+.btn-warning{
+    color:#fff;
+    background:#a96800;
+}
+
+.btn-small{
+    min-height:34px;
+    padding:0 10px;
+    font-size:11px;
+}
+
+/* =========================================================
+   WELCOME
+========================================================= */
+
+.welcome{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+    padding:25px;
+    color:#fff;
+    border-radius:22px;
+    background:
+        radial-gradient(
+            circle at 90% 20%,
+            rgba(255,122,0,.23),
+            transparent 30%
+        ),
+        linear-gradient(
+            120deg,
+            #061832,
+            #0b2b59
+        );
+    box-shadow:var(--shadow);
+}
+
+.welcome h2{
+    font-size:22px;
+    letter-spacing:-.4px;
+}
+
+.welcome p{
+    margin-top:7px;
+    color:rgba(255,255,255,.65);
+    font-size:13px;
+}
+
+.welcome-actions{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+}
+
+/* =========================================================
+   STAT CARDS
+========================================================= */
+
+.stats{
+    display:grid;
+    grid-template-columns:
+        repeat(4,minmax(0,1fr));
+    gap:16px;
+    margin-top:20px;
+}
+
+.stat{
+    padding:20px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:18px;
+    box-shadow:var(--shadow-small);
+}
+
+.stat-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+
+.stat-icon{
+    width:42px;
+    height:42px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:13px;
+    color:var(--blue);
+    background:#eef4fb;
+}
+
+.stat-icon.orange{
+    color:var(--orange-dark);
+    background:#fff1e5;
+}
+
+.stat-icon.green{
+    color:var(--success);
+    background:var(--success-bg);
+}
+
+.stat-icon.red{
+    color:var(--danger);
+    background:var(--danger-bg);
+}
+
+.stat-icon svg{
+    width:20px;
+    height:20px;
+}
+
+.stat-number{
+    margin-top:15px;
+    font-size:27px;
+    font-weight:850;
+    letter-spacing:-.7px;
+}
+
+.stat-label{
+    margin-top:3px;
+    color:var(--muted);
+    font-size:12px;
+}
+
+/* =========================================================
+   MANAGEMENT PANEL
+========================================================= */
+
+.panel{
+    margin-top:22px;
+    overflow:hidden;
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:20px;
+    box-shadow:var(--shadow-small);
+}
+
+.panel-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:15px;
+    padding:20px;
+    border-bottom:1px solid var(--border);
+}
+
+.panel-title h3{
+    font-size:16px;
+    font-weight:850;
+}
+
+.panel-title p{
+    margin-top:4px;
+    color:var(--muted);
+    font-size:11px;
+}
+
+.toolbar{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    padding:14px 20px;
+    background:var(--surface-soft);
+    border-bottom:1px solid var(--border);
+}
+
+.search{
+    position:relative;
+    flex:1;
+    min-width:180px;
+}
+
+.search svg{
+    position:absolute;
+    left:12px;
+    top:50%;
+    width:17px;
+    height:17px;
+    color:#8290a4;
+    transform:translateY(-50%);
+}
+
+.search input{
+    width:100%;
+    height:40px;
+    padding:0 13px 0 39px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    outline:none;
+    background:#fff;
+    color:var(--text);
+    font:inherit;
+    font-size:12px;
+}
+
+.search input:focus{
+    border-color:rgba(255,122,0,.6);
+    box-shadow:0 0 0 3px rgba(255,122,0,.08);
+}
+
+.select{
+    height:40px;
+    min-width:145px;
+    padding:0 11px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    outline:none;
+    background:#fff;
+    color:var(--text);
+    font:inherit;
+    font-size:12px;
+}
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.table-wrap{
+    width:100%;
+    overflow-x:auto;
+}
+
+table{
+    width:100%;
+    min-width:900px;
+    border-collapse:collapse;
+}
+
+thead{
+    background:#fafbfd;
+}
+
+th{
+    padding:13px 20px;
+    text-align:left;
+    color:#718096;
+    font-size:10px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.8px;
+    border-bottom:1px solid var(--border);
+}
+
+td{
+    padding:15px 20px;
+    border-bottom:1px solid #edf0f4;
+    font-size:12px;
+    vertical-align:middle;
+}
+
+tbody tr{
+    transition:background .15s ease;
+}
+
+tbody tr:hover{
+    background:#fbfcfe;
+}
+
+.admin-cell{
+    display:flex;
+    align-items:center;
+    gap:11px;
+}
+
+.avatar{
+    width:39px;
+    height:39px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex:none;
+    color:#fff;
+    border-radius:12px;
+    background:
+        linear-gradient(
+            145deg,
+            var(--blue-2),
+            var(--blue-3)
+        );
+    font-size:12px;
+    font-weight:850;
+}
+
+.admin-name{
+    font-weight:800;
+    color:var(--text);
+}
+
+.admin-email{
+    margin-top:3px;
+    color:var(--muted);
+    font-size:10px;
+}
+
+.id-text{
+    color:#657389;
+    font-family:
+        ui-monospace,
+        SFMono-Regular,
+        Menlo,
+        Monaco,
+        Consolas,
+        monospace;
+    font-size:10px;
+}
+
+.badge{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    padding:5px 9px;
+    border-radius:999px;
+    font-size:10px;
+    font-weight:800;
+}
+
+.badge::before{
+    content:"";
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    background:currentColor;
+}
+
+.badge.active{
+    color:var(--success);
+    background:var(--success-bg);
+}
+
+.badge.inactive{
+    color:#64748b;
+    background:#eef1f5;
+}
+
+.badge.suspended{
+    color:var(--danger);
+    background:var(--danger-bg);
+}
+
+.badge.pending{
+    color:var(--warning);
+    background:var(--warning-bg);
+}
+
+.actions{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:6px;
+}
+
+.icon-btn{
+    width:34px;
+    height:34px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border:1px solid var(--border);
+    border-radius:9px;
+    background:#fff;
+    color:#526176;
+    cursor:pointer;
+    transition:.15s ease;
+}
+
+.icon-btn:hover{
+    color:var(--blue);
+    border-color:#cbd5e1;
+    background:#f8fafc;
+}
+
+.icon-btn.danger:hover{
+    color:var(--danger);
+    border-color:#f2c3c3;
+    background:#fff6f6;
+}
+
+.icon-btn svg{
+    width:16px;
+    height:16px;
+}
+
+/* =========================================================
+   EMPTY / LOADING
+========================================================= */
+
+.state{
+    padding:60px 20px;
+    text-align:center;
+}
+
+.state svg{
+    width:38px;
+    height:38px;
+    color:#b3bfce;
+}
+
+.state h4{
+    margin-top:12px;
+    font-size:14px;
+}
+
+.state p{
+    margin:6px auto 0;
+    max-width:450px;
+    color:var(--muted);
+    font-size:11px;
+    line-height:1.6;
+}
+
+.mini-loader{
+    width:27px;
+    height:27px;
+    margin:0 auto;
+    border:3px solid #e5eaf0;
+    border-top-color:var(--orange);
+    border-radius:50%;
+    animation:spin .8s linear infinite;
+}
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.modal-layer{
+    position:fixed;
+    inset:0;
+    z-index:500;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    background:rgba(2,12,28,.64);
+    backdrop-filter:blur(8px);
+}
+
+.modal-layer.show{
+    display:flex;
+}
+
+.modal{
+    width:min(560px,100%);
+    max-height:90vh;
+    overflow:auto;
+    border-radius:22px;
+    background:#fff;
+    box-shadow:0 35px 100px rgba(0,0,0,.30);
+    animation:modalIn .2s ease;
+}
+
+@keyframes modalIn{
+    from{
+        opacity:0;
+        transform:translateY(12px) scale(.98);
+    }
+    to{
+        opacity:1;
+        transform:none;
+    }
+}
+
+.modal-header{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:15px;
+    padding:21px;
+    border-bottom:1px solid var(--border);
+}
+
+.modal-header h3{
+    font-size:17px;
+}
+
+.modal-header p{
+    margin-top:4px;
+    color:var(--muted);
+    font-size:11px;
+    line-height:1.5;
+}
+
+.close-btn{
+    width:35px;
+    height:35px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border:1px solid var(--border);
+    border-radius:9px;
+    background:#fff;
+    cursor:pointer;
+}
+
+.close-btn svg{
+    width:17px;
+    height:17px;
+}
+
+.modal-body{
+    padding:21px;
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:15px;
+}
+
+.field{
+    display:flex;
+    flex-direction:column;
+    gap:7px;
+}
+
+.field.full{
+    grid-column:1/-1;
+}
+
+.field label{
+    color:#465469;
+    font-size:11px;
+    font-weight:800;
+}
+
+.field input,
+.field select{
+    width:100%;
+    height:43px;
+    padding:0 12px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    outline:none;
+    background:#fff;
+    color:var(--text);
+    font:inherit;
+    font-size:12px;
+}
+
+.field input:focus,
+.field select:focus{
+    border-color:rgba(255,122,0,.6);
+    box-shadow:0 0 0 3px rgba(255,122,0,.08);
+}
+
+.password-wrap{
+    position:relative;
+}
+
+.password-wrap input{
+    padding-right:45px;
+}
+
+.password-toggle{
+    position:absolute;
+    top:50%;
+    right:8px;
+    width:32px;
+    height:32px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transform:translateY(-50%);
+    border:0;
+    border-radius:8px;
+    background:transparent;
+    color:#6d7b8e;
+    cursor:pointer;
+}
+
+.password-toggle svg{
+    width:16px;
+    height:16px;
+}
+
+.form-note{
+    margin-top:15px;
+    padding:12px;
+    color:#58677b;
+    border:1px solid #e8edf3;
+    border-radius:10px;
+    background:#f8fafc;
+    font-size:10px;
+    line-height:1.6;
+}
+
+.modal-footer{
+    display:flex;
+    justify-content:flex-end;
+    gap:8px;
+    padding:16px 21px;
+    border-top:1px solid var(--border);
+}
+
+/* =========================================================
+   SUCCESS CREDENTIAL CARD
+========================================================= */
+
+.credentials{
+    padding:15px;
+    border:1px solid #cfe9da;
+    border-radius:14px;
+    background:#f3fbf6;
+}
+
+.credentials-title{
+    color:var(--success);
+    font-size:13px;
+    font-weight:850;
+}
+
+.credentials-warning{
+    margin-top:5px;
+    color:#587064;
+    font-size:10px;
+    line-height:1.5;
+}
+
+.credential-row{
+    display:grid;
+    grid-template-columns:90px 1fr auto;
+    align-items:center;
+    gap:8px;
+    margin-top:11px;
+}
+
+.credential-row label{
+    color:#68758a;
+    font-size:10px;
+    font-weight:800;
+}
+
+.credential-value{
+    min-width:0;
+    overflow:hidden;
+    padding:9px 10px;
+    border:1px solid #dce9e1;
+    border-radius:8px;
+    background:#fff;
+    color:var(--text);
+    font-family:monospace;
+    font-size:11px;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+.toast-container{
+    position:fixed;
+    right:20px;
+    bottom:20px;
+    z-index:1000;
+    width:min(390px,calc(100% - 40px));
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.toast{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    padding:13px;
+    border:1px solid var(--border);
+    border-radius:13px;
+    background:#fff;
+    box-shadow:0 18px 50px rgba(7,27,58,.16);
+    animation:toastIn .2s ease;
+}
+
+@keyframes toastIn{
+    from{
+        opacity:0;
+        transform:translateY(8px);
+    }
+    to{
+        opacity:1;
+        transform:none;
+    }
+}
+
+.toast-icon{
+    width:30px;
+    height:30px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex:none;
+    border-radius:9px;
+    background:#eef4fb;
+    color:var(--blue);
+}
+
+.toast.success .toast-icon{
+    color:var(--success);
+    background:var(--success-bg);
+}
+
+.toast.error .toast-icon{
+    color:var(--danger);
+    background:var(--danger-bg);
+}
+
+.toast strong{
+    display:block;
+    font-size:11px;
+}
+
+.toast p{
+    margin-top:3px;
+    color:var(--muted);
+    font-size:10px;
+    line-height:1.45;
+}
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.footer{
+    padding:25px 10px 8px;
+    text-align:center;
+    color:#8a96a8;
+    font-size:10px;
+    line-height:1.7;
+}
+
+.footer strong{
+    color:#647286;
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media(max-width:1050px){
+
+    .sidebar{
+        transform:translateX(-100%);
+        box-shadow:25px 0 70px rgba(0,0,0,.18);
+    }
+
+    .sidebar.open{
+        transform:none;
+    }
+
+    .main{
+        width:100%;
+        margin-left:0;
+    }
+
+    .mobile-menu{
+        display:flex;
+    }
+
+    .stats{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+}
+
+@media(max-width:700px){
+
+    .topbar{
+        height:68px;
+        padding:0 15px;
+    }
+
+    .page-title h1{
+        font-size:16px;
+    }
+
+    .page-title p{
+        display:none;
+    }
+
+    .top-actions .dashboard-btn{
+        display:none;
+    }
+
+    .content{
+        padding:18px 14px 30px;
+    }
+
+    .welcome{
+        flex-direction:column;
+        align-items:flex-start;
+        padding:20px;
+    }
+
+    .welcome h2{
+        font-size:19px;
+    }
+
+    .stats{
+        gap:10px;
+    }
+
+    .stat{
+        padding:15px;
+    }
+
+    .stat-number{
+        font-size:22px;
+    }
+
+    .panel-header{
+        align-items:flex-start;
+        flex-direction:column;
+    }
+
+    .toolbar{
+        align-items:stretch;
+        flex-direction:column;
+    }
+
+    .search{
+        width:100%;
+    }
+
+    .select{
+        width:100%;
+    }
+
+    .form-grid{
+        grid-template-columns:1fr;
+    }
+
+    .field.full{
+        grid-column:auto;
+    }
+
+    .modal-layer{
+        padding:10px;
+    }
+
+    .modal{
+        max-height:94vh;
+        border-radius:17px;
+    }
+
+    .credential-row{
+        grid-template-columns:1fr;
+    }
+}
+
+@media(max-width:450px){
+
+    .stats{
+        grid-template-columns:1fr;
+    }
+
+    .top-actions .logout-btn{
+        display:none;
+    }
+
+    .welcome-actions{
+        width:100%;
+    }
+
+    .welcome-actions .btn{
+        flex:1;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ========================================================
+     BOOT SCREEN
+========================================================= -->
+
+<div class="boot-screen" id="bootScreen">
+
+    <div class="boot-card">
+
+        <img
+            src="assets/images/Almafaaz-logo.png"
+            class="boot-logo"
+            alt="ALMAFAAZ ACADEMY">
+
+        <h1>Verifying Super Administrator</h1>
+
+        <p id="bootMessage">
+            Securely checking your administrator session...
+        </p>
+
+        <div class="loader" id="bootLoader"></div>
+
+        <div class="boot-error" id="bootError"></div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================
+     APPLICATION
+========================================================= -->
+
+<div class="app" id="application" hidden>
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar" id="sidebar">
+
+        <div class="brand">
+
+            <img
+                src="assets/images/Almafaaz-logo.png"
+                alt="ALMAFAAZ">
+
+            <div class="brand-text">
+                <strong>ALMAFAAZ ACADEMY</strong>
+                <span>Management Console</span>
+            </div>
+
+        </div>
+
+
+        <nav class="nav">
+
+            <div class="nav-title">Main</div>
+
+            <a href="./super-admin-dashboard.html">
+
+                <svg viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="1.8">
+                    <rect x="3" y="3" width="7" height="7" rx="1"/>
+                    <rect x="14" y="3" width="7" height="7" rx="1"/>
+                    <rect x="3" y="14" width="7" height="7" rx="1"/>
+                    <rect x="14" y="14" width="7" height="7" rx="1"/>
+                </svg>
+
+                Dashboard
+
+            </a>
+
+
+            <a href="./admins.html" class="active">
+
+                <svg viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="1.8">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+
+                Administrators
+
+            </a>
+
+
+            <div class="nav-title">Management</div>
+
+            <a href="./teachers.html">
+
+                <svg viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="1.8">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/>
+                </svg>
+
+                Teachers
+
+            </a>
+
+
+            <a href="./students.html">
+
+                <svg viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="1.8">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M23 21v-2a4 4 0 0 0-4-4h-1"/>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+
+                Students
+
+            </a>
+
+
+            <a href="./classes.html">
+
+                <svg viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="1.8">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/>
+                </svg>
+
+                Classes
+
+            </a>
+
+
+            <a href="./settings.html">
+
+                <svg viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="1.8">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-1.42 1.42-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56V20h-2v-.09a1.7 1.7 0 0 0-1.03-1.56 1.7 1.7 0 0 0-1.88.34l-.06.06-1.42-1.42.06-.06A1.7 1.7 0 0 0 9.4 15a1.7 1.7 0 0 0-1.56-1.03H7v-2h.84A1.7 1.7 0 0 0 9.4 10a1.7 1.7 0 0 0-.34-1.88L9 8.06l1.42-1.42.06.06A1.7 1.7 0 0 0 12.36 7.04 1.7 1.7 0 0 0 13.39 5.5V5h2v.5A1.7 1.7 0 0 0 16.42 7.04a1.7 1.7 0 0 0 1.88-.34l.06-.06 1.42 1.42-.06.06A1.7 1.7 0 0 0 19.38 10a1.7 1.7 0 0 0 1.56 1.03H21v2h-.06A1.7 1.7 0 0 0 19.4 15Z"/>
+                </svg>
+
+                Settings
+
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <div class="sidebar-user">
+
+                <small>Signed in as</small>
+
+                <strong id="sidebarUserName">
+                    Super Administrator
+                </strong>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <div class="topbar-left">
+
+                <button
+                    class="mobile-menu"
+                    id="mobileMenu"
+                    aria-label="Open menu">
+
+                    <svg viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2">
+                        <path d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+
+                </button>
+
+                <div class="page-title">
+
+                    <h1>Administrators</h1>
+
+                    <p>
+                        Manage school administrator accounts and access.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="top-actions">
+
+                <button
+                    class="btn btn-light dashboard-btn"
+                    id="backDashboard">
+
+                    <svg viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="1.8">
+                        <path d="M19 12H5"/>
+                        <path d="m12 19-7-7 7-7"/>
+                    </svg>
+
+                    Dashboard
+
+                </button>
+
+
+                <button
+                    class="btn btn-dark logout-btn"
+                    id="logoutButton">
+
+                    <svg viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="1.8">
+                        <path d="M10 17l5-5-5-5"/>
+                        <path d="M15 12H3"/>
+                        <path d="M21 19V5a2 2 0 0 0-2-2h-7"/>
+                    </svg>
+
+                    Logout
+
+                </button>
+
+            </div>
+
+        </header>
+
+
+        <section class="content">
+
+            <!-- WELCOME -->
+
+            <div class="welcome">
+
+                <div>
+
+                    <h2>Administrator Management</h2>
+
+                    <p>
+                        Create, review and control administrator access
+                        for ALMAFAAZ ACADEMY.
+                    </p>
+
+                </div>
+
+
+                <div class="welcome-actions">
+
+                    <button
+                        class="btn btn-light"
+                        id="refreshButton">
+
+                        <svg viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="1.8">
+                            <path d="M20 11a8.1 8.1 0 0 0-15.5-2"/>
+                            <path d="M4 5v4h4"/>
+                            <path d="M4 13a8.1 8.1 0 0 0 15.5 2"/>
+                            <path d="M20 19v-4h-4"/>
+                        </svg>
+
+                        Refresh
+
+                    </button>
+
+
+                    <button
+                        class="btn btn-primary"
+                        id="createAdminButton">
+
+                        <svg viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2">
+                            <path d="M12 5v14"/>
+                            <path d="M5 12h14"/>
+                        </svg>
+
+                        Create Administrator
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- STATISTICS -->
+
+            <div class="stats">
+
+                <div class="stat">
+
+                    <div class="stat-top">
+
+                        <div>
+                            <div class="stat-number" id="totalAdmins">
+                                0
+                            </div>
+
+                            <div class="stat-label">
+                                Total Administrators
+                            </div>
+                        </div>
+
+                        <div class="stat-icon">
+
+                            <svg viewBox="0 0 24 24" fill="none"
+                                 stroke="currentColor"
+                                 stroke-width="1.8">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                                <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                            </svg>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="stat">
+
+                    <div class="stat-top">
+
+                        <div>
+                            <div class="stat-number" id="activeAdmins">
+                                0
+                            </div>
+
+                            <div class="stat-label">
+                                Active
+                            </div>
+                        </div>
+
+                        <div class="stat-icon green">
+
+                            <svg viewBox="0 0 24 24" fill="none"
+                                 stroke="currentColor"
+                                 stroke-width="1.8">
+                                <path d="M20 6 9 17l-5-5"/>
+                            </svg>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="stat">
+
+                    <div class="stat-top">
+
+                        <div>
+                            <div class="stat-number" id="inactiveAdmins">
+                                0
+                            </div>
+
+                            <div class="stat-label">
+                                Archived / Inactive
+                            </div>
+                        </div>
+
+                        <div class="stat-icon orange">
+
+                            <svg viewBox="0 0 24 24" fill="none"
+                                 stroke="currentColor"
+                                 stroke-width="1.8">
+                                <path d="M3 7h18"/>
+                                <path d="M5 7v13h14V7"/>
+                                <path d="M8 7V4h8v3"/>
+                            </svg>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="stat">
+
+                    <div class="stat-top">
+
+                        <div>
+                            <div class="stat-number" id="suspendedAdmins">
+                                0
+                            </div>
+
+                            <div class="stat-label">
+                                Suspended
+                            </div>
+                        </div>
+
+                        <div class="stat-icon red">
+
+                            <svg viewBox="0 0 24 24" fill="none"
+                                 stroke="currentColor"
+                                 stroke-width="1.8">
+                                <circle cx="12" cy="12" r="9"/>
+                                <path d="m9 9 6 6"/>
+                                <path d="m15 9-6 6"/>
+                            </svg>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ADMINISTRATOR TABLE -->
+
+            <section class="panel">
+
+                <div class="panel-header">
+
+                    <div class="panel-title">
+
+                        <h3>All Administrators</h3>
+
+                        <p>
+                            Administrators registered in the school system.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="toolbar">
+
+                    <div class="search">
+
+                        <svg viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor"
+                             stroke-width="1.8">
+                            <circle cx="11" cy="11" r="7"/>
+                            <path d="m20 20-4-4"/>
+                        </svg>
+
+                        <input
+                            type="search"
+                            id="searchInput"
+                            placeholder="Search by name, email or ID...">
+
+                    </div>
+
+
+                    <select
+                        class="select"
+                        id="statusFilter">
+
+                        <option value="all">
+                            All statuses
+                        </option>
+
+                        <option value="active">
+                            Active
+                        </option>
+
+                        <option value="inactive">
+                            Archived / Inactive
+                        </option>
+
+                        <option value="suspended">
+                            Suspended
+                        </option>
+
+                        <option value="pending">
+                            Pending
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="table-wrap">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>Administrator</th>
+
+                                <th>Administrator ID</th>
+
+                                <th>Status</th>
+
+                                <th>Created</th>
+
+                                <th>Updated</th>
+
+                                <th style="text-align:right;">
+                                    Actions
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="adminsTableBody">
+
+                            <tr>
+
+                                <td colspan="6">
+
+                                    <div class="state">
+
+                                        <div class="mini-loader"></div>
+
+                                        <p>
+                                            Loading administrators...
+                                        </p>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+
+            <footer class="footer">
+
+                <strong>ALMAFAAZ ACADEMY</strong>
+                <br>
+
+                Copyright © 2026 ALMAFAAZ ACADEMY.
+                All rights reserved.
+                <br>
+
+                Powered by
+                <strong>Yalerima Technologies Limited</strong>.
+
+            </footer>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- ========================================================
+     ADMIN DETAILS / EDIT MODAL
+========================================================= -->
+
+<div class="modal-layer" id="editModal">
+
+    <div class="modal">
+
+        <div class="modal-header">
+
+            <div>
+
+                <h3>Edit Administrator</h3>
+
+                <p>
+                    Update the administrator's profile and account status.
+                </p>
+
+            </div>
+
+            <button class="close-btn" data-close="editModal">
+
+                <svg viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="1.8">
+                    <path d="m6 6 12 12"/>
+                    <path d="m18 6-12 12"/>
+                </svg>
+
+            </button>
+
+        </div>
+
+
+        <div class="modal-body">
+
+            <div class="form-grid">
+
+                <div class="field full">
+
+                    <label>Administrator ID</label>
+
+                    <input
+                        id="editAdminId"
+                        readonly>
+
+                </div>
+
+
+                <div class="field full">
+
+                    <label>Full Name</label>
+
+                    <input
+                        id="editFullName"
+                        type="text"
+                        autocomplete="name">
+
+                </div>
+
+
+                <div class="field full">
+
+                    <label>Email Address</label>
+
+                    <input
+                        id="editEmail"
+                        type="email"
+                        readonly>
+
+                </div>
+
+
+                <div class="field full">
+
+                    <label>Account Status</label>
+
+                    <select id="editStatus">
+
+                        <option value="active">
+                            Active
+                        </option>
+
+                        <option value="inactive">
+                            Inactive / Archived
+                        </option>
+
+                        <option value="suspended">
+                            Suspended
+                        </option>
+
+                        <option value="pending">
+                            Pending
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="modal-footer">
+
+            <button
+                class="btn btn-light"
+                data-close="editModal">
+
+                Cancel
+
+            </button>
+
+            <button
+                class="btn btn-primary"
+                id="saveEditButton">
+
+                Save Changes
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================
+     CREATE ADMIN MODAL
+========================================================= -->
+
+<div class="modal-layer" id="createModal">
+
+    <div class="modal">
+
+        <div class="modal-header">
+
+            <div>
+
+                <h3>Create Administrator</h3>
+
+                <p>
+                    Create a new administrator account using an email
+                    address and temporary password.
+                </p>
+
+            </div>
+
+            <button class="close-btn" data-close="createModal">
+
+                <svg viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="1.8">
+                    <path d="m6 6 12 12"/>
+                    <path d="m18 6-12 12"/>
+                </svg>
+
+            </button>
+
+        </div>
+
+
+        <div class="modal-body">
+
+            <div class="form-grid">
+
+                <div class="field full">
+
+                    <label>Full Name</label>
+
+                    <input
+                        id="createFullName"
+                        type="text"
+                        placeholder="Administrator full name"
+                        autocomplete="name">
+
+                </div>
+
+
+                <div class="field full">
+
+                    <label>Email Address</label>
+
+                    <input
+                        id="createEmail"
+                        type="email"
+                        placeholder="administrator@example.com"
+                        autocomplete="email">
+
+                </div>
+
+
+                <div class="field full">
+
+                    <label>Temporary Password</label>
+
+                    <div class="password-wrap">
+
+                        <input
+                            id="createPassword"
+                            type="password"
+                            placeholder="Create or generate a temporary password"
+                            autocomplete="new-password">
+
+                        <button
+                            type="button"
+                            class="password-toggle"
+                            id="togglePassword"
+                            aria-label="Show password">
+
+                            <svg
+                                id="eyeIcon"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8">
+
+                                <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/>
+                                <circle cx="12" cy="12" r="3"/>
+
+                            </svg>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>Account Status</label>
+
+                    <select id="createStatus">
+
+                        <option value="active">
+                            Active
+                        </option>
+
+                        <option value="pending">
+                            Pending
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>&nbsp;</label>
+
+                    <button
+                        type="button"
+                        class="btn btn-light"
+                        id="generatePassword">
+
+                        Generate Secure Password
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-note">
+
+                The temporary password will not be stored in this browser.
+                After successful account creation, it will be displayed
+                once so the Super Administrator can securely provide it
+                to the administrator. The administrator should change it
+                after signing in.
+
+            </div>
+
+
+            <div
+                id="creationCredentials"
+                style="display:none;margin-top:15px;">
+
+            </div>
+
+        </div>
+
+
+        <div class="modal-footer">
+
+            <button
+                class="btn btn-light"
+                data-close="createModal">
+
+                Cancel
+
+            </button>
+
+            <button
+                class="btn btn-primary"
+                id="submitCreateButton">
+
+                Create Administrator
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================
+     CONFIRM MODAL
+========================================================= -->
+
+<div class="modal-layer" id="confirmModal">
+
+    <div class="modal">
+
+        <div class="modal-header">
+
+            <div>
+
+                <h3 id="confirmTitle">
+                    Confirm Action
+                </h3>
+
+                <p id="confirmMessage">
+                    Are you sure you want to continue?
+                </p>
+
+            </div>
+
+            <button class="close-btn" data-close="confirmModal">
+
+                <svg viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="1.8">
+                    <path d="m6 6 12 12"/>
+                    <path d="m18 6-12 12"/>
+                </svg>
+
+            </button>
+
+        </div>
+
+
+        <div class="modal-footer">
+
+            <button
+                class="btn btn-light"
+                data-close="confirmModal">
+
+                Cancel
+
+            </button>
+
+            <button
+                class="btn btn-danger"
+                id="confirmActionButton">
+
+                Confirm
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- TOASTS -->
+
+<div class="toast-container" id="toastContainer"></div>
+
+
+<script>
+"use strict";
+
+/* =========================================================
+   SUPABASE CONFIG
+========================================================= */
+
+const SUPABASE_URL =
+    "https://orkokipqrwsqnslbwpbt.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+    "sb_publishable_sjcK3_WrRNCnz04ePDsuHg_GfsHjr0l";
+
+const SUPER_ADMIN_ID =
+    "35ec4ffa-0b6a-4fb4-a79f-3d4c4289370d";
+
+let supabaseClient = null;
+
+let currentSession = null;
+let currentProfile = null;
+
+let administrators = [];
+let filteredAdministrators = [];
+
+let pendingConfirmAction = null;
+
+
+/* =========================================================
+   DOM HELPERS
+========================================================= */
+
+const $ = (id) => document.getElementById(id);
+
+
+/* =========================================================
+   BOOT
+========================================================= */
+
+document.addEventListener("DOMContentLoaded", async () => {
+
+    try {
+
+        if (!window.supabase) {
+            throw new Error(
+                "Supabase library failed to load."
+            );
+        }
+
+        supabaseClient =
+            window.supabase.createClient(
+                SUPABASE_URL,
+                SUPABASE_PUBLISHABLE_KEY,
+                {
+                    auth: {
+                        persistSession: true,
+                        autoRefreshToken: true,
+                        detectSessionInUrl: true
+                    }
+                }
+            );
+
+        await verifySuperAdmin();
+
+        setupEvents();
+
+        await loadAdministrators();
+
+        showApplication();
+
+        /*
+         * IMPORTANT:
+         * We do not redirect or sign out here after CRUD operations.
+         */
+
+    } catch (error) {
+
+        console.error(error);
+
+        showBootError(
+            error?.message ||
+            "Unable to verify your Super Administrator session."
+        );
+
+    }
+
+});
+
+
+/* =========================================================
+   VERIFY SESSION
+========================================================= */
+
+async function verifySuperAdmin() {
+
+    setBootMessage(
+        "Checking your secure authentication session..."
+    );
+
+    const {
+        data,
+        error
+    } = await supabaseClient.auth.getSession();
+
+    if (error) {
+        throw error;
+    }
+
+    const session = data?.session;
+
+    if (!session?.user) {
+
+        redirectToLogin();
+
+        throw new Error(
+            "No active session was found."
+        );
+    }
+
+    currentSession = session;
+
+    setBootMessage(
+        "Verifying Super Administrator privileges..."
+    );
+
+
+    const {
+        data: profile,
+        error: profileError
+    } = await supabaseClient
+        .from("profiles")
+        .select(
+            "id,full_name,role,account_status"
+        )
+        .eq("id", session.user.id)
+        .maybeSingle();
+
+
+    if (profileError) {
+
+        console.error(
+            "Profile verification error:",
+            profileError
+        );
+
+        throw new Error(
+            "Unable to verify your Super Administrator profile. " +
+            profileError.message
+        );
+    }
+
+
+    if (!profile) {
+
+        await safeLogout();
+
+        redirectToLogin();
+
+        throw new Error(
+            "Your profile could not be found."
+        );
+    }
+
+
+    if (
+        profile.role !== "super_admin" ||
+        profile.account_status !== "active"
+    ) {
+
+        await safeLogout();
+
+        redirectToLogin();
+
+        throw new Error(
+            "This account does not have active Super Administrator access."
+        );
+    }
+
+
+    if (session.user.id !== SUPER_ADMIN_ID) {
+
+        console.warn(
+            "Authenticated Super Admin differs from configured primary Super Admin ID."
+        );
+
+    }
+
+
+    currentProfile = profile;
+
+    $("sidebarUserName").textContent =
+        profile.full_name ||
+        "Super Administrator";
+
+
+    setBootMessage(
+        "Secure session verified. Loading administrator management..."
+    );
+
+}
+
+
+/* =========================================================
+   LOAD ADMINISTRATORS
+========================================================= */
+
+async function loadAdministrators() {
+
+    renderTableLoading();
+
+    const {
+        data,
+        error
+    } = await supabaseClient
+        .rpc("list_administrators");
+
+
+    if (error) {
+
+        console.error(
+            "list_administrators error:",
+            error
+        );
+
+        renderTableError(
+            "Unable to load administrators: " +
+            error.message
+        );
+
+        showToast(
+            "Unable to load administrators",
+            error.message,
+            "error"
+        );
+
+        return;
+    }
+
+
+    administrators =
+        Array.isArray(data)
+            ? data
+            : [];
+
+    applyFilters();
+
+    updateStatistics();
+}
+
+
+/* =========================================================
+   FILTERS
+========================================================= */
+
+function applyFilters() {
+
+    const search =
+        $("searchInput")
+            .value
+            .trim()
+            .toLowerCase();
+
+    const status =
+        $("statusFilter").value;
+
+
+    filteredAdministrators =
+        administrators.filter(admin => {
+
+            const matchesSearch =
+                !search ||
+                String(admin.full_name || "")
+                    .toLowerCase()
+                    .includes(search) ||
+                String(admin.email || "")
+                    .toLowerCase()
+                    .includes(search) ||
+                String(admin.id || "")
+                    .toLowerCase()
+                    .includes(search);
+
+
+            const matchesStatus =
+                status === "all" ||
+                admin.account_status === status;
+
+
+            return matchesSearch && matchesStatus;
+
+        });
+
+
+    renderTable();
+}
+
+
+/* =========================================================
+   STATISTICS
+========================================================= */
+
+function updateStatistics() {
+
+    const total =
+        administrators.length;
+
+    const active =
+        administrators.filter(
+            a => a.account_status === "active"
+        ).length;
+
+    const inactive =
+        administrators.filter(
+            a => a.account_status === "inactive"
+        ).length;
+
+    const suspended =
+        administrators.filter(
+            a => a.account_status === "suspended"
+        ).length;
+
+
+    $("totalAdmins").textContent =
+        total;
+
+    $("activeAdmins").textContent =
+        active;
+
+    $("inactiveAdmins").textContent =
+        inactive;
+
+    $("suspendedAdmins").textContent =
+        suspended;
+}
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+function renderTableLoading() {
+
+    $("adminsTableBody").innerHTML = `
+        <tr>
+            <td colspan="6">
+                <div class="state">
+                    <div class="mini-loader"></div>
+                    <p>Loading administrators...</p>
+                </div>
+            </td>
+        </tr>
+    `;
+}
+
+
+function renderTableError(message) {
+
+    $("adminsTableBody").innerHTML = `
+        <tr>
+            <td colspan="6">
+                <div class="state">
+
+                    <svg viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="1.7">
+
+                        <circle cx="12" cy="12" r="9"/>
+                        <path d="M12 8v4"/>
+                        <path d="M12 16h.01"/>
+
+                    </svg>
+
+                    <h4>Unable to load administrators</h4>
+
+                    <p>${escapeHtml(message)}</p>
+
+                </div>
+            </td>
+        </tr>
+    `;
+}
+
+
+function renderTable() {
+
+    if (!filteredAdministrators.length) {
+
+        $("adminsTableBody").innerHTML = `
+            <tr>
+                <td colspan="6">
+
+                    <div class="state">
+
+                        <svg viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="1.6">
+
+                            <circle cx="12" cy="12" r="9"/>
+                            <path d="M8 12h8"/>
+
+                        </svg>
+
+                        <h4>No administrators found</h4>
+
+                        <p>
+                            There are no administrators matching
+                            the current search or status filter.
+                        </p>
+
+                    </div>
+
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+
+
+    $("adminsTableBody").innerHTML =
+        filteredAdministrators
+            .map(admin => createAdminRow(admin))
+            .join("");
+}
+
+
+function createAdminRow(admin) {
+
+    const name =
+        admin.full_name ||
+        "Unnamed Administrator";
+
+    const email =
+        admin.email ||
+        "No email available";
+
+    const initials =
+        getInitials(name);
+
+    const status =
+        admin.account_status ||
+        "pending";
+
+    return `
+        <tr>
+
+            <td>
+
+                <div class="admin-cell">
+
+                    <div class="avatar">
+                        ${escapeHtml(initials)}
+                    </div>
+
+                    <div>
+
+                        <div class="admin-name">
+                            ${escapeHtml(name)}
+                        </div>
+
+                        <div class="admin-email">
+                            ${escapeHtml(email)}
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </td>
+
+
+            <td>
+
+                <div class="id-text"
+                     title="${escapeHtml(admin.id)}">
+
+                    ${escapeHtml(shortId(admin.id))}
+
+                </div>
+
+            </td>
+
+
+            <td>
+
+                <span class="badge ${escapeHtml(status)}">
+
+                    ${escapeHtml(formatStatus(status))}
+
+                </span>
+
+            </td>
+
+
+            <td>
+                ${formatDate(admin.created_at)}
+            </td>
+
+
+            <td>
+                ${formatDate(admin.updated_at)}
+            </td>
+
+
+            <td>
+
+                <div class="actions">
+
+                    <button
+                        class="icon-btn"
+                        title="View / Edit"
+                        data-action="edit"
+                        data-id="${escapeHtml(admin.id)}">
+
+                        <svg viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="1.8">
+
+                            <path d="M12 20h9"/>
+                            <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z"/>
+
+                        </svg>
+
+                    </button>
+
+
+                    ${
+                        status === "inactive"
+                        ? `
+                            <button
+                                class="icon-btn"
+                                title="Restore"
+                                data-action="restore"
+                                data-id="${escapeHtml(admin.id)}">
+
+                                <svg viewBox="0 0 24 24"
+                                     fill="none"
+                                     stroke="currentColor"
+                                     stroke-width="1.8">
+
+                                    <path d="M3 12a9 9 0 1 0 3-6.7"/>
+                                    <path d="M3 4v5h5"/>
+
+                                </svg>
+
+                            </button>
+                        `
+                        : `
+                            <button
+                                class="icon-btn"
+                                title="Archive"
+                                data-action="archive"
+                                data-id="${escapeHtml(admin.id)}">
+
+                                <svg viewBox="0 0 24 24"
+                                     fill="none"
+                                     stroke="currentColor"
+                                     stroke-width="1.8">
+
+                                    <path d="M3 7h18"/>
+                                    <path d="M5 7v13h14V7"/>
+                                    <path d="M8 7V4h8v3"/>
+
+                                </svg>
+
+                            </button>
+                        `
+                    }
+
+
+                    <button
+                        class="icon-btn danger"
+                        title="Delete profile"
+                        data-action="delete"
+                        data-id="${escapeHtml(admin.id)}">
+
+                        <svg viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="1.8">
+
+                            <path d="M3 6h18"/>
+                            <path d="M8 6V4h8v2"/>
+                            <path d="M19 6l-1 15H6L5 6"/>
+                            <path d="M10 11v6"/>
+                            <path d="M14 11v6"/>
+
+                        </svg>
+
+                    </button>
+
+                </div>
+
+            </td>
+
+        </tr>
+    `;
+}
+
+
+/* =========================================================
+   EDIT ADMIN
+========================================================= */
+
+async function openEditAdmin(id) {
+
+    const admin =
+        administrators.find(
+            item => item.id === id
+        );
+
+    if (!admin) {
+
+        showToast(
+            "Administrator not found",
+            "The selected administrator could not be found.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    $("editAdminId").value =
+        admin.id || "";
+
+    $("editFullName").value =
+        admin.full_name || "";
+
+    $("editEmail").value =
+        admin.email || "";
+
+    $("editStatus").value =
+        admin.account_status || "active";
+
+
+    openModal("editModal");
+}
+
+
+async function saveAdminEdit() {
+
+    const id =
+        $("editAdminId").value;
+
+    const fullName =
+        $("editFullName")
+            .value
+            .trim();
+
+    const status =
+        $("editStatus").value;
+
+
+    if (!id) {
+
+        showToast(
+            "Missing administrator ID",
+            "The administrator could not be identified.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    if (!fullName) {
+
+        showToast(
+            "Full name required",
+            "Enter the administrator's full name.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    const button =
+        $("saveEditButton");
+
+    setButtonLoading(
+        button,
+        "Saving..."
+    );
+
+
+    const {
+        error
+    } = await supabaseClient
+        .rpc(
+            "update_admin_profile",
+            {
+                target_user_id: id,
+                new_full_name: fullName,
+                new_account_status: status
+            }
+        );
+
+
+    restoreButton(
+        button,
+        "Save Changes"
+    );
+
+
+    if (error) {
+
+        showToast(
+            "Update failed",
+            error.message,
+            "error"
+        );
+
+        return;
+    }
+
+
+    closeModal("editModal");
+
+
+    showToast(
+        "Administrator updated",
+        "The administrator profile has been updated successfully.",
+        "success"
+    );
+
+
+    await loadAdministrators();
+}
+
+
+/* =========================================================
+   ARCHIVE
+========================================================= */
+
+function requestArchive(id) {
+
+    const admin =
+        administrators.find(
+            item => item.id === id
+        );
+
+    if (!admin) return;
+
+
+    pendingConfirmAction =
+        async () => {
+
+            const {
+                error
+            } = await supabaseClient
+                .rpc(
+                    "archive_admin",
+                    {
+                        target_user_id: id
+                    }
+                );
+
+
+            if (error) {
+
+                showToast(
+                    "Archive failed",
+                    error.message,
+                    "error"
+                );
+
+                return;
+            }
+
+
+            showToast(
+                "Administrator archived",
+                `${admin.full_name || "Administrator"} is now inactive.`,
+                "success"
+            );
+
+
+            await loadAdministrators();
+        };
+
+
+    $("confirmTitle").textContent =
+        "Archive Administrator";
+
+    $("confirmMessage").textContent =
+        `Archive ${admin.full_name || "this administrator"}? ` +
+        "The profile will remain in the system but will become inactive.";
+
+    $("confirmActionButton").textContent =
+        "Archive";
+
+    $("confirmActionButton").className =
+        "btn btn-warning";
+
+    openModal("confirmModal");
+}
+
+
+/* =========================================================
+   RESTORE
+========================================================= */
+
+function requestRestore(id) {
+
+    const admin =
+        administrators.find(
+            item => item.id === id
+        );
+
+    if (!admin) return;
+
+
+    pendingConfirmAction =
+        async () => {
+
+            const {
+                error
+            } = await supabaseClient
+                .rpc(
+                    "restore_admin",
+                    {
+                        target_user_id: id
+                    }
+                );
+
+
+            if (error) {
+
+                showToast(
+                    "Restore failed",
+                    error.message,
+                    "error"
+                );
+
+                return;
+            }
+
+
+            showToast(
+                "Administrator restored",
+                `${admin.full_name || "Administrator"} is active again.`,
+                "success"
+            );
+
+
+            await loadAdministrators();
+        };
+
+
+    $("confirmTitle").textContent =
+        "Restore Administrator";
+
+    $("confirmMessage").textContent =
+        `Restore ${admin.full_name || "this administrator"}?`;
+
+    $("confirmActionButton").textContent =
+        "Restore";
+
+    $("confirmActionButton").className =
+        "btn btn-success";
+
+    openModal("confirmModal");
+}
+
+
+/* =========================================================
+   DELETE PROFILE
+========================================================= */
+
+function requestDelete(id) {
+
+    const admin =
+        administrators.find(
+            item => item.id === id
+        );
+
+    if (!admin) return;
+
+
+    pendingConfirmAction =
+        async () => {
+
+            const {
+                error
+            } = await supabaseClient
+                .rpc(
+                    "delete_admin_profile",
+                    {
+                        target_user_id: id
+                    }
+                );
+
+
+            if (error) {
+
+                showToast(
+                    "Delete failed",
+                    error.message,
+                    "error"
+                );
+
+                return;
+            }
+
+
+            showToast(
+                "Profile deleted",
+                "The administrator profile record has been deleted.",
+                "success"
+            );
+
+
+            await loadAdministrators();
+        };
+
+
+    $("confirmTitle").textContent =
+        "Delete Administrator Profile";
+
+    $("confirmMessage").textContent =
+        `Delete the profile for ${admin.full_name || "this administrator"}? ` +
+        "This removes the profile record. It does not permanently delete the Supabase Auth account.";
+
+    $("confirmActionButton").textContent =
+        "Delete Profile";
+
+    $("confirmActionButton").className =
+        "btn btn-danger";
+
+    openModal("confirmModal");
+}
+
+
+/* =========================================================
+   CREATE ADMIN
+========================================================= */
+
+function openCreateAdmin() {
+
+    $("createFullName").value = "";
+    $("createEmail").value = "";
+    $("createPassword").value = "";
+    $("createStatus").value = "active";
+
+    $("creationCredentials").style.display =
+        "none";
+
+    $("creationCredentials").innerHTML =
+        "";
+
+    openModal("createModal");
+}
+
+
+async function createAdministrator() {
+
+    const fullName =
+        $("createFullName")
+            .value
+            .trim();
+
+    const email =
+        $("createEmail")
+            .value
+            .trim()
+            .toLowerCase();
+
+    const password =
+        $("createPassword")
+            .value;
+
+    const status =
+        $("createStatus").value;
+
+
+    if (!fullName) {
+
+        showToast(
+            "Full name required",
+            "Enter the administrator's full name.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    if (!isValidEmail(email)) {
+
+        showToast(
+            "Invalid email",
+            "Enter a valid administrator email address.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    if (password.length < 8) {
+
+        showToast(
+            "Password too short",
+            "The temporary password must contain at least 8 characters.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    const button =
+        $("submitCreateButton");
+
+    setButtonLoading(
+        button,
+        "Creating..."
+    );
+
+
+    /*
+     * SECURITY:
+     *
+     * This calls a Supabase Edge Function.
+     *
+     * The service-role key must NEVER be placed
+     * inside this HTML file.
+     *
+     * Expected Edge Function:
+     *
+     * admin-create-user
+     */
+
+
+    let result;
+
+
+    try {
+
+        result =
+            await supabaseClient.functions.invoke(
+                "admin-create-user",
+                {
+                    body: {
+                        full_name: fullName,
+                        email: email,
+                        password: password,
+                        account_status: status
+                    }
+                }
+            );
+
+    } catch (error) {
+
+        restoreButton(
+            button,
+            "Create Administrator"
+        );
+
+        showToast(
+            "Creation service unavailable",
+            "The administrator creation Edge Function is not deployed or cannot be reached yet.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    restoreButton(
+        button,
+        "Create Administrator"
+    );
+
+
+    if (result.error) {
+
+        console.error(
+            "Admin creation error:",
+            result.error
+        );
+
+        showToast(
+            "Administrator creation failed",
+            result.error.message ||
+            "The creation service returned an error.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    const created =
+        result.data;
+
+
+    /*
+     * Show credentials only after successful creation.
+     * The password is never saved to localStorage.
+     */
+
+    $("creationCredentials").innerHTML = `
+
+        <div class="credentials">
+
+            <div class="credentials-title">
+                Administrator created successfully
+            </div>
+
+            <div class="credentials-warning">
+                Keep these temporary credentials secure.
+                The password is shown here only for this session.
+                Ask the administrator to change it after first login.
+            </div>
+
+
+            <div class="credential-row">
+
+                <label>Email</label>
+
+                <div class="credential-value"
+                     id="createdEmail">
+                    ${escapeHtml(
+                        created?.email || email
+                    )}
+                </div>
+
+                <button
+                    class="btn btn-light btn-small"
+                    data-copy-target="createdEmail">
+
+                    Copy
+
+                </button>
+
+            </div>
+
+
+            <div class="credential-row">
+
+                <label>Password</label>
+
+                <div class="credential-value"
+                     id="createdPassword">
+                    ${escapeHtml(password)}
+                </div>
+
+                <button
+                    class="btn btn-light btn-small"
+                    data-copy-target="createdPassword">
+
+                    Copy
+
+                </button>
+
+            </div>
+
+        </div>
+    `;
+
+    $("creationCredentials").style.display =
+        "block";
+
+
+    /*
+     * Do not close the modal immediately.
+     * The Super Admin needs to see the credentials.
+     */
+
+    $("submitCreateButton").textContent =
+        "Administrator Created";
+
+
+    $("submitCreateButton").disabled =
+        true;
+
+
+    showToast(
+        "Administrator created",
+        "The new administrator account has been created.",
+        "success"
+    );
+
+
+    await loadAdministrators();
+}
+
+
+/* =========================================================
+   PASSWORD GENERATOR
+========================================================= */
+
+function generateSecurePassword() {
+
+    const upper =
+        "ABCDEFGHJKLMNPQRSTUVWXYZ";
+
+    const lower =
+        "abcdefghijkmnopqrstuvwxyz";
+
+    const numbers =
+        "23456789";
+
+    const symbols =
+        "!@#$%&*";
+
+    const all =
+        upper +
+        lower +
+        numbers +
+        symbols;
+
+
+    let password =
+        pickRandom(upper) +
+        pickRandom(lower) +
+        pickRandom(numbers) +
+        pickRandom(symbols);
+
+
+    while (password.length < 12) {
+
+        password +=
+            pickRandom(all);
+
+    }
+
+
+    password =
+        shuffle(password);
+
+
+    $("createPassword").value =
+        password;
+
+    $("createPassword").type =
+        "text";
+}
+
+
+function pickRandom(string) {
+
+    if (
+        window.crypto &&
+        window.crypto.getRandomValues
+    ) {
+
+        const array =
+            new Uint32Array(1);
+
+        window.crypto.getRandomValues(
+            array
+        );
+
+        return string[
+            array[0] % string.length
+        ];
+
+    }
+
+    return string[
+        Math.floor(
+            Math.random() *
+            string.length
+        )
+    ];
+}
+
+
+function shuffle(value) {
+
+    return value
+        .split("")
+        .sort(() => Math.random() - .5)
+        .join("");
+}
+
+
+/* =========================================================
+   EVENTS
+========================================================= */
+
+function setupEvents() {
+
+    $("backDashboard")
+        .addEventListener(
+            "click",
+            () => {
+                window.location.href =
+                    "./super-admin-dashboard.html";
+            }
+        );
+
+
+    $("logoutButton")
+        .addEventListener(
+            "click",
+            logout
+        );
+
+
+    $("refreshButton")
+        .addEventListener(
+            "click",
+            loadAdministrators
+        );
+
+
+    $("createAdminButton")
+        .addEventListener(
+            "click",
+            openCreateAdmin
+        );
+
+
+    $("submitCreateButton")
+        .addEventListener(
+            "click",
+            createAdministrator
+        );
+
+
+    $("generatePassword")
+        .addEventListener(
+            "click",
+            generateSecurePassword
+        );
+
+
+    $("togglePassword")
+        .addEventListener(
+            "click",
+            togglePassword
+        );
+
+
+    $("saveEditButton")
+        .addEventListener(
+            "click",
+            saveAdminEdit
+        );
+
+
+    $("searchInput")
+        .addEventListener(
+            "input",
+            applyFilters
+        );
+
+
+    $("statusFilter")
+        .addEventListener(
+            "change",
+            applyFilters
+        );
+
+
+    $("confirmActionButton")
+        .addEventListener(
+            "click",
+            async () => {
+
+                if (
+                    typeof pendingConfirmAction !==
+                    "function"
+                ) {
+                    closeModal("confirmModal");
+                    return;
+                }
+
+
+                const action =
+                    pendingConfirmAction;
+
+                pendingConfirmAction =
+                    null;
+
+
+                closeModal(
+                    "confirmModal"
+                );
+
+
+                await action();
+
+            }
+        );
+
+
+    $("adminsTableBody")
+        .addEventListener(
+            "click",
+            event => {
+
+                const button =
+                    event.target.closest(
+                        "[data-action]"
+                    );
+
+                if (!button) return;
+
+
+                const action =
+                    button.dataset.action;
+
+                const id =
+                    button.dataset.id;
+
+
+                if (action === "edit") {
+                    openEditAdmin(id);
+                }
+
+                if (action === "archive") {
+                    requestArchive(id);
+                }
+
+                if (action === "restore") {
+                    requestRestore(id);
+                }
+
+                if (action === "delete") {
+                    requestDelete(id);
+                }
+
+            }
+        );
+
+
+    document.addEventListener(
+        "click",
+        async event => {
+
+            const button =
+                event.target.closest(
+                    "[data-copy-target]"
+                );
+
+            if (!button) return;
+
+
+            const target =
+                $(button.dataset.copyTarget);
+
+            if (!target) return;
+
+
+            try {
+
+                await navigator.clipboard.writeText(
+                    target.textContent.trim()
+                );
+
+                button.textContent =
+                    "Copied";
+
+                setTimeout(
+                    () => {
+                        button.textContent =
+                            "Copy";
+                    },
+                    1200
+                );
+
+            } catch {
+
+                showToast(
+                    "Copy failed",
+                    "Unable to copy this value automatically.",
+                    "error"
+                );
+
+            }
+
+        }
+    );
+
+
+    document.querySelectorAll(
+        "[data-close]"
+    ).forEach(button => {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                closeModal(
+                    button.dataset.close
+                );
+
+            }
+        );
+
+    });
+
+
+    $("mobileMenu")
+        .addEventListener(
+            "click",
+            () => {
+
+                $("sidebar")
+                    .classList
+                    .toggle("open");
+
+            }
+        );
+
+
+    /*
+     * Close modal by clicking outside.
+     */
+
+    document.querySelectorAll(
+        ".modal-layer"
+    ).forEach(layer => {
+
+        layer.addEventListener(
+            "click",
+            event => {
+
+                if (
+                    event.target === layer
+                ) {
+
+                    closeModal(
+                        layer.id
+                    );
+
+                }
+
+            }
+        );
+
+    });
+
+
+    /*
+     * Auth state listener.
+     *
+     * IMPORTANT:
+     * We do NOT redirect when normal database operations happen.
+     *
+     * Only an actual SIGNED_OUT event sends the user to login.
+     */
+
+    supabaseClient.auth.onAuthStateChange(
+        (event, session) => {
+
+            if (
+                event === "SIGNED_OUT" ||
+                !session
+            ) {
+
+                redirectToLogin();
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   PASSWORD TOGGLE
+========================================================= */
+
+function togglePassword() {
+
+    const input =
+        $("createPassword");
+
+    const currentlyHidden =
+        input.type === "password";
+
+    input.type =
+        currentlyHidden
+            ? "text"
+            : "password";
+}
+
+
+/* =========================================================
+   MODALS
+========================================================= */
+
+function openModal(id) {
+
+    const modal =
+        $(id);
+
+    if (!modal) return;
+
+    modal.classList.add("show");
+
+    document.body.style.overflow =
+        "hidden";
+}
+
+
+function closeModal(id) {
+
+    const modal =
+        $(id);
+
+    if (!modal) return;
+
+    modal.classList.remove("show");
+
+    if (
+        !document.querySelector(
+            ".modal-layer.show"
+        )
+    ) {
+
+        document.body.style.overflow =
+            "";
+
+    }
+
+}
+
+
+/* =========================================================
+   APPLICATION DISPLAY
+========================================================= */
+
+function showApplication() {
+
+    $("application").hidden =
+        false;
+
+    setTimeout(
+        () => {
+
+            $("bootScreen")
+                .classList
+                .add("hidden");
+
+        },
+        150
+    );
+
+}
+
+
+/* =========================================================
+   BOOT ERROR
+========================================================= */
+
+function setBootMessage(message) {
+
+    $("bootMessage")
+        .textContent =
+        message;
+
+}
+
+
+function showBootError(message) {
+
+    $("bootLoader")
+        .style.display =
+        "none";
+
+    $("bootMessage")
+        .textContent =
+        "Administrator management could not be loaded.";
+
+    const error =
+        $("bootError");
+
+    error.textContent =
+        message;
+
+    error.classList.add(
+        "show"
+    );
+
+}
+
+
+/* =========================================================
+   LOGIN / LOGOUT
+========================================================= */
+
+function redirectToLogin() {
+
+    window.location.replace(
+        "./super-admin-login.html"
+    );
+
+}
+
+
+async function safeLogout() {
+
+    try {
+
+        await supabaseClient.auth.signOut();
+
+    } catch (error) {
+
+        console.error(
+            "Logout error:",
+            error
+        );
+
+    }
+
+}
+
+
+async function logout() {
+
+    const confirmed =
+        window.confirm(
+            "Are you sure you want to sign out of the Super Administrator account?"
+        );
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    await safeLogout();
+
+    window.location.replace(
+        "./super-admin-login.html"
+    );
+
+}
+
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+function showToast(
+    title,
+    message,
+    type = "info"
+) {
+
+    const container =
+        $("toastContainer");
+
+    const toast =
+        document.createElement(
+            "div"
+        );
+
+    toast.className =
+        `toast ${type}`;
+
+
+    const icon =
+        type === "success"
+            ? `
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2">
+
+                    <path d="M20 6 9 17l-5-5"/>
+
+                </svg>
+            `
+            : type === "error"
+            ? `
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2">
+
+                    <circle cx="12" cy="12" r="9"/>
+                    <path d="M12 8v4"/>
+                    <path d="M12 16h.01"/>
+
+                </svg>
+            `
+            : `
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2">
+
+                    <circle cx="12" cy="12" r="9"/>
+                    <path d="M12 8v4"/>
+                    <path d="M12 16h.01"/>
+
+                </svg>
+            `;
+
+
+    toast.innerHTML = `
+
+        <div class="toast-icon">
+            ${icon}
+        </div>
+
+        <div>
+
+            <strong>
+                ${escapeHtml(title)}
+            </strong>
+
+            <p>
+                ${escapeHtml(message)}
+            </p>
+
+        </div>
+    `;
+
+
+    container.appendChild(
+        toast
+    );
+
+
+    setTimeout(
+        () => {
+
+            toast.style.opacity =
+                "0";
+
+            toast.style.transform =
+                "translateY(8px)";
+
+            setTimeout(
+                () => toast.remove(),
+                200
+            );
+
+        },
+        4500
+    );
+
+}
+
+
+/* =========================================================
+   BUTTON HELPERS
+========================================================= */
+
+function setButtonLoading(
+    button,
+    text
+) {
+
+    button.disabled =
+        true;
+
+    button.dataset.originalText =
+        button.textContent;
+
+    button.textContent =
+        text;
+}
+
+
+function restoreButton(
+    button,
+    fallback
+) {
+
+    button.disabled =
+        false;
+
+    button.textContent =
+        button.dataset.originalText ||
+        fallback;
+}
+
+
+/* =========================================================
+   FORMATTING
+========================================================= */
+
+function formatStatus(status) {
+
+    const map = {
+        active: "Active",
+        inactive: "Inactive",
+        suspended: "Suspended",
+        pending: "Pending"
+    };
+
+    return map[status] ||
+        status ||
+        "Unknown";
+}
+
+
+function formatDate(value) {
+
+    if (!value) {
+        return "—";
+    }
+
+    const date =
+        new Date(value);
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return "—";
+
+    }
+
+    return date.toLocaleDateString(
+        "en-NG",
+        {
+            day:"2-digit",
+            month:"short",
+            year:"numeric"
+        }
+    );
+
+}
+
+
+function getInitials(name) {
+
+    const words =
+        String(name)
+            .trim()
+            .split(/\s+/)
+            .filter(Boolean);
+
+
+    if (!words.length) {
+        return "AD";
+    }
+
+
+    if (words.length === 1) {
+
+        return words[0]
+            .slice(0,2)
+            .toUpperCase();
+
+    }
+
+
+    return (
+        words[0][0] +
+        words[words.length - 1][0]
+    ).toUpperCase();
+
+}
+
+
+function shortId(id) {
+
+    if (!id) {
+        return "—";
+    }
+
+    return (
+        id.slice(0,8) +
+        "..." +
+        id.slice(-6)
+    );
+
+}
+
+
+function isValidEmail(email) {
+
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        .test(email);
+
+}
+
+
+/* =========================================================
+   HTML ESCAPING
+========================================================= */
+
+function escapeHtml(value) {
+
+    return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+
+}
+</script>
+
+</body>
+</html>
